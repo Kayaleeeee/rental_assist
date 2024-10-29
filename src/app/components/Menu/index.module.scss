@@ -1,0 +1,46 @@
+@mixin commonWrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  box-shadow: var(--shadow);
+  min-height: calc(100vh - 70px);
+}
+
+.wrapper {
+  @include commonWrapper();
+  width: 200px;
+}
+
+.hiddenMenuWrapper {
+  @include commonWrapper();
+  overflow: hidden;
+  width: 60px;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  padding: 16px;
+  height: 60px;
+
+  &:hover {
+    font-weight: 800;
+  }
+}
+
+.icon {
+  width: 24px;
+  margin-right: 8px;
+}
+
+.hideMenu {
+  display: inline-flex;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgb(232, 232, 232);
+
+  &:hover {
+    cursor: pointer;
+  }
+}
