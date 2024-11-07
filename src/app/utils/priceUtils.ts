@@ -1,6 +1,4 @@
 export function formatKoreanCurrency(amount: number): string {
-  if (amount === 0) return "0원";
-
   if (amount >= 100000000) {
     return `${Math.floor(amount / 100000000)}억 ${formatKoreanCurrency(
       amount % 100000000

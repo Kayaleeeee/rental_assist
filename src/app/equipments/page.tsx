@@ -2,9 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "../components/Button";
+import { useEffect } from "react";
+import { getEquipmentList } from "../api/equipments";
 
 export default function EquipmentPage() {
   const router = useRouter();
+
+  useEffect(() => {
+    getEquipmentList().then((res) => console.log(res));
+  });
 
   return (
     <div>

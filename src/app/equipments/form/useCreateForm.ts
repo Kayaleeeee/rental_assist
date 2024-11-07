@@ -1,16 +1,23 @@
+import { createEquipment } from "@/app/api/equipments";
+import {
+  EquipmentCategory,
+  EquipmentPostBody,
+} from "@/app/types/equipmentType";
 import { useCallback, useState } from "react";
 
 const categoryMenu = [
-  { key: "camera", title: "카메라" },
-  { key: "accessary", title: "악세서리" },
+  { key: EquipmentCategory.camera, title: "카메라" },
+  { key: EquipmentCategory.accessary, title: "악세서리" },
 ];
 
 export const useCreateForm = () => {
-  const [category, setCategory] = useState<{ key: string; title: string }>(
-    categoryMenu[0]
-  );
+  const [category, setCategory] = useState<{
+    key: EquipmentCategory;
+    title: string;
+  }>(categoryMenu[0]);
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
+  const [detail, setDetail] = useState<string>("");
 
   const onChangeCategory = (key: string) => {
     const selectedCategoryIndex = categoryMenu.findIndex(
@@ -22,15 +29,17 @@ export const useCreateForm = () => {
     setCategory(categoryMenu[selectedCategoryIndex]);
   };
 
-  const submitEquipmentForm = useCallback(() => {
-    const form = {
-      category,
+  const submitEquipmentForm = useCallback(async () => {
+    const form: EquipmentPostBody = {
+      category: category.key,
       title,
       price,
+      detail,
     };
 
-    console.log(form);
-  }, []);
+    const data = await createEquipment(form);
+    console.log(data);
+  }, [category, title, price, detail]);
 
   return {
     categoryMenu,
@@ -40,6 +49,8 @@ export const useCreateForm = () => {
     setTitle,
     price,
     setPrice,
+    detail,
+    setDetail,
     submitEquipmentForm,
   };
 };

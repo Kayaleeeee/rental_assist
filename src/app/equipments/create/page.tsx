@@ -18,6 +18,8 @@ const EquipmentCreatePage = () => {
     price,
     setPrice,
     submitEquipmentForm,
+    detail,
+    setDetail,
   } = useCreateForm();
 
   return (
@@ -51,7 +53,6 @@ const EquipmentCreatePage = () => {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
-
       <div className={styles.sectionWrapper}>
         <Label title="렌탈 가격" />
         <TextField
@@ -69,6 +70,17 @@ const EquipmentCreatePage = () => {
         <div className={styles.convertedPrice}>
           {formatKoreanCurrency(price)}
         </div>
+      </div>
+
+      <div className={styles.sectionWrapper}>
+        <Label title="상세 정보" />
+        <TextField
+          fullWidth
+          multiline
+          value={detail}
+          placeholder="상세 정보를 입력해주세요."
+          onChange={(e) => setDetail(e.target.value)}
+        />
       </div>
 
       <div className={styles.buttonWrapper}>
