@@ -1,19 +1,20 @@
-import { EquipmentPostBody } from "@/app/types/equipmentType";
-import { apiClient } from "..";
+import {
+  EquipmentDetailType,
+  EquipmentListItemType,
+  EquipmentPostBody,
+} from "@/app/types/equipmentType";
+import { apiGet, apiPost } from "..";
 
-const client = apiClient.from("equipments");
+const apiUrl = "/equipments";
 
-export const getEquipmentList = async () => {
-  const { data, error } = await client.select("*");
-
-  return {
-    data,
-    error,
-  };
+export const getEquipmentList = () => {
+  return apiGet<EquipmentListItemType[]>(apiUrl);
 };
 
-export const createEquipment = async (payload: EquipmentPostBody) => {
-  const { data, error } = await client.insert([payload]);
+export const createEquipment = (payload: EquipmentPostBody) => {
+  return apiPost(apiUrl, payload);
+};
 
-  return { data, error };
+export const getEquipmentDetail = (id: number) => {
+  return apiGet<EquipmentDetailType[]>(apiUrl, { id });
 };
