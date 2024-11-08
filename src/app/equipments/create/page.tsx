@@ -2,11 +2,12 @@
 
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
 import { MenuItem, Select, TextField } from "@mui/material";
-import { useCreateForm } from "../form/useCreateForm";
+import { useCreateForm } from "../hooks/useCreateForm";
 import { Label } from "@/app/components/Form/Label";
-import styles from "./page.module.scss";
+import styles from "../page.module.scss";
 import { Button } from "@/app/components/Button";
 import { formatKoreanCurrency } from "@/app/utils/priceUtils";
+import { EditableField } from "@/app/components/EditableField";
 
 const EquipmentCreatePage = () => {
   const {
@@ -47,7 +48,7 @@ const EquipmentCreatePage = () => {
 
       <div className={styles.sectionWrapper}>
         <Label title="장비명" />
-        <TextField
+        <EditableField
           fullWidth
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -67,6 +68,7 @@ const EquipmentCreatePage = () => {
             setPrice(value);
           }}
         />
+        <div style={{ marginTop: "10px" }} />
         <div className={styles.convertedPrice}>
           {formatKoreanCurrency(price)}
         </div>

@@ -3,6 +3,7 @@ import {
   EquipmentCategory,
   EquipmentPostBody,
 } from "@/app/types/equipmentType";
+import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 const categoryMenu = [
@@ -11,6 +12,7 @@ const categoryMenu = [
 ];
 
 export const useCreateForm = () => {
+  const router = useRouter();
   const [category, setCategory] = useState<{
     key: EquipmentCategory;
     title: string;
@@ -37,8 +39,12 @@ export const useCreateForm = () => {
       detail,
     };
 
-    const data = await createEquipment(form);
-    console.log(data);
+    try {
+      await createEquipment(form);
+      router.push("/equipments");
+    } catch (e) {
+      console.log("등록 실패", e);
+    }
   }, [category, title, price, detail]);
 
   return {
