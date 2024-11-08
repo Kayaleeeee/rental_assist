@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <nav className="navWrapper">
-          <h1 className="mainTitle">Title</h1>
+          <h1 className="mainTitle">Rental Assist</h1>
         </nav>
         <div className="mainWrapper">
           <aside>
