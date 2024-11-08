@@ -16,6 +16,17 @@
   display: flex;
   width: 100%;
   justify-content: flex-end;
-  margin-top: 10px;
   color: var(--grey);
+}
+
+.rightAlignButtonWrapper {
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.detailPriceWrapper {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
 }
