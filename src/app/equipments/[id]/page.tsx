@@ -6,11 +6,15 @@ import styles from "../page.module.scss";
 import { EditableField } from "@/app/components/EditableField";
 import { Label } from "@/app/components/Form/Label";
 import { Button } from "@/app/components/Button";
-import { formatKoreanCurrency } from "@/app/utils/priceUtils";
+import {
+  formatKoreanCurrency,
+  formatLocaleString,
+} from "@/app/utils/priceUtils";
 import { useEquipmentDetail } from "../hooks/useEquipmentDetail";
 import { useParams, useRouter } from "next/navigation";
 import { EquipmentCategoryList } from "@/app/types/equipmentType";
 import { useMemo } from "react";
+import { ListButton } from "@/app/components/Button/ListButton";
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
@@ -31,54 +35,66 @@ const EquipmentDetailPage = () => {
   if (!equipmentDetail) return null;
 
   return (
-    <FormWrapper>
-      <div className={styles.sectionWrapper}>
-        <Label title="카테고리" />
-        <EditableField isEditable={false} value={selectedCategory} />
-      </div>
+    <>
+      <ListButton
+        title="목록 보기"
+        onClick={() => router.push("/equipments")}
+        style={{
+          marginBottom: "16px",
+        }}
+      />
+      <FormWrapper>
+        <div className={styles.sectionWrapper}>
+          <Label title="카테고리" />
+          <EditableField isEditable={false} value={selectedCategory} />
+        </div>
 
-      <div className={styles.sectionWrapper}>
-        <Label title="장비명" />
-        <EditableField
-          isEditable={false}
-          fullWidth
-          value={equipmentDetail.title}
-        />
-      </div>
-      <div className={styles.sectionWrapper}>
-        <Label title="렌탈 가격" />
-        <div className={styles.detailPriceWrapper}>
+        <div className={styles.sectionWrapper}>
+          <Label title="장비명" />
           <EditableField
             isEditable={false}
             fullWidth
-            value={equipmentDetail.price}
+            value={equipmentDetail.title}
           />
-          <div className={styles.convertedPrice} style={{ marginLeft: "10px" }}>
-            ({formatKoreanCurrency(equipmentDetail.price)})
+        </div>
+        <div className={styles.sectionWrapper}>
+          <Label title="렌탈 가격" />
+          <div className={styles.detailPriceWrapper}>
+            <EditableField
+              isEditable={false}
+              fullWidth
+              value={formatLocaleString(equipmentDetail.price)}
+            />
+            <div
+              className={styles.convertedPrice}
+              style={{ marginLeft: "10px" }}
+            >
+              ({formatKoreanCurrency(equipmentDetail.price)})
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className={styles.sectionWrapper}>
-        <Label title="상세 정보" />
-        <EditableField
-          isEditable={false}
-          fullWidth
-          multiline
-          value={equipmentDetail.detail}
-        />
-      </div>
+        <div className={styles.sectionWrapper}>
+          <Label title="상세 정보" />
+          <EditableField
+            isEditable={false}
+            fullWidth
+            multiline
+            value={equipmentDetail.detail}
+          />
+        </div>
 
-      <div className={styles.buttonWrapper}>
-        <Button
-          size="Medium"
-          style={{ width: "150px" }}
-          onClick={() => router.push(`/equipments/${equipmentId}/edit`)}
-        >
-          수정
-        </Button>
-      </div>
-    </FormWrapper>
+        <div className={styles.buttonWrapper}>
+          <Button
+            size="Medium"
+            style={{ width: "150px" }}
+            onClick={() => router.push(`/equipments/${equipmentId}/edit`)}
+          >
+            수정
+          </Button>
+        </div>
+      </FormWrapper>
+    </>
   );
 };
 
