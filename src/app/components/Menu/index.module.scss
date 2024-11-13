@@ -29,6 +29,11 @@
   }
 }
 
+.selectedItem {
+  @extend .item;
+  font-weight: 800;
+}
+
 .icon {
   width: 24px;
   margin-right: 8px;

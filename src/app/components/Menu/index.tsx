@@ -7,6 +7,7 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBulletedOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const menuList = [
   {
@@ -27,6 +28,7 @@ const menuList = [
 ];
 
 export const Menu = () => {
+  const path = usePathname();
   const [isHide, setIsHide] = useState<boolean>(false);
 
   return (
@@ -41,9 +43,11 @@ export const Menu = () => {
         {!isHide && "메뉴 숨기기"}
       </div>
       {menuList.map((item, index) => {
+        const isSelected = path?.includes(item.path);
+
         return (
           <Link
-            className={styles.item}
+            className={isSelected ? styles.selectedItem : styles.item}
             key={`${item.path}_${index}`}
             href={item.path}
           >
