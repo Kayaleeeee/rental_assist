@@ -9,6 +9,8 @@ import { Button } from "@/app/components/Button";
 import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { useEquipmentDetail } from "../hooks/useEquipmentDetail";
 import { useParams, useRouter } from "next/navigation";
+import { EquipmentCategoryList } from "@/app/types/equipmentType";
+import { useMemo } from "react";
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
@@ -16,6 +18,15 @@ const EquipmentDetailPage = () => {
   const equipmentId = Number(params.id);
 
   const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
+  const selectedCategory = useMemo(() => {
+    if (!equipmentDetail) return "";
+
+    return (
+      EquipmentCategoryList.find(
+        (item) => item.key === equipmentDetail.category
+      )?.title || ""
+    );
+  }, [equipmentDetail]);
 
   if (!equipmentDetail) return null;
 
@@ -23,7 +34,7 @@ const EquipmentDetailPage = () => {
     <FormWrapper>
       <div className={styles.sectionWrapper}>
         <Label title="카테고리" />
-        <EditableField isEditable={false} value={equipmentDetail.category} />
+        <EditableField isEditable={false} value={selectedCategory} />
       </div>
 
       <div className={styles.sectionWrapper}>

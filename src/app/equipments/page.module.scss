@@ -30,3 +30,23 @@
   align-items: center;
   width: fit-content;
 }
+
+.listCategoryWrapper {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.categoryItem {
+  cursor: pointer;
+  border-radius: 16px;
+  background: white;
+  font-weight: 600;
+  padding: 8px 24px;
+}
+
+.activeCategoryItem {
+  @extend .categoryItem;
+  background: #529aff;
+  color: white;
+}

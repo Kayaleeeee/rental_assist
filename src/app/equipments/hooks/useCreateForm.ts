@@ -1,15 +1,13 @@
 import { createEquipment } from "@/app/api/equipments";
 import {
   EquipmentCategory,
+  EquipmentCategoryList,
   EquipmentPostBody,
 } from "@/app/types/equipmentType";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-const categoryMenu = [
-  { key: EquipmentCategory.camera, title: "카메라" },
-  { key: EquipmentCategory.accessory, title: "악세서리" },
-];
+const categoryMenu = EquipmentCategoryList;
 
 export const useCreateForm = () => {
   const router = useRouter();
@@ -17,6 +15,7 @@ export const useCreateForm = () => {
     key: EquipmentCategory;
     title: string;
   }>(categoryMenu[0]);
+
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [detail, setDetail] = useState<string>("");

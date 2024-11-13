@@ -19,3 +19,7 @@ export function formatKoreanCurrency(amount: number): string {
     return `${amount > 0 ? amount : ""}원`;
   }
 }
+
+export const formatLocaleString = (number: number) => {
+  return number.toLocaleString("ko-KR");
+};
