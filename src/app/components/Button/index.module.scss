@@ -1,6 +1,4 @@
 @mixin wrapper {
-  color: white;
-  background-color: var(--primary);
   border-radius: 8px;
   outline: none;
   border: none;
@@ -24,4 +22,17 @@
   padding: 16px 24px;
   font-size: 24px;
   font-weight: 700;
+}
+
+.filledButton {
+  @include wrapper();
+  color: white;
+  background-color: var(--primary);
+}
+
+.outlinedButton {
+  @include wrapper();
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
 }
