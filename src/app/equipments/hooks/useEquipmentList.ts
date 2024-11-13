@@ -7,8 +7,9 @@ import {
 import { useCallback, useEffect, useState } from "react";
 
 export const useEquipmentList = () => {
-  const [selectedCategory, setSelectedCategory] =
-    useState<EquipmentCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<
+    EquipmentCategory | undefined
+  >(undefined);
   const [list, setList] = useState<EquipmentListItemType[]>([]);
 
   const fetchList = useCallback(async (params?: EquipmentListParams) => {
@@ -25,13 +26,15 @@ export const useEquipmentList = () => {
     fetchList();
   }, [fetchList]);
 
-  const toggleEquipmentCategory = (categoryKey: EquipmentCategory) => {
+  const toggleEquipmentCategory = (
+    categoryKey: EquipmentCategory | undefined
+  ) => {
     if (selectedCategory === categoryKey) {
-      setSelectedCategory(null);
+      setSelectedCategory(undefined);
       fetchList();
     } else {
       setSelectedCategory(categoryKey);
-      fetchList({ category: categoryKey });
+      fetchList(categoryKey ? { category: categoryKey } : undefined);
     }
   };
 
