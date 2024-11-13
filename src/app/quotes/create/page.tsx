@@ -11,6 +11,7 @@ import { useQuoteForm } from "../hooks/useQuoteForm";
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
 import { useState } from "react";
+import { EquipmentSearchModal } from "../modules/EquipmentSearchModal";
 
 const QuoteCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -42,21 +43,10 @@ const QuoteCreatePage = () => {
         </div>
       </div>
       {isOpenSearchModal && (
-        <Modal
+        <EquipmentSearchModal
           onCloseModal={() => setIsOpenSearchModal(false)}
-          ButtonProps={[
-            {
-              title: "닫기",
-              onClick: () => setIsOpenSearchModal(false),
-            },
-            {
-              title: "추가하기",
-              onClick: () => {},
-            },
-          ]}
-        >
-          <div></div>
-        </Modal>
+          onConfirm={() => {}}
+        />
       )}
 
       {/* <div className={formStyles.sectionWrapper}>
