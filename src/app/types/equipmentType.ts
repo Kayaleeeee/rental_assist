@@ -21,17 +21,29 @@ export type EquipmentPostBody = {
   detail: string;
 };
 
+export type EquipmentListParams = {
+  category?: EquipmentCategory;
+  title?: string;
+};
+
 export enum EquipmentCategory {
-  camera = "camera",
-  accessory = "accessory",
-  full_set = "full_set",
-  lens = "lens",
-  body = "body",
-  action_camera = "action_camera",
-  filter = "filter",
-  focus = "focus",
-  shoulder_rig = "shoulder_rig",
-  lamp = "lamp",
-  audio = "audio",
-  battery = "battery",
+  camera = "카메라",
+  accessory = "악세서리",
+  full_set = "풀세트",
+  lens = "렌즈",
+  body = "바디",
+  action_camera = "액션캠",
+  filter = "필터",
+  focus = "포커스",
+  shoulder_rig = "숄더리그",
+  lamp = "조명",
+  audio = "오디오",
+  battery = "배터리",
 }
+
+export const EquipmentCategoryList: {
+  key: EquipmentCategory;
+  title: string;
+}[] = Object.entries(EquipmentCategory).map(([key, value]) => {
+  return { key: key as EquipmentCategory, title: value };
+});

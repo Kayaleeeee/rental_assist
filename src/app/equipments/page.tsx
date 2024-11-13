@@ -5,8 +5,12 @@ import { Button } from "../components/Button";
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEquipmentList } from "./hooks/useEquipmentList";
-import { EquipmentListItemType } from "../types/equipmentType";
+import {
+  EquipmentCategoryList,
+  EquipmentListItemType,
+} from "../types/equipmentType";
 import styles from "./page.module.scss";
+import { formatLocaleString } from "../utils/priceUtils";
 
 const HeaderName = (name: string) => {
   return (
@@ -34,14 +38,15 @@ const columns: GridColDef<EquipmentListItemType>[] = [
   {
     field: "price",
     renderHeader: () => HeaderName("단가"),
+    renderCell: ({ row }) => formatLocaleString(row.price),
   },
   { field: "detail", flex: 1, renderHeader: () => HeaderName("상세설명") },
 ];
 
 export default function EquipmentPage() {
   const router = useRouter();
-  const { list } = useEquipmentList();
-  console.log(list);
+  const { list, selectedCategory, toggleEquipmentCategory } =
+    useEquipmentList();
 
   return (
     <div>
@@ -53,6 +58,24 @@ export default function EquipmentPage() {
         >
           장비 추가
         </Button>
+      </div>
+
+      <div className={styles.listCategoryWrapper}>
+        {EquipmentCategoryList.map((category) => {
+          return (
+            <div
+              className={
+                category.key === selectedCategory
+                  ? styles.activeCategoryItem
+                  : styles.categoryItem
+              }
+              key={category.key}
+              onClick={() => toggleEquipmentCategory(category.key)}
+            >
+              {category.title}
+            </div>
+          );
+        })}
       </div>
 
       <DataGrid<EquipmentListItemType>
