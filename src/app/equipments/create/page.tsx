@@ -5,6 +5,7 @@ import { MenuItem, Select, TextField } from "@mui/material";
 import { useCreateForm } from "../hooks/useCreateForm";
 import { Label } from "@/app/components/Form/Label";
 import styles from "../page.module.scss";
+import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
@@ -25,7 +26,7 @@ const EquipmentCreatePage = () => {
 
   return (
     <FormWrapper title="장비 등록">
-      <div className={styles.sectionWrapper}>
+      <div className={formStyles.sectionWrapper}>
         <Label title="카테고리" />
         <Select<string>
           title="카테고리"
@@ -34,7 +35,8 @@ const EquipmentCreatePage = () => {
           onChange={(e) => {
             onChangeCategory(e.target.value);
           }}
-          children={categoryMenu.map((item) => (
+        >
+          {categoryMenu.map((item) => (
             <MenuItem
               key={item.key}
               selected={item.key === category.key}
@@ -43,7 +45,7 @@ const EquipmentCreatePage = () => {
               {item.title}
             </MenuItem>
           ))}
-        />
+        </Select>
       </div>
 
       <div className={styles.sectionWrapper}>
