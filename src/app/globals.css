@@ -3,6 +3,7 @@
   --foreground: #171717;
   --grey: #8c8c8c;
   --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  --primary: #529aff;
 }
 
 @media (prefers-color-scheme: dark) {

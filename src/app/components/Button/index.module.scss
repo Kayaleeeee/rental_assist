@@ -1,6 +1,6 @@
 @mixin wrapper {
   color: white;
-  background-color: rgb(82, 154, 255);
+  background-color: var(--primary);
   border-radius: 8px;
   outline: none;
   border: none;

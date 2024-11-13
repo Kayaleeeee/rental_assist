@@ -47,6 +47,6 @@
 
 .activeCategoryItem {
   @extend .categoryItem;
-  background: #529aff;
+  background: var(--primary);
   color: white;
 }
