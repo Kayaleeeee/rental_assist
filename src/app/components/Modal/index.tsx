@@ -4,6 +4,7 @@ import { Button } from "../Button";
 
 type Props = {
   onCloseModal: () => void;
+  ButtonListWrapperStyle?: HtmlHTMLAttributes<HTMLDivElement>["style"];
   ButtonProps?: {
     title: string;
     onClick: HtmlHTMLAttributes<HTMLButtonElement>["onClick"];
@@ -13,11 +14,15 @@ type Props = {
 
 export const Modal = (props: PropsWithChildren<Props>) => {
   return (
-    <div className={styles.overlay} onClick={props.onCloseModal}>
+    <>
+      <div className={styles.overlay} onClick={props.onCloseModal}></div>
       <div className={styles.modalContent}>
         {props.children}
         {props.ButtonProps && (
-          <div className={styles.buttonListWrapper}>
+          <div
+            className={styles.buttonListWrapper}
+            style={props.ButtonListWrapperStyle}
+          >
             {props.ButtonProps.map((button, index) => {
               const isFirst =
                 (props.ButtonProps || []).length > 1 && index === 0;
@@ -40,6 +45,6 @@ export const Modal = (props: PropsWithChildren<Props>) => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
