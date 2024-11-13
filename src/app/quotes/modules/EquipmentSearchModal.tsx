@@ -1,11 +1,18 @@
+import { Label } from "@/app/components/Form/Label";
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
 import { useEquipmentList } from "@/app/equipments/hooks/useEquipmentList";
-import { EquipmentListItemType } from "@/app/types/equipmentType";
+import {
+  EquipmentCategory,
+  EquipmentCategoryList,
+  EquipmentListItemType,
+} from "@/app/types/equipmentType";
 import { formatLocaleString } from "@/app/utils/priceUtils";
+import { MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
 
+const allString = "all";
 const HeaderName = (name: string) => {
   return (
     <div
@@ -47,7 +54,8 @@ export const EquipmentSearchModal = ({ onCloseModal, onConfirm }: Props) => {
     EquipmentListItemType[]
   >([]);
 
-  const { list } = useEquipmentList();
+  const { list, selectedCategory, toggleEquipmentCategory } =
+    useEquipmentList();
 
   return (
     <Modal
@@ -63,15 +71,43 @@ export const EquipmentSearchModal = ({ onCloseModal, onConfirm }: Props) => {
         },
         {
           title: "추가하기",
-          onClick: () => onConfirm(selectedEquipmentList),
+          onClick: () => {
+            onConfirm(selectedEquipmentList);
+            onCloseModal();
+          },
         },
       ]}
     >
       <div
         style={{
           width: "900px",
+          maxHeight: "80vh",
         }}
       >
+        <Label title="카테고리" />
+        <Select<EquipmentCategory | string>
+          value={selectedCategory || allString}
+          onChange={(event) => {
+            const value =
+              event.target.value === allString
+                ? undefined
+                : (event.target.value as EquipmentCategory | undefined);
+
+            toggleEquipmentCategory(value);
+          }}
+          sx={{
+            width: "400px",
+          }}
+        >
+          <MenuItem value={allString}>전체</MenuItem>
+          {EquipmentCategoryList.map((category) => {
+            return (
+              <MenuItem value={category.key} key={category.key}>
+                {category.title}
+              </MenuItem>
+            );
+          })}
+        </Select>
         <DataGrid<EquipmentListItemType>
           checkboxSelection
           columns={columns}
@@ -83,7 +119,7 @@ export const EquipmentSearchModal = ({ onCloseModal, onConfirm }: Props) => {
           sx={{
             background: "white",
             width: "100%",
-            height: "600px",
+            minHeight: "400px",
             borderRadius: "16px",
             marginTop: "24px",
           }}
