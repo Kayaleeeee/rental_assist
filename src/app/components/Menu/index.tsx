@@ -8,6 +8,7 @@ import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBullet
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 const menuList = [
   {
@@ -19,6 +20,11 @@ const menuList = [
     path: "/equipments",
     title: "장비 리스트",
     renderIcon: () => <FormatListBulletedOutlinedIcon />,
+  },
+  {
+    path: "/quotes",
+    title: "견적서 리스트",
+    renderIcon: () => <ReceiptLongOutlinedIcon />,
   },
   {
     path: "/users",
