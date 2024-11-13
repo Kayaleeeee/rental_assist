@@ -1,0 +1,19 @@
+.buttonWrapper {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.inlineWrapper {
+  width: 100%;
+  display: inline-flex;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 16px;
+}
