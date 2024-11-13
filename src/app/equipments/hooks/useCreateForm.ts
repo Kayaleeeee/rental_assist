@@ -8,7 +8,7 @@ import { useCallback, useState } from "react";
 
 const categoryMenu = [
   { key: EquipmentCategory.camera, title: "카메라" },
-  { key: EquipmentCategory.accessary, title: "악세서리" },
+  { key: EquipmentCategory.accessory, title: "악세서리" },
 ];
 
 export const useCreateForm = () => {

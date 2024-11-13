@@ -23,5 +23,15 @@ export type EquipmentPostBody = {
 
 export enum EquipmentCategory {
   camera = "camera",
-  accessary = "accessary",
+  accessory = "accessory",
+  full_set = "full_set",
+  lens = "lens",
+  body = "body",
+  action_camera = "action_camera",
+  filter = "filter",
+  focus = "focus",
+  shoulder_rig = "shoulder_rig",
+  lamp = "lamp",
+  audio = "audio",
+  battery = "battery",
 }
