@@ -17,24 +17,35 @@ import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
+import { EditableField } from "@/app/components/EditableField";
 
 const QuoteCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
-  const { form, onChangeForm } = useQuoteForm();
+  const {
+    form,
+    onChangeForm,
+    quoteItemListState,
+    onChangeQuoteItem,
+    onDeleteQuoteItem,
+    onAddQuoteItemList,
+  } = useQuoteForm();
 
   const rentalDays = useMemo(() => {
-    if (!form.endDateTime || !form.startDateTime) return 0;
+    if (!form.endDate || !form.startDate) return 0;
 
-    return getDiffDays(form.startDateTime, form.endDateTime);
-  }, [form.startDateTime, form.endDateTime]);
+    return getDiffDays(form.startDate, form.endDate);
+  }, [form.startDate, form.endDate]);
 
   const totalPrice = useMemo(() => {
-    return form.equipmentList.reduce((prev, acc) => {
-      return (prev += acc.price * rentalDays);
-    }, 0);
-  }, [form.equipmentList, rentalDays]);
+    if (!rentalDays) return 0;
 
-  const onClickOpenEquipemtModal = () => {
+    return quoteItemListState.reduce(
+      (prev, acc) => (prev += acc.totalPrice * rentalDays),
+      0
+    );
+  }, [quoteItemListState, rentalDays]);
+
+  const onClickEquipmentModal = () => {
     if (rentalDays === 0) {
       alert("기간을 먼저 설정해주세요.");
       return;
@@ -46,19 +57,36 @@ const QuoteCreatePage = () => {
   return (
     <FormWrapper title="견적서 생성">
       <div className={formStyles.sectionWrapper}>
+        <Label title="고객 정보" />
+
+        <Label title="이름" />
+        <EditableField
+          value={form.guestName}
+          onChange={(e) => onChangeForm("guestName", e.target.value)}
+        />
+        <Margin top={10} />
+        <Label title="전화번호" />
+        <EditableField
+          value={form.guestPhoneNumber || ""}
+          onChange={(e) => {
+            onChangeForm("guestPhoneNumber", e.target.value);
+          }}
+        />
+      </div>
+      <div className={formStyles.sectionWrapper}>
         <Label title={`기간 설정 (총 ${rentalDays}일)`} />
         <Margin top={10} />
         <div className={styles.inlineWrapper}>
           <DateTimeSelector
             label="대여 시작 시간"
-            value={form.startDateTime}
-            onChange={(value) => onChangeForm("startDateTime", value)}
+            value={form.startDate}
+            onChange={(value) => onChangeForm("startDate", value)}
           />
           <div className={styles.separator}>~</div>
           <DateTimeSelector
             label="반납 시간"
-            value={form.endDateTime}
-            onChange={(value) => onChangeForm("endDateTime", value)}
+            value={form.endDate}
+            onChange={(value) => onChangeForm("endDate", value)}
           />
         </div>
         <Margin top={20} />
@@ -69,7 +97,7 @@ const QuoteCreatePage = () => {
             <Button
               size="Small"
               variant="outlined"
-              onClick={onClickOpenEquipemtModal}
+              onClick={onClickEquipmentModal}
               style={{
                 width: "200px",
               }}
@@ -79,28 +107,16 @@ const QuoteCreatePage = () => {
           </Margin>
 
           <div className={styles.equipmentListWrapper}>
-            {form.equipmentList.map((equipment) => {
+            {quoteItemListState.map((quote) => {
               return (
                 <QuotationItemEditor
-                  key={equipment.id}
+                  key={quote.equipmentId}
                   rentalDays={rentalDays}
-                  equipmentState={equipment}
+                  quoteState={quote}
                   onChangeField={(state) =>
-                    onChangeForm(
-                      "equipmentList",
-                      form.equipmentList.map((item) =>
-                        item.id === equipment.id ? state : item
-                      )
-                    )
+                    onChangeQuoteItem(quote.equipmentId, state)
                   }
-                  onDeleteEquipment={() => {
-                    onChangeForm(
-                      "equipmentList",
-                      form.equipmentList.filter(
-                        (item) => item.id !== equipment.id
-                      )
-                    );
-                  }}
+                  onDeleteEquipment={() => onDeleteQuoteItem(quote.equipmentId)}
                 />
               );
             })}
@@ -117,9 +133,7 @@ const QuoteCreatePage = () => {
       {isOpenSearchModal && (
         <EquipmentSearchModal
           onCloseModal={() => setIsOpenSearchModal(false)}
-          onConfirm={(list) =>
-            onChangeForm("equipmentList", form.equipmentList.concat(list))
-          }
+          onConfirm={onAddQuoteItemList}
         />
       )}
 
