@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from "axios";
 import { apiInstance } from "./apiInstance";
 
 export const apiGet = async <T,>(url: string, params = {}): Promise<T> => {
@@ -7,16 +8,18 @@ export const apiGet = async <T,>(url: string, params = {}): Promise<T> => {
 
 export const apiPost = async <T,>(
   url: string,
-  body: Record<string, any>
+  body: Record<string, any>,
+  options?: AxiosRequestConfig<any>
 ): Promise<T> => {
-  const response = await apiInstance.post<T>(url, body);
+  const response = await apiInstance.post<T>(url, body, options);
   return response.data;
 };
 
 export const apiPut = async <T,>(
   url: string,
-  body: Record<string, any>
+  body: Record<string, any>,
+  options?: AxiosRequestConfig<any>
 ): Promise<T> => {
-  const response = await apiInstance.put<T>(url, body);
+  const response = await apiInstance.put<T>(url, body, options);
   return response.data;
 };

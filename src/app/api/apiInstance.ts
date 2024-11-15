@@ -1,14 +1,47 @@
 import axios from "axios";
 import { createClient } from "../utils/supabase/client";
+import { camelCase, isArray, isObject, snakeCase } from "lodash";
 
 const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+const toCamelCase = (obj: any): any => {
+  if (isArray(obj)) {
+    return obj.map(toCamelCase);
+  } else if (isObject(obj)) {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+      acc[camelCase(key)] = toCamelCase(value); // Recursively apply for objects
+      return acc;
+    }, {} as Record<string, any>);
+  }
+  return obj;
+};
+
+// Convert keys of an object to snakeCase
+const toSnakeCase = (obj: any): any => {
+  if (isArray(obj)) {
+    return obj.map(toSnakeCase);
+  } else if (isObject(obj)) {
+    return Object.entries(obj).reduce((acc, [key, value]) => {
+      acc[snakeCase(key)] = toSnakeCase(value); // Recursively apply for objects
+      return acc;
+    }, {} as Record<string, any>);
+  }
+  return obj;
+};
 
 export const apiInstance = axios.create({
   baseURL: `${apiUrl}/rest/v1`,
   headers: {
     "Content-Type": "application/json",
     apikey: anonKey,
+  },
+  paramsSerializer: (params) => {
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      searchParams.append(key, `eq.${value}`);
+    }
+    return searchParams.toString();
   },
 });
 
@@ -21,11 +54,25 @@ apiInstance.interceptors.request.use(async (config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  if (config.data) {
+    config.data = toSnakeCase(config.data); // Convert request body to snake_case
+  }
+
+  if (config.params) {
+    config.params = toSnakeCase(config.params); // Convert query params to snake_case
+  }
+
   return config;
 });
 
 apiInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data) {
+      response.data = toCamelCase(response.data); // Convert response body to camelCase
+    }
+
+    return response;
+  },
   async (error) => {
     if (error.response?.status === 401) {
       // 토큰 갱신 로직
