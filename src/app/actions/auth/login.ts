@@ -1,5 +1,6 @@
 "use server";
 
+import { CustomError } from "@/app/class/CustomError";
 import { createClient } from "@/app/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -7,28 +8,28 @@ import { redirect } from "next/navigation";
 export async function login(formData: { email: string; password: string }) {
   const supabase = await createClient();
 
-  const { error, data } = await supabase.auth.signInWithPassword(formData);
-
-  console.log(data, error);
+  const { error } = await supabase.auth.signInWithPassword(formData);
 
   if (error) {
-    redirect("/error");
+    throw new Error(error.message);
   }
 
   revalidatePath("/", "layout");
   redirect("/");
 }
 
-export async function signup(formData: { email: string; password: string }) {
+export async function signup(formData: {
+  email: string;
+  password: string;
+}): Promise<void> {
   const supabase = await createClient();
 
-  const { error, data } = await supabase.auth.signUp(formData);
-  console.log(data, error);
+  const { error } = await supabase.auth.signUp(formData);
 
   if (error) {
-    redirect("/error");
+    throw new CustomError(error.message);
+  } else {
+    revalidatePath("/", "layout");
+    redirect("/");
   }
-
-  revalidatePath("/", "layout");
-  redirect("/");
 }
