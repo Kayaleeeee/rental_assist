@@ -23,9 +23,12 @@
 
 .price {
   @include cell();
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  width: 200px;
+}
+
+.supplyPrice {
+  @include cell();
+  width: 200px;
 }
 
 .deleteButtonWrapper {

@@ -1,7 +1,8 @@
 import styles from "./quotationItemEditor.module.scss";
-import { EditableField } from "@/app/components/EditableField";
+
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { QuotItemStateType } from "../hooks/useQuoteForm";
+import { formatLocaleString } from "@/app/utils/priceUtils";
 
 type Props = {
   rentalDays: number;
@@ -22,7 +23,7 @@ export const QuotationItemEditor = ({
     onChangeField({
       ...quoteState,
       quantity: newQuantity,
-      totalPrice: quoteState.price * newQuantity,
+      totalPrice: quoteState.price * newQuantity * rentalDays,
     });
   };
 
@@ -34,7 +35,7 @@ export const QuotationItemEditor = ({
     onChangeField({
       ...quoteState,
       quantity: newQuantity,
-      totalPrice: quoteState.price * newQuantity,
+      totalPrice: quoteState.price * newQuantity * rentalDays,
     });
   };
 
@@ -54,18 +55,12 @@ export const QuotationItemEditor = ({
       </div>
 
       <div className={styles.days}>{rentalDays}일</div>
-      <div className={styles.price}>
-        <EditableField
-          isEditable
-          value={quoteState.totalPrice}
-          onChange={(e) => {
-            const changedPrice = Number(e.target.value);
-            if (isNaN(changedPrice)) return;
+      <div className={styles.supplyPrice}>
+        정가: {formatLocaleString(quoteState.price)}원
+      </div>
 
-            onChangeField({ ...quoteState, totalPrice: changedPrice });
-          }}
-        />
-        원
+      <div className={styles.price}>
+        {formatLocaleString(quoteState.totalPrice)}원
       </div>
       <div className={styles.deleteButtonWrapper} onClick={onDeleteEquipment}>
         <CloseOutlinedIcon className={styles.closeButton} />

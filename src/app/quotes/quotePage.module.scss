@@ -24,14 +24,27 @@
   gap: 12px;
 }
 
+.priceSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  border-top: 1px solid var(--grey-1);
+  padding: 16px 0;
+  gap: 16px;
+}
+
+.discountPriceWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .totalPriceWrapper {
   display: inline-flex;
   align-items: center;
-  margin-top: 24px;
   width: 100%;
   justify-content: flex-end;
-  padding: 16px 0;
-  border-top: 1px solid var(--grey-1);
 }
 
 .totalPrice {

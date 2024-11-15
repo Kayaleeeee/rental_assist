@@ -8,6 +8,7 @@ import {
   EquipmentListItemType,
 } from "@/app/types/equipmentType";
 import { formatLocaleString } from "@/app/utils/priceUtils";
+import { showToast } from "@/app/utils/toastUtils";
 import { MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
@@ -45,11 +46,16 @@ const columns: GridColDef<EquipmentListItemType>[] = [
 ];
 
 type Props = {
+  disabledIdList: number[];
   onCloseModal: () => void;
   onConfirm: (list: EquipmentListItemType[]) => void;
 };
 
-export const EquipmentSearchModal = ({ onCloseModal, onConfirm }: Props) => {
+export const EquipmentSearchModal = ({
+  onCloseModal,
+  onConfirm,
+  disabledIdList,
+}: Props) => {
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     EquipmentListItemType[]
   >([]);
@@ -111,9 +117,25 @@ export const EquipmentSearchModal = ({ onCloseModal, onConfirm }: Props) => {
         <DataGrid<EquipmentListItemType>
           checkboxSelection
           columns={columns}
-          onCellClick={({ row }) =>
-            setSelectedEquipmentList((prev) => [...prev, row])
-          }
+          isRowSelectable={(row) => !disabledIdList.includes(Number(row.id))}
+          onCellClick={({ row }) => {
+            if (disabledIdList.includes(row.id)) {
+              showToast({ message: "이미 추가된 장비입니다.", type: "error" });
+              return;
+            }
+
+            const equipmentIndex = selectedEquipmentList
+              .map((item) => item.id)
+              .findIndex((item) => item === row.id);
+
+            if (equipmentIndex === -1) {
+              setSelectedEquipmentList((prev) => [...prev, row]);
+            } else {
+              setSelectedEquipmentList((prev) =>
+                prev.filter((item) => item.id !== row.id)
+              );
+            }
+          }}
           rows={list}
           getRowId={(cell) => cell.id}
           sx={{

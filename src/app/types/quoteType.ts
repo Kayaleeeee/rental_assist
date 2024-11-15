@@ -30,10 +30,12 @@ export type QuotePostPayload = {
   supplyPrice: number;
   startDate: string;
   endDate: string;
+  createdBy: string;
 };
 
 export type QuoteItemPostPayload = {
+  quoteId: QuoteType["id"];
   equipmentId: number;
   quantity: number;
   price: number;
-};
+}[];
