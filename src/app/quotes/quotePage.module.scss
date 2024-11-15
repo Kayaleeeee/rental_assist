@@ -1,6 +1,6 @@
 .buttonWrapper {
   width: 100%;
-  display: flex;
+  display: inline-flex;
   align-items: flex-end;
   justify-content: flex-end;
   margin-top: 2rem;
@@ -31,7 +31,6 @@
   align-items: flex-end;
   border-top: 1px solid var(--grey-1);
   padding: 16px 0;
-  gap: 16px;
 }
 
 .discountPriceWrapper {
@@ -45,6 +44,7 @@
   align-items: center;
   width: 100%;
   justify-content: flex-end;
+  padding: 10px 0;
 }
 
 .totalPrice {
