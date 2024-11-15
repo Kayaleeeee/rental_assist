@@ -15,7 +15,7 @@ export const DateTimeSelector = ({ label, onChange, value }: Props) => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DateTimePicker
         label={label}
-        value={dayjs(value)}
+        value={value ? dayjs(value) : undefined}
         onChange={(value) => {
           const dateTime = value?.toISOString() || null;
 
