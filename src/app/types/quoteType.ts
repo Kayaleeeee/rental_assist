@@ -21,7 +21,13 @@ export type QuoteType = {
   endDate: string;
 };
 
+export type QuoteListParams = {
+  userId?: number;
+  guestPhoneNumber?: string;
+};
+
 export type QuotePostPayload = {
+  title: string;
   userId?: number;
   guestName?: string;
   guestPhoneNumber?: string;

@@ -8,7 +8,7 @@ import { Label } from "@/app/components/Form/Label";
 import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 import { useQuoteForm } from "../hooks/useQuoteForm";
 import { Margin } from "@/app/components/Margin";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { EquipmentSearchModal } from "../modules/EquipmentSearchModal";
 import { QuotationItemEditor } from "../modules/QuotationItemEditor";
 import {
@@ -50,6 +50,13 @@ const QuoteCreatePage = () => {
 
   return (
     <FormWrapper title="견적서 생성">
+      <div className={formStyles.sectionWrapper}>
+        <Label title="견적서 제목" />
+        <EditableField
+          value={form.title}
+          onChange={(e) => onChangeForm("title", e.target.value)}
+        />
+      </div>
       <div className={formStyles.sectionWrapper}>
         <Label title="고객 정보" />
 
