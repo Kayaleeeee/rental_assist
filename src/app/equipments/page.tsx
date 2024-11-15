@@ -13,18 +13,7 @@ import styles from "./page.module.scss";
 import { formatLocaleString } from "../utils/priceUtils";
 import { Margin } from "../components/Margin";
 import formStyles from "@components/Form/index.module.scss";
-
-const HeaderName = (name: string) => {
-  return (
-    <div
-      style={{
-        fontWeight: 900,
-      }}
-    >
-      {name}
-    </div>
-  );
-};
+import { HeaderName } from "../components/DataTable/HeaderName";
 
 const columns: GridColDef<EquipmentListItemType>[] = [
   {

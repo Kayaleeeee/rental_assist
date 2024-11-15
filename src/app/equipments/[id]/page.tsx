@@ -15,6 +15,7 @@ import { useParams, useRouter } from "next/navigation";
 import { EquipmentCategoryList } from "@/app/types/equipmentType";
 import { useMemo } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
+import { Margin } from "@/app/components/Margin";
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
@@ -40,7 +41,7 @@ const EquipmentDetailPage = () => {
         title="목록 보기"
         onClick={() => router.push("/equipments")}
         style={{
-          marginBottom: "16px",
+          marginBottom: "20px",
         }}
       />
       <FormWrapper>
@@ -48,6 +49,7 @@ const EquipmentDetailPage = () => {
           <Label title="카테고리" />
           <EditableField isEditable={false} value={selectedCategory} />
         </div>
+        <Margin top={20} />
 
         <div className={styles.sectionWrapper}>
           <Label title="장비명" />
@@ -57,6 +59,8 @@ const EquipmentDetailPage = () => {
             value={equipmentDetail.title}
           />
         </div>
+        <Margin top={20} />
+
         <div className={styles.sectionWrapper}>
           <Label title="렌탈 가격" />
           <div className={styles.detailPriceWrapper}>
@@ -73,6 +77,7 @@ const EquipmentDetailPage = () => {
             </div>
           </div>
         </div>
+        <Margin top={20} />
 
         <div className={styles.sectionWrapper}>
           <Label title="상세 정보" />
@@ -83,6 +88,7 @@ const EquipmentDetailPage = () => {
             value={equipmentDetail.detail}
           />
         </div>
+        <Margin top={20} />
 
         <div className={styles.buttonWrapper}>
           <Button
