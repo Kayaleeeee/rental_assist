@@ -12,8 +12,8 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 const menuList = [
   {
-    path: "/schedules",
-    title: "스케줄 검색",
+    path: "/reservations",
+    title: "예약 리스트",
     renderIcon: () => <CalendarMonthOutlinedIcon />,
   },
   {
