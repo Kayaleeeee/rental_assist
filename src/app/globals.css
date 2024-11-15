@@ -25,6 +25,7 @@ body {
   height: 70px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 24px;
   color: #1a1a1a;
   background: white;
