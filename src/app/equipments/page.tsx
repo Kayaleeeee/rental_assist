@@ -11,6 +11,8 @@ import {
 } from "../types/equipmentType";
 import styles from "./page.module.scss";
 import { formatLocaleString } from "../utils/priceUtils";
+import { Margin } from "../components/Margin";
+import formStyles from "@components/Form/index.module.scss";
 
 const HeaderName = (name: string) => {
   return (
@@ -50,7 +52,7 @@ export default function EquipmentPage() {
 
   return (
     <div>
-      <div className={styles.rightAlignButtonWrapper}>
+      <div className={formStyles.rightAlignButtonWrapper}>
         <Button
           style={{ width: "200px" }}
           size="Medium"
@@ -59,6 +61,8 @@ export default function EquipmentPage() {
           장비 추가
         </Button>
       </div>
+
+      <Margin top={40} />
 
       <div className={styles.listCategoryWrapper}>
         {EquipmentCategoryList.map((category) => {
