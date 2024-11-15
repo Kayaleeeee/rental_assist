@@ -1,44 +1,22 @@
-const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+import { apiInstance } from "./apiInstance";
 
-export async function apiGet<T>(url: string, params = {}): Promise<T> {
-  const paramString = Object.entries(params)
-    .map(([key, value]) => `${key}=eq.${value}`)
-    .join("&");
+export const apiGet = async <T,>(url: string, params = {}): Promise<T> => {
+  const response = await apiInstance.get<T>(url, { params });
+  return response.data;
+};
 
-  const response = await fetch(
-    `${apiUrl}/rest/v1${url}${paramString ? `?${paramString}` : ""}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        apikey: anonKey,
-        Authorization: `Bearer ${anonKey}`,
-      },
-    }
-  );
+export const apiPost = async <T,>(
+  url: string,
+  body: Record<string, any>
+): Promise<T> => {
+  const response = await apiInstance.post<T>(url, body);
+  return response.data;
+};
 
-  const data = await response.json();
-  return data as T;
-}
-
-export async function apiPost<T>(url: string, body: Record<string, any>) {
-  const response = await fetch(`${apiUrl}/rest/v1${url}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: anonKey,
-      Authorization: `Bearer ${anonKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-
-  console.log(response);
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Failed to post data");
-  }
-
-  return response.ok;
-}
+export const apiPut = async <T,>(
+  url: string,
+  body: Record<string, any>
+): Promise<T> => {
+  const response = await apiInstance.put<T>(url, body);
+  return response.data;
+};
