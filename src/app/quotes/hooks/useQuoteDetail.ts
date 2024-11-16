@@ -1,7 +1,6 @@
 import { getQuoteDetail } from "@/app/api/quote";
 import { QuoteDetailType, QuoteItemType } from "@/app/types/quoteType";
 import { getDiffDays } from "@/app/utils/timeUtils";
-import { showToast } from "@/app/utils/toastUtils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 export const useQuoteDetail = (id?: number) => {
@@ -29,16 +28,6 @@ export const useQuoteDetail = (id?: number) => {
 
     fetchDetail(id);
   }, [fetchDetail, id]);
-
-  const createReservation = useCallback(async () => {
-    try {
-    } catch {
-      showToast({
-        message: "예약 생성에 실패했습니다.",
-        type: "error",
-      });
-    }
-  }, []);
 
   return { detail, quoteItemList, rentalDays };
 };

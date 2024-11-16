@@ -1,4 +1,5 @@
 import { EquipmentDetailType } from "./equipmentType";
+import { UserType } from "./userType";
 
 export type QuoteItemType = {
   id: number;
@@ -35,9 +36,9 @@ export type QuoteListParams = {
 
 export type QuotePostPayload = {
   title: string;
-  userId?: number;
-  guestName?: string;
-  guestPhoneNumber?: string;
+  userId?: UserType["id"];
+  guestName?: UserType["name"];
+  guestPhoneNumber?: UserType["phoneNumber"];
   discountPrice?: number;
   totalPrice: number;
   supplyPrice: number;

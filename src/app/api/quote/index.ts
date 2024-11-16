@@ -24,6 +24,6 @@ export const getQuoteList = (params?: QuoteListParams) => {
 };
 
 export const getQuoteDetail = async (id: number) => {
-  const result = await apiGet<QuoteDetailType[]>(detailUrl, id);
+  const result = await apiGet<QuoteDetailType[]>(detailUrl, { id });
   return result[0];
 };

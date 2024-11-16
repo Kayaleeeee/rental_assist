@@ -18,7 +18,7 @@ export type QuotItemStateType = {
 
 type QuotePostStateType = {
   title: string;
-  userId?: number;
+  userId?: string;
   guestName: string;
   guestPhoneNumber: string;
   discountPrice: number;
@@ -157,6 +157,7 @@ export const useQuoteForm = () => {
 
   return {
     form,
+    setForm,
     onChangeForm,
     onChangeQuoteItem,
     onDeleteQuoteItem,

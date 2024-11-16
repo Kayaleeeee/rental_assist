@@ -17,13 +17,17 @@ import {
 } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
+import { UserSearchModal } from "../../users/modules/UserSearchModal";
+import { UserType } from "@/app/types/userType";
 
 const QuoteCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
+  const [isOpenUserModal, setIsOpenUserModal] = useState(false);
   const [isDiscounted, setIsDiscounted] = useState<boolean>(false);
   const [discountPriceState, setDiscountPriceState] = useState<number>(0);
   const {
     form,
+    setForm,
     onChangeForm,
     quoteItemListState,
     onChangeQuoteItem,
@@ -48,134 +52,162 @@ const QuoteCreatePage = () => {
     setIsOpenSearchModal(true);
   };
 
-  return (
-    <FormWrapper title="견적서 생성">
-      <div className={formStyles.sectionWrapper}>
-        <Label title="견적서 제목" />
-        <EditableField
-          value={form.title}
-          onChange={(e) => onChangeForm("title", e.target.value)}
-        />
-      </div>
-      <div className={formStyles.sectionWrapper}>
-        <Label title="고객 정보" />
+  const handleSelectUser = (user: UserType) => {
+    setForm((prev) => ({
+      ...prev,
+      userId: user.id,
+      guestName: user.name,
+      guestPhoneNumber: user.phoneNumber ?? "",
+    }));
+  };
 
-        <Label title="이름" />
-        <EditableField
-          value={form.guestName}
-          onChange={(e) => onChangeForm("guestName", e.target.value)}
-        />
-        <Margin top={10} />
-        <Label title="전화번호" />
-        <EditableField
-          value={form.guestPhoneNumber || ""}
-          onChange={(e) => {
-            onChangeForm("guestPhoneNumber", e.target.value);
-          }}
-        />
-      </div>
-      <div className={formStyles.sectionWrapper}>
-        <Label title={`기간 설정 (총 ${rentalDays}일)`} />
-        <Margin top={10} />
-        <div className={styles.inlineWrapper}>
-          <DateTimeSelector
-            label="대여 시작 시간"
-            value={form.startDate}
-            onChange={(value) => onChangeForm("startDate", value)}
-          />
-          <div className={styles.separator}>~</div>
-          <DateTimeSelector
-            label="반납 시간"
-            value={form.endDate}
-            onChange={(value) => onChangeForm("endDate", value)}
+  return (
+    <div>
+      <FormWrapper title="견적서 생성">
+        <div className={formStyles.sectionWrapper}>
+          <Label title="견적서 제목" />
+          <EditableField
+            value={form.title}
+            onChange={(e) => onChangeForm("title", e.target.value)}
           />
         </div>
-        <Margin top={20} />
+        <div className={formStyles.sectionWrapper}>
+          <Label title="고객 정보" />
 
-        {rentalDays > 0 && (
-          <div className={formStyles.sectionWrapper}>
-            <Label title="대여 장비 목록" />
-
-            <Margin top={10} bottom={20}>
-              <Button
-                size="Small"
-                variant="outlined"
-                onClick={onClickEquipmentModal}
-                style={{
-                  width: "200px",
-                }}
-              >
-                장비 추가
-              </Button>
-            </Margin>
-
-            <div className={styles.equipmentListWrapper}>
-              {quoteItemListState.map((quote) => {
-                return (
-                  <QuotationItemEditor
-                    key={quote.equipmentId}
-                    rentalDays={rentalDays}
-                    quoteState={quote}
-                    onChangeField={(state) =>
-                      onChangeQuoteItem(quote.equipmentId, state)
-                    }
-                    onDeleteEquipment={() =>
-                      onDeleteQuoteItem(quote.equipmentId)
-                    }
-                  />
-                );
-              })}
-            </div>
+          <Button
+            variant="outlined"
+            size="Medium"
+            onClick={() => setIsOpenUserModal(true)}
+          >
+            회원 찾기
+          </Button>
+          <Label title="이름" />
+          <EditableField
+            value={form.guestName}
+            onChange={(e) => onChangeForm("guestName", e.target.value)}
+          />
+          <Margin top={10} />
+          <Label title="전화번호" />
+          <EditableField
+            value={form.guestPhoneNumber || ""}
+            onChange={(e) => {
+              onChangeForm("guestPhoneNumber", e.target.value);
+            }}
+          />
+        </div>
+        <div className={formStyles.sectionWrapper}>
+          <Label title={`기간 설정 (총 ${rentalDays}일)`} />
+          <Margin top={10} />
+          <div className={styles.inlineWrapper}>
+            <DateTimeSelector
+              label="대여 시작 시간"
+              value={form.startDate}
+              onChange={(value) => onChangeForm("startDate", value)}
+            />
+            <div className={styles.separator}>~</div>
+            <DateTimeSelector
+              label="반납 시간"
+              value={form.endDate}
+              onChange={(value) => onChangeForm("endDate", value)}
+            />
           </div>
-        )}
-        {quoteItemListState.length > 0 && (
-          <div className={styles.priceSection}>
-            <div className={styles.discountPriceWrapper}>
-              <Label title="정가" />
-              <div>{formatLocaleString(totalSupplyPrice)}원</div>
-            </div>
-            {isDiscounted ? (
-              <div className={styles.discountPriceWrapper}>
-                <Label title="할인 금액" />
-                <EditableField
-                  value={discountPriceState}
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
+          <Margin top={20} />
 
-                    if (isNaN(value)) return;
-                    setDiscountPriceState(value);
+          {rentalDays > 0 && (
+            <div className={formStyles.sectionWrapper}>
+              <Label title="대여 장비 목록" />
+
+              <Margin top={10} bottom={20}>
+                <Button
+                  size="Small"
+                  variant="outlined"
+                  onClick={onClickEquipmentModal}
+                  style={{
+                    width: "200px",
                   }}
-                />
+                >
+                  장비 추가
+                </Button>
+              </Margin>
+
+              <div className={styles.equipmentListWrapper}>
+                {quoteItemListState.map((quote) => {
+                  return (
+                    <QuotationItemEditor
+                      key={quote.equipmentId}
+                      rentalDays={rentalDays}
+                      quoteState={quote}
+                      onChangeField={(state) =>
+                        onChangeQuoteItem(quote.equipmentId, state)
+                      }
+                      onDeleteEquipment={() =>
+                        onDeleteQuoteItem(quote.equipmentId)
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {quoteItemListState.length > 0 && (
+            <div className={styles.priceSection}>
+              <div className={styles.discountPriceWrapper}>
+                <Label title="정가" />
+                <div>{formatLocaleString(totalSupplyPrice)}원</div>
+              </div>
+              {isDiscounted ? (
+                <div className={styles.discountPriceWrapper}>
+                  <Label title="할인 금액" />
+                  <EditableField
+                    value={discountPriceState}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
+
+                      if (isNaN(value)) return;
+                      setDiscountPriceState(value);
+                    }}
+                  />
+                  <Button
+                    variant="outlined"
+                    size="Small"
+                    onClick={() => {
+                      onChangeForm("discountPrice", discountPriceState);
+                      setIsDiscounted(false);
+                    }}
+                  >
+                    적용
+                  </Button>
+                </div>
+              ) : (
                 <Button
                   variant="outlined"
                   size="Small"
-                  onClick={() => {
-                    onChangeForm("discountPrice", discountPriceState);
-                    setIsDiscounted(false);
-                  }}
+                  onClick={() => setIsDiscounted(true)}
                 >
-                  적용
+                  할인추가
                 </Button>
-              </div>
-            ) : (
-              <Button
-                variant="outlined"
-                size="Small"
-                onClick={() => setIsDiscounted(true)}
-              >
-                할인추가
-              </Button>
-            )}
+              )}
 
-            <div className={styles.totalPriceWrapper}>
-              <div className={styles.totalPrice}>
-                총 {formatLocaleString(totalPrice)}원 (
+              <div className={styles.totalPriceWrapper}>
+                <div className={styles.totalPrice}>
+                  총 {formatLocaleString(totalPrice)}원 (
+                </div>
+                <div> {formatKoreanCurrency(totalPrice)})</div>
               </div>
-              <div> {formatKoreanCurrency(totalPrice)})</div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+
+        <div className={styles.buttonWrapper}>
+          <Button
+            size="Medium"
+            style={{ width: "150px" }}
+            onClick={onCreateQuote}
+          >
+            생성하기
+          </Button>
+        </div>
+      </FormWrapper>
       {isOpenSearchModal && (
         <EquipmentSearchModal
           disabledIdList={quoteItemListState.map((quote) => quote.equipmentId)}
@@ -183,17 +215,13 @@ const QuoteCreatePage = () => {
           onConfirm={onAddQuoteItemList}
         />
       )}
-
-      <div className={styles.buttonWrapper}>
-        <Button
-          size="Medium"
-          style={{ width: "150px" }}
-          onClick={onCreateQuote}
-        >
-          생성하기
-        </Button>
-      </div>
-    </FormWrapper>
+      {isOpenUserModal && (
+        <UserSearchModal
+          onCloseModal={() => setIsOpenUserModal(false)}
+          onConfirm={handleSelectUser}
+        />
+      )}
+    </div>
   );
 };
 

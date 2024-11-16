@@ -16,6 +16,9 @@ import { Button } from "@/app/components/Button";
 import { QuotationItem } from "../modules/QuotationItem";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { formatDateTime } from "@/app/utils/timeUtils";
+import { useCallback } from "react";
+import { showToast } from "@/app/utils/toastUtils";
+import { postReservation } from "@/app/api/reservation";
 
 const defaultString = "-";
 
@@ -25,6 +28,24 @@ const QuoteDetailPage = () => {
   const quoteId = Number(id);
 
   const { detail, quoteItemList, rentalDays } = useQuoteDetail(quoteId);
+
+  const handleMakeReservation = useCallback(async () => {
+    if (!quoteId || !detail) return;
+
+    if (!confirm("예약을 생성하시겠습니까?")) return;
+
+    try {
+      await postReservation({
+        userId: detail.userId,
+        quoteId: detail.id,
+      });
+      await showToast({ message: "예약이 생성되었습니다.", type: "success" });
+
+      router.push("/reservations");
+    } catch {
+      showToast({ message: "예약 생성에 실패했습니다.", type: "error" });
+    }
+  }, [detail, quoteId]);
 
   if (!detail) return;
 
@@ -125,6 +146,7 @@ const QuoteDetailPage = () => {
             size="Medium"
             variant="outlined"
             style={{ width: "150px" }}
+            onClick={handleMakeReservation}
             //   onClick={onCreateQuote}
           >
             예약 생성
