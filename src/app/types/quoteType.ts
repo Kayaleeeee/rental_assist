@@ -1,4 +1,5 @@
 import { EquipmentDetailType } from "./equipmentType";
+import { ReservationType } from "./reservationType";
 import { UserType } from "./userType";
 
 export type QuoteItemType = {
@@ -22,6 +23,7 @@ export type QuoteType = {
   supplyPrice: number;
   startDate: string;
   endDate: string;
+  reservationId?: ReservationType["id"];
 };
 
 export type QuoteDetailType = QuoteType & {
@@ -45,6 +47,7 @@ export type QuotePostPayload = {
   startDate: string;
   endDate: string;
   createdBy: string;
+  reservationId?: ReservationType["id"];
 };
 
 export type QuoteItemPostPayload = {

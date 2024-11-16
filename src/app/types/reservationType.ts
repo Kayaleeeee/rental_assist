@@ -1,4 +1,5 @@
 import { QuoteItemType } from "./quoteType";
+import { UserType } from "./userType";
 
 export type ReservationType = {
   id: number;
@@ -8,21 +9,36 @@ export type ReservationType = {
   updatedAt?: string;
   status: ReservationStatus;
   paymentStatus: PaymentStatus;
+  totalPrice: number;
+  startDate: string;
+  endDate: string;
+  userName: string;
 };
 
 export enum ReservationStatus {
-  pending = "대기중",
-  confirmed = "확정",
-  canceled = "취소됨",
+  pending = "pending",
+  confirmed = "confirmed",
+  canceled = "canceled",
 }
 
 export enum PaymentStatus {
-  unpaid = "미결제",
-  paid = "결제완료",
-  refunded = "환불완료",
+  unpaid = "unpaid",
+  paid = "paid",
+  refunded = "refunded",
 }
 
 export type ReservationPostPayload = {
   quoteId: QuoteItemType["id"];
-  userId: number;
+  userId?: number;
+};
+
+export type ReservationDetailType = ReservationType & {
+  quoteItems: QuoteItemType[];
+  quoteId: QuoteItemType["id"];
+  quoteTitle: string;
+  createdBy: string;
+  userId: UserType["id"];
+  phoneNumber: UserType["phoneNumber"];
+  supplyPrice: number;
+  discountPrice?: number;
 };

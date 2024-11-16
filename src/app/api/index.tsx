@@ -23,3 +23,12 @@ export const apiPut = async <T,>(
   const response = await apiInstance.put<T>(url, body, options);
   return response.data;
 };
+
+export const apiPatch = async <T,>(
+  url: string,
+  body: Record<string, any>,
+  options?: AxiosRequestConfig<any>
+): Promise<T> => {
+  const response = await apiInstance.patch<T>(url, body, options);
+  return response.data;
+};

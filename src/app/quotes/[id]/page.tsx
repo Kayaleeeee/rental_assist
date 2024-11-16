@@ -19,6 +19,7 @@ import { formatDateTime } from "@/app/utils/timeUtils";
 import { useCallback } from "react";
 import { showToast } from "@/app/utils/toastUtils";
 import { postReservation } from "@/app/api/reservation";
+import { updateQuote } from "@/app/api/quote";
 
 const defaultString = "-";
 
@@ -35,10 +36,15 @@ const QuoteDetailPage = () => {
     if (!confirm("예약을 생성하시겠습니까?")) return;
 
     try {
-      await postReservation({
+      const result = await postReservation({
         userId: detail.userId,
         quoteId: detail.id,
       });
+
+      if (!result) throw new Error("예약 생성 실패");
+
+      await updateQuote(quoteId, { reservationId: result.id });
+
       await showToast({ message: "예약이 생성되었습니다.", type: "success" });
 
       router.push("/reservations");
@@ -133,25 +139,26 @@ const QuoteDetailPage = () => {
           )}
         </div>
 
-        <div className={styles.buttonWrapper}>
-          <Button
-            size="Medium"
-            style={{ width: "150px" }}
-            //   onClick={onCreateQuote}
-          >
-            수정하기
-          </Button>
-          <Margin left={16} />
-          <Button
-            size="Medium"
-            variant="outlined"
-            style={{ width: "150px" }}
-            onClick={handleMakeReservation}
-            //   onClick={onCreateQuote}
-          >
-            예약 생성
-          </Button>
-        </div>
+        {!detail.reservationId && (
+          <div className={styles.buttonWrapper}>
+            <Button
+              size="Medium"
+              style={{ width: "150px" }}
+              //   onClick={onCreateQuote}
+            >
+              수정하기
+            </Button>
+            <Margin left={16} />
+            <Button
+              size="Medium"
+              variant="outlined"
+              style={{ width: "150px" }}
+              onClick={handleMakeReservation}
+            >
+              예약 생성
+            </Button>
+          </div>
+        )}
       </FormWrapper>
     </>
   );

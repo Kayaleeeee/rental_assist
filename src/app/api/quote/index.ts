@@ -4,7 +4,7 @@ import {
   QuotePostPayload,
   QuoteType,
 } from "@/app/types/quoteType";
-import { apiGet, apiPost } from "..";
+import { apiGet, apiPatch, apiPost } from "..";
 
 const apiUrl = "/quotes";
 const detailUrl = "/quote_detail";
@@ -26,4 +26,19 @@ export const getQuoteList = (params?: QuoteListParams) => {
 export const getQuoteDetail = async (id: number) => {
   const result = await apiGet<QuoteDetailType[]>(detailUrl, { id });
   return result[0];
+};
+
+export const updateQuote = async (
+  id: number,
+  payload: Partial<QuotePostPayload>
+) => {
+  console.log(payload, id);
+  const data = await apiPatch<QuoteType[]>(apiUrl, payload, {
+    headers: {
+      Prefer: "return=representation",
+    },
+    params: { id },
+  });
+
+  return data[0];
 };
