@@ -5,13 +5,9 @@ export type ReservationType = {
   createdAt: string;
   quoteId: QuoteItemType["id"];
   userId: number;
-  startDate: string;
-  endDate: string;
-  totalPrice: number;
-  supplyPrice: number;
-  discountPrice?: number;
   updatedAt?: string;
   status: ReservationStatus;
+  paymentStatus: PaymentStatus;
 };
 
 export enum ReservationStatus {
@@ -25,3 +21,8 @@ export enum PaymentStatus {
   paid = "결제완료",
   refunded = "환불완료",
 }
+
+export type ReservationPostPayload = {
+  quoteId: QuoteItemType["id"];
+  userId: number;
+};
