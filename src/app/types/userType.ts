@@ -11,3 +11,9 @@ export type UserType = {
 };
 
 export type UserPostPayload = Omit<UserType, "id">;
+
+export type UserListParams = {
+  name?: string;
+  phoneNumber?: string;
+  email?: string;
+};
