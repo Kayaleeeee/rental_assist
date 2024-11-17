@@ -12,6 +12,7 @@ export const PaymentStatusText = ({ status }: { status: PaymentStatus }) => {
         return "#009cd8";
     }
   }, [status]);
+
   return (
     <div
       style={{

@@ -29,12 +29,12 @@
 .filledButton {
   @include wrapper();
   color: white;
-  background-color: var(--primary);
+  background-color: var(--button-color, var(--primary));
 }
 
 .outlinedButton {
   @include wrapper();
   background: white;
-  color: var(--primary);
-  border: 1px solid var(--primary);
+  color: var(--button-color, var(--primary));
+  border: 1px solid var(--button-color, var(--primary));
 }

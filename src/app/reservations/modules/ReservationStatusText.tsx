@@ -6,10 +6,21 @@ export const ReservationStatusText = ({
 }: {
   status: ReservationStatus;
 }) => {
+  const color = useMemo(() => {
+    switch (status) {
+      case ReservationStatus.canceled:
+        return "#f3260c";
+      case ReservationStatus.confirmed:
+        return "#009cd8";
+      default:
+        return "#000";
+    }
+  }, [status]);
+
   return (
     <div
       style={{
-        // color,
+        color,
         fontWeight: 700,
       }}
     >

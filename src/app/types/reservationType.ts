@@ -42,3 +42,13 @@ export type ReservationDetailType = ReservationType & {
   supplyPrice: number;
   discountPrice?: number;
 };
+
+export type ReservationSearchParams = {
+  status?: string;
+  userName?: string;
+};
+
+export type ReservationPutPayload = {
+  status?: ReservationStatus;
+  paymentStatus?: PaymentStatus;
+};

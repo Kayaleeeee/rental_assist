@@ -1,9 +1,12 @@
 import {
   ReservationDetailType,
   ReservationPostPayload,
+  ReservationPutPayload,
+  ReservationSearchParams,
+  ReservationStatus,
   ReservationType,
 } from "@/app/types/reservationType";
-import { apiGet, apiPost } from "..";
+import { apiGet, apiPatch, apiPost } from "..";
 
 const apiUrl = "/reservations";
 const listUrl = "/reservation_list";
@@ -19,10 +22,27 @@ export const postReservation = async (payload: ReservationPostPayload) => {
   return result[0];
 };
 
-export const getReservationList = () => {
-  return apiGet<ReservationType[]>(listUrl);
+export const getReservationList = (params?: ReservationSearchParams) => {
+  return apiGet<ReservationType[]>(listUrl, params);
 };
 
 export const getReservationDetail = (id: number) => {
   return apiGet<ReservationDetailType>(detailUrl, { id });
+};
+
+export const getReservationStatusCount = async () => {
+  const result = await apiGet<
+    { statusCounts: { status: ReservationStatus; count: number }[] }[]
+  >("reservation_counts");
+
+  return result[0].statusCounts;
+};
+
+export const updateReservation = (
+  id: number,
+  payload: ReservationPutPayload
+) => {
+  return apiPatch(apiUrl, payload, {
+    params: { id },
+  });
 };
