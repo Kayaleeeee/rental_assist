@@ -95,6 +95,7 @@ export const useReservationList = () => {
 
   return {
     list,
+    setList,
     categoryList,
     selectedCategory,
     onChangeCategory,

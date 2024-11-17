@@ -65,13 +65,6 @@ const QuoteCreatePage = () => {
     <div>
       <FormWrapper title="견적서 생성">
         <div className={formStyles.sectionWrapper}>
-          <Label title="견적서 제목" />
-          <EditableField
-            value={form.title}
-            onChange={(e) => onChangeForm("title", e.target.value)}
-          />
-        </div>
-        <div className={formStyles.sectionWrapper}>
           <Label title="고객 정보" />
 
           <Button

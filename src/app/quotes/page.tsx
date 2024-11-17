@@ -19,8 +19,13 @@ const columns: GridColDef<QuoteType>[] = [
   { field: "guestName", flex: 1, renderHeader: () => HeaderName("고객명") },
 
   {
-    field: "title",
-    renderHeader: () => HeaderName("제목"),
+    field: "startDate",
+    renderHeader: () => HeaderName("대여 기간"),
+    renderCell: ({ row }) => (
+      <div>{`${formatDateTime(row.startDate)} - ${formatDateTime(
+        row.endDate
+      )}`}</div>
+    ),
     flex: 2,
   },
   {

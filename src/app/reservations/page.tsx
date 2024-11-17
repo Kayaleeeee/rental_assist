@@ -10,9 +10,14 @@ import { PaymentStatusText } from "./modules/PaymentStatusText";
 import { ReservationStatusText } from "./modules/ReservationStatusText";
 import { ReservationCategoryList } from "./modules/ReservationCategoryList";
 import { Margin } from "../components/Margin";
-import { useEffect, useState } from "react";
-import { getReservationStatusCount } from "../api/reservation";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getReservationStatusCount,
+  updateReservation,
+} from "../api/reservation";
 import { ReservationStatusChangeModal } from "./modules/StatusChangeModal";
+import { formatLocaleString } from "../utils/priceUtils";
+import { showToast } from "../utils/toastUtils";
 
 const getColumns = (
   onClickStatusButton: (reservation: ReservationType) => void
@@ -41,6 +46,7 @@ const getColumns = (
     field: "totalPrice",
     flex: 1,
     renderHeader: () => HeaderName("총 금액"),
+    renderCell: ({ row }) => <>{formatLocaleString(row.totalPrice)}</>,
   },
   {
     field: "status",
@@ -92,7 +98,7 @@ const getColumns = (
 
 export default function ReservationListPage() {
   const [isOpenStatusModal, setIsOpenStatusModal] = useState<boolean>(false);
-  const { list, categoryList, selectedCategory, onChangeCategory } =
+  const { list, setList, categoryList, selectedCategory, onChangeCategory } =
     useReservationList();
   const [selectedReservation, setSelectedReservation] =
     useState<ReservationType | null>(null);
@@ -110,6 +116,33 @@ export default function ReservationListPage() {
     setIsOpenStatusModal(false);
     setSelectedReservation(null);
   };
+
+  const onChangeStatus = useCallback(
+    async (status: ReservationStatus) => {
+      if (!selectedReservation) return;
+
+      try {
+        await updateReservation(selectedReservation.id, { status });
+        showToast({
+          message: "상태를 변경했습니다.",
+          type: "success",
+        });
+
+        setList((prev) =>
+          prev.map((item) =>
+            item.id === selectedReservation.id ? { ...item, status } : item
+          )
+        );
+        setIsOpenStatusModal(false);
+      } catch {
+        showToast({
+          message: "상태 변경에 실패했습니다.",
+          type: "error",
+        });
+      }
+    },
+    [selectedReservation]
+  );
 
   const columns = getColumns(onClickStatusButton);
 
@@ -134,9 +167,9 @@ export default function ReservationListPage() {
       />
       {isOpenStatusModal && selectedReservation && (
         <ReservationStatusChangeModal
-          reservationId={selectedReservation.id}
           currentStatus={selectedReservation.status}
           onCloseModal={onCloseStatusModal}
+          onChangeStatus={onChangeStatus}
         />
       )}
     </div>

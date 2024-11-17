@@ -13,7 +13,6 @@ export type QuoteItemType = {
 
 export type QuoteType = {
   id: number;
-  title: string;
   createdAt: string;
   userId?: number;
   guestName?: string;
@@ -37,7 +36,6 @@ export type QuoteListParams = {
 };
 
 export type QuotePostPayload = {
-  title: string;
   userId?: UserType["id"];
   guestName?: UserType["name"];
   guestPhoneNumber?: UserType["phoneNumber"];

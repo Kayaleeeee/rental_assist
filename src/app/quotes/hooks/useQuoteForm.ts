@@ -17,7 +17,6 @@ export type QuotItemStateType = {
 };
 
 type QuotePostStateType = {
-  title: string;
   userId?: string;
   guestName: string;
   guestPhoneNumber: string;
@@ -29,7 +28,6 @@ type QuotePostStateType = {
 export const useQuoteForm = () => {
   const router = useRouter();
   const [form, setForm] = useState<QuotePostStateType>({
-    title: "",
     guestName: "",
     guestPhoneNumber: "",
     discountPrice: 0,

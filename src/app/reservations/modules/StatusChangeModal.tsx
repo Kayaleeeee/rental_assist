@@ -14,15 +14,15 @@ const statusMenu = [
 ];
 
 type Props = {
-  reservationId: number;
   currentStatus: ReservationStatus;
   onCloseModal: () => void;
+  onChangeStatus: (status: ReservationStatus) => void;
 };
 
 export const ReservationStatusChangeModal = ({
-  reservationId,
   onCloseModal,
   currentStatus,
+  onChangeStatus,
 }: Props) => {
   const [selectedStatus, setSelectedStatus] =
     useState<ReservationStatus>(currentStatus);
@@ -30,20 +30,8 @@ export const ReservationStatusChangeModal = ({
   const onConfirmChange = useCallback(async () => {
     if (!confirm("예약 상태를 변경하시겠어요?")) return;
 
-    try {
-      await updateReservation(reservationId, { status: selectedStatus });
-      showToast({
-        message: "상태를 변경했습니다.",
-        type: "success",
-      });
-      onCloseModal();
-    } catch {
-      showToast({
-        message: "상태 변경에 실패했습니다.",
-        type: "error",
-      });
-    }
-  }, [selectedStatus, reservationId]);
+    onChangeStatus(selectedStatus);
+  }, [selectedStatus]);
 
   return (
     <Modal
