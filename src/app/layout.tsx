@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Menu } from "@components/Menu";
-import Link from "next/link";
-import { NavLoginButton } from "./components/Button/NavLoginButton";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -77,12 +75,6 @@ export default function RootLayout({
           pauseOnHover
           theme="colored"
         />
-        <nav className="navWrapper">
-          <Link href={"/"}>
-            <h1 className="mainTitle">Rental Assist</h1>
-          </Link>
-          <NavLoginButton />
-        </nav>
         <div className="mainWrapper">
           <aside>
             <Menu />

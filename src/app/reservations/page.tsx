@@ -8,7 +8,6 @@ import { Button } from "../components/Button";
 import Link from "next/link";
 import { PaymentStatusText } from "./modules/PaymentStatusText";
 import { ReservationStatusText } from "./modules/ReservationStatusText";
-import { ReservationCategoryList } from "./modules/ReservationCategoryList";
 import { Margin } from "../components/Margin";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -18,6 +17,7 @@ import {
 import { ReservationStatusChangeModal } from "./modules/StatusChangeModal";
 import { formatLocaleString } from "../utils/priceUtils";
 import { showToast } from "../utils/toastUtils";
+import { CategoryList } from "../components/Category/CategoryList";
 
 const getColumns = (
   onClickStatusButton: (reservation: ReservationType) => void
@@ -66,7 +66,7 @@ const getColumns = (
     renderHeader: () => HeaderName("견적서"),
     align: "center",
     renderCell: ({ row }) => (
-      <Link href={`/quotes/${row.quoteId}`} target="blank">
+      <Link href={`/quotes/${row.quoteId}`} target="_blank">
         <Button
           variant="outlined"
           size="Small"
@@ -149,7 +149,7 @@ export default function ReservationListPage() {
   return (
     <div>
       <Margin top={24} />
-      <ReservationCategoryList
+      <CategoryList
         categoryList={categoryList}
         selectedCategory={selectedCategory}
         onChangeCategory={onChangeCategory}

@@ -1,13 +1,18 @@
-import { Margin } from "@/app/components/Margin";
-import styles from "./reservationCategoryList.module.scss";
+import { ReactElement } from "react";
+import styles from "./category.module.scss";
+
+interface CategoryMenu {
+  key: string;
+  title: string | ReactElement;
+}
 
 type Props = {
-  categoryList: { key: string; title: string; count: number }[];
-  selectedCategory: string;
-  onChangeCategory: (key: string) => void;
+  categoryList: CategoryMenu[];
+  selectedCategory?: string;
+  onChangeCategory: (key: CategoryMenu["key"]) => void;
 };
 
-export const ReservationCategoryList = ({
+export const CategoryList = ({
   categoryList,
   selectedCategory,
   onChangeCategory,
@@ -25,10 +30,7 @@ export const ReservationCategoryList = ({
                 : styles.categoryItem
             }
           >
-            <Margin right={5}>
-              <b>{item.title}</b>
-            </Margin>
-            {item.key !== "all" && `(${item.count})`}
+            <b>{item.title}</b>
           </div>
         );
       })}

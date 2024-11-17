@@ -64,7 +64,7 @@ const QuoteDetailPage = () => {
           marginBottom: "20px",
         }}
       />
-      <FormWrapper title={detail.title}>
+      <FormWrapper title={"장비 견적서"}>
         <div className={formStyles.sectionWrapper}>
           <Label title="고객 정보" />
 

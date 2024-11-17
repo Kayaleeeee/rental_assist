@@ -9,7 +9,9 @@ type Props = {
 export const ListButton = (props: PropsWithChildren<Props>) => {
   return (
     <button className={styles.wrapper} {...props}>
-      <ArrowBackRoundedIcon sx={{ marginRight: "4px", color: "#529aff" }} />
+      <ArrowBackRoundedIcon
+        sx={{ marginRight: "4px", color: "var(--primary)" }}
+      />
       {props.title || props.children}
     </button>
   );

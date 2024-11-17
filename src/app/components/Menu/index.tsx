@@ -35,19 +35,14 @@ const menuList = [
 
 export const Menu = () => {
   const path = usePathname();
-  const [isHide, setIsHide] = useState<boolean>(false);
 
   return (
-    <div className={isHide ? styles.hiddenMenuWrapper : styles.wrapper}>
-      <div
-        className={styles.hideMenu}
-        onClick={() => setIsHide((prev) => !prev)}
-      >
-        <div className={styles.icon}>
-          <ArrowBackIosNewOutlinedIcon fontSize={"medium"} />
-        </div>
-        {!isHide && "메뉴 숨기기"}
-      </div>
+    <div className={styles.wrapper}>
+      <Link href={"/"}>
+        <h1 className="mainTitle">{`RENTAL\nASSIST`}</h1>
+      </Link>
+
+      <div className={styles.line}></div>
       {menuList.map((item, index) => {
         const isSelected = path?.includes(item.path);
 
@@ -58,7 +53,7 @@ export const Menu = () => {
             href={item.path}
           >
             <div className={styles.icon}>{item.renderIcon()}</div>
-            {!isHide && item.title}
+            {item.title}
           </Link>
         );
       })}

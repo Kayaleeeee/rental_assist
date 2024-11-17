@@ -5,16 +5,18 @@
 }
 
 .categoryItem {
+  cursor: pointer;
   display: flex;
   padding: 8px 24px;
   border-radius: 24px;
   background: #fff;
+  font-size: 14px;
+  background: #fff;
+  box-shadow: var(--shadow);
 }
 
 .activeCategoryItem {
-  display: flex;
-  padding: 8px 24px;
-  border-radius: 24px;
+  @extend .categoryItem;
   background: var(--primary);
   color: white;
 }

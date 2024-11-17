@@ -2,9 +2,9 @@
   --background: #fffff;
   --foreground: #171717;
   --grey: #8c8c8c;
-  --grey-1: #d9d8d8;
-  --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-  --primary: #529aff;
+  --grey-1: #e8e8e8;
+  --shadow: rgba(100, 100, 111, 0.2) 0px 7px 18px 0px;
+  --primary: #1b293d;
   --error: #ff4d4f;
 }
 
@@ -30,13 +30,17 @@ body {
   padding: 0 24px;
   color: #1a1a1a;
   background: white;
-  box-shadow: var(--shadow);
   z-index: 1;
 }
 
 .mainTitle {
   color: black;
   font-size: 1.5rem;
+  font-weight: 800;
+  margin: 24px 8px;
+  height: 70px;
+  text-align: center;
+  white-space: pre-wrap;
 }
 
 .mainWrapper {
@@ -50,7 +54,6 @@ body {
 }
 
 body {
-  background-color: #ddecff;
   font-family: "NotoSansKR", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -6,6 +6,7 @@ import { Button } from "../components/Button";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEquipmentList } from "./hooks/useEquipmentList";
 import {
+  EquipmentCategory,
   EquipmentCategoryList,
   EquipmentListItemType,
 } from "../types/equipmentType";
@@ -14,6 +15,7 @@ import { formatLocaleString } from "../utils/priceUtils";
 import { Margin } from "../components/Margin";
 import formStyles from "@components/Form/index.module.scss";
 import { HeaderName } from "../components/DataTable/HeaderName";
+import { CategoryList } from "../components/Category/CategoryList";
 
 const columns: GridColDef<EquipmentListItemType>[] = [
   {
@@ -53,23 +55,13 @@ export default function EquipmentPage() {
 
       <Margin top={40} />
 
-      <div className={styles.listCategoryWrapper}>
-        {EquipmentCategoryList.map((category) => {
-          return (
-            <div
-              className={
-                category.key === selectedCategory
-                  ? styles.activeCategoryItem
-                  : styles.categoryItem
-              }
-              key={category.key}
-              onClick={() => toggleEquipmentCategory(category.key)}
-            >
-              {category.title}
-            </div>
-          );
-        })}
-      </div>
+      <CategoryList
+        categoryList={EquipmentCategoryList}
+        selectedCategory={selectedCategory}
+        onChangeCategory={(key) =>
+          toggleEquipmentCategory(key as EquipmentCategory)
+        }
+      />
 
       <DataGrid<EquipmentListItemType>
         columns={columns}
