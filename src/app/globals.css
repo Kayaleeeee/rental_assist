@@ -6,6 +6,8 @@
   --shadow: rgba(100, 100, 111, 0.2) 0px 7px 18px 0px;
   --primary: #1b293d;
   --error: #ff4d4f;
+  --green: #27b67b;
+  --green-1: #eaf5ef;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -16,6 +16,9 @@ import { EquipmentCategoryList } from "@/app/types/equipmentType";
 import { useMemo } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
+import { CalendarComponent } from "@/app/components/Calendar";
+import { useEquipmentRentalDates } from "../hooks/useEquipmenRentalDates";
+import { convertRentedDaysToEvent } from "@/app/components/Calendar/calendarUtils";
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
@@ -23,6 +26,13 @@ const EquipmentDetailPage = () => {
   const equipmentId = Number(params.id);
 
   const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
+  const { rentalDateList } = useEquipmentRentalDates(equipmentId);
+
+  const eventDateList = useMemo(
+    () => rentalDateList.map(convertRentedDaysToEvent),
+    [rentalDateList]
+  );
+
   const selectedCategory = useMemo(() => {
     if (!equipmentDetail) return "";
 
@@ -45,50 +55,58 @@ const EquipmentDetailPage = () => {
         }}
       />
       <FormWrapper>
-        <div className={styles.sectionWrapper}>
-          <Label title="카테고리" />
-          <EditableField isEditable={false} value={selectedCategory} />
-        </div>
-        <Margin top={20} />
-
-        <div className={styles.sectionWrapper}>
-          <Label title="장비명" />
-          <EditableField
-            isEditable={false}
-            fullWidth
-            value={equipmentDetail.title}
-          />
-        </div>
-        <Margin top={20} />
-
-        <div className={styles.sectionWrapper}>
-          <Label title="렌탈 가격" />
-          <div className={styles.detailPriceWrapper}>
-            <EditableField
-              isEditable={false}
-              fullWidth
-              value={formatLocaleString(equipmentDetail.price)}
-            />
-            <div
-              className={styles.convertedPrice}
-              style={{ marginLeft: "10px" }}
-            >
-              ({formatKoreanCurrency(equipmentDetail.price)})
+        <div className={styles.flexibleInline}>
+          <div className={styles.detailWrapper}>
+            <div className={styles.sectionWrapper}>
+              <Label title="카테고리" />
+              <EditableField isEditable={false} value={selectedCategory} />
             </div>
+            <Margin top={20} />
+
+            <div className={styles.sectionWrapper}>
+              <Label title="장비명" />
+              <EditableField
+                isEditable={false}
+                fullWidth
+                value={equipmentDetail.title}
+              />
+            </div>
+            <Margin top={20} />
+
+            <div className={styles.sectionWrapper}>
+              <Label title="렌탈 가격" />
+              <div className={styles.detailPriceWrapper}>
+                <EditableField
+                  isEditable={false}
+                  fullWidth
+                  value={formatLocaleString(equipmentDetail.price)}
+                />
+                <div
+                  className={styles.convertedPrice}
+                  style={{ marginLeft: "10px" }}
+                >
+                  ({formatKoreanCurrency(equipmentDetail.price)})
+                </div>
+              </div>
+            </div>
+            <Margin top={20} />
+
+            <div className={styles.sectionWrapper}>
+              <Label title="상세 정보" />
+              <EditableField
+                isEditable={false}
+                fullWidth
+                multiline
+                value={equipmentDetail.detail}
+              />
+            </div>
+            <Margin top={20} />
+          </div>
+          <div className={styles.reservationCalendarWrapper}>
+            <Label title="예약 현황" />
+            <CalendarComponent size={500} eventDateList={eventDateList} />
           </div>
         </div>
-        <Margin top={20} />
-
-        <div className={styles.sectionWrapper}>
-          <Label title="상세 정보" />
-          <EditableField
-            isEditable={false}
-            fullWidth
-            multiline
-            value={equipmentDetail.detail}
-          />
-        </div>
-        <Margin top={20} />
 
         <div className={styles.buttonWrapper}>
           <Button

@@ -47,3 +47,7 @@ export const EquipmentCategoryList: {
 }[] = Object.entries(EquipmentCategory).map(([key, value]) => {
   return { key: key as EquipmentCategory, title: value };
 });
+
+export type EquipmentItemWithRentedDates = EquipmentListItemType & {
+  rentedDates: { startDate: string; endDate: string }[];
+};
