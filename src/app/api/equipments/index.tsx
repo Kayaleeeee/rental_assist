@@ -33,11 +33,11 @@ export const getEquipmentListWithRentedDates = (params?: {
 
 export const getEquipmentRentedDates = async (
   equipmentId: EquipmentListItemType["id"]
-): Promise<EquipmentItemWithRentedDates["rentedDates"]> => {
+): Promise<EquipmentItemWithRentedDates | null> => {
   const result = await apiGet<EquipmentItemWithRentedDates[]>(
     `/equipment_with_rented_dates`,
     { equipmentId }
   );
 
-  return isEmpty(result) ? [] : result[0].rentedDates;
+  return isEmpty(result) ? null : result[0];
 };

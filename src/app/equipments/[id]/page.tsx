@@ -18,7 +18,8 @@ import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
 import { CalendarComponent } from "@/app/components/Calendar";
 import { useEquipmentRentalDates } from "../hooks/useEquipmenRentalDates";
-import { convertRentedDaysToEvent } from "@/app/components/Calendar/calendarUtils";
+import dayjs from "dayjs";
+import { Event } from "react-big-calendar";
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
@@ -26,12 +27,16 @@ const EquipmentDetailPage = () => {
   const equipmentId = Number(params.id);
 
   const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
-  const { rentalDateList } = useEquipmentRentalDates(equipmentId);
+  const { rentalInfo } = useEquipmentRentalDates(equipmentId);
 
-  const eventDateList = useMemo(
-    () => rentalDateList.map(convertRentedDaysToEvent),
-    [rentalDateList]
-  );
+  const eventDateList: Event[] = useMemo(() => {
+    if (!rentalInfo) return [];
+    return rentalInfo.rentedDates.map((item) => ({
+      start: dayjs(item.startDate).toDate(),
+      end: dayjs(item.endDate).toDate(),
+      title: rentalInfo.reservationId,
+    }));
+  }, [rentalInfo]);
 
   const selectedCategory = useMemo(() => {
     if (!equipmentDetail) return "";

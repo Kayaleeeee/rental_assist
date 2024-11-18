@@ -7,22 +7,33 @@ import { showToast } from "@/app/utils/toastUtils";
 import { useEffect, useState } from "react";
 
 export const useEquipmentRentalDates = (id?: EquipmentListItemType["id"]) => {
-  const [rentalDateList, setRentalDateList] = useState<
-    EquipmentItemWithRentedDates["rentedDates"]
-  >([]);
+  const [rentalInfo, setRentalInfo] = useState<
+    | {
+        rentedDates: EquipmentItemWithRentedDates["rentedDates"];
+        reservationId: EquipmentItemWithRentedDates["reservationId"];
+      }
+    | undefined
+  >(undefined);
 
   const fetchRentalDateList = async (id: EquipmentListItemType["id"]) => {
     try {
       const result = await getEquipmentRentedDates(id);
 
-      setRentalDateList(result);
+      if (!result) {
+        setRentalInfo(undefined);
+      } else {
+        setRentalInfo({
+          rentedDates: result.rentedDates,
+          reservationId: result.reservationId,
+        });
+      }
     } catch (e) {
       showToast({
         message: "예약 히스토리를 조회하는데 실패했습니다.",
         type: "error",
       });
 
-      setRentalDateList([]);
+      setRentalInfo(undefined);
     }
   };
 
@@ -32,5 +43,5 @@ export const useEquipmentRentalDates = (id?: EquipmentListItemType["id"]) => {
     fetchRentalDateList(id);
   }, [id]);
 
-  return { rentalDateList };
+  return { rentalInfo };
 };

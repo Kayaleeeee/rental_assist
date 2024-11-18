@@ -1,3 +1,5 @@
+import { ReservationType } from "./reservationType";
+
 export type EquipmentListItemType = {
   id: number;
   title: string;
@@ -50,4 +52,5 @@ export const EquipmentCategoryList: {
 
 export type EquipmentItemWithRentedDates = EquipmentListItemType & {
   rentedDates: { startDate: string; endDate: string }[];
+  reservationId: ReservationType["id"];
 };
