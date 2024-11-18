@@ -23,6 +23,7 @@
     "lodash": "^4.17.21",
     "next": "14.2.15",
     "react": "^18",
+    "react-big-calendar": "^1.15.0",
     "react-dom": "^18",
     "react-toastify": "^10.0.6",
     "zustand": "^5.0.1"
@@ -30,6 +31,7 @@
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
+    "@types/react-big-calendar": "^1.15.0",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
