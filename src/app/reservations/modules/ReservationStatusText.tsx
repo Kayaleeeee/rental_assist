@@ -3,8 +3,10 @@ import { useMemo } from "react";
 
 export const ReservationStatusText = ({
   status,
+  size = 14,
 }: {
   status: ReservationStatus;
+  size?: number;
 }) => {
   const color = useMemo(() => {
     switch (status) {
@@ -22,6 +24,7 @@ export const ReservationStatusText = ({
       style={{
         color,
         fontWeight: 700,
+        fontSize: size,
       }}
     >
       {getReservationStatusText(status)}

@@ -1,7 +1,13 @@
 import { PaymentStatus } from "@/app/types/reservationType";
 import { useMemo } from "react";
 
-export const PaymentStatusText = ({ status }: { status: PaymentStatus }) => {
+export const PaymentStatusText = ({
+  status,
+  size,
+}: {
+  status: PaymentStatus;
+  size?: number;
+}) => {
   const color = useMemo(() => {
     switch (status) {
       case PaymentStatus.unpaid:
@@ -18,6 +24,7 @@ export const PaymentStatusText = ({ status }: { status: PaymentStatus }) => {
       style={{
         color,
         fontWeight: 700,
+        fontSize: size || 14,
       }}
     >
       {getPaymentStatusText(status)}
@@ -25,7 +32,7 @@ export const PaymentStatusText = ({ status }: { status: PaymentStatus }) => {
   );
 };
 
-const getPaymentStatusText = (status: PaymentStatus) => {
+export const getPaymentStatusText = (status: PaymentStatus) => {
   switch (status) {
     case PaymentStatus.paid:
       return "결제완료";

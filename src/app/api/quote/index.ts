@@ -32,7 +32,6 @@ export const updateQuote = async (
   id: number,
   payload: Partial<QuotePostPayload>
 ) => {
-  console.log(payload, id);
   const data = await apiPatch<QuoteType[]>(apiUrl, payload, {
     headers: {
       Prefer: "return=representation",

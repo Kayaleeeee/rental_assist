@@ -13,6 +13,7 @@ export type ReservationType = {
   startDate: string;
   endDate: string;
   userName: string;
+  paymentMethod?: PaymentMethod;
 };
 
 export enum ReservationStatus {
@@ -25,6 +26,12 @@ export enum PaymentStatus {
   unpaid = "unpaid",
   paid = "paid",
   refunded = "refunded",
+}
+
+export enum PaymentMethod {
+  card = "card",
+  cash = "cash",
+  bank_transfer = "bank_transfer",
 }
 
 export type ReservationPostPayload = {
@@ -41,6 +48,7 @@ export type ReservationDetailType = ReservationType & {
   phoneNumber: UserType["phoneNumber"];
   supplyPrice: number;
   discountPrice?: number;
+  paymentMethod?: PaymentMethod;
 };
 
 export type ReservationSearchParams = {

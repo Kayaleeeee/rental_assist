@@ -2,10 +2,7 @@ import { Margin } from "@/app/components/Margin";
 import { ReservationStatus } from "@/app/types/reservationType";
 import { Modal } from "@components/Modal";
 import { MenuItem, Select } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
-import { ReservationStatusText } from "./ReservationStatusText";
-import { updateReservation } from "@/app/api/reservation";
-import { showToast } from "@/app/utils/toastUtils";
+import { useCallback, useState } from "react";
 
 const statusMenu = [
   { key: ReservationStatus.pending, title: "대기" },

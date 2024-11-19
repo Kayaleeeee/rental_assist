@@ -31,12 +31,12 @@ export const CalendarComponent = ({
   const goToPrevMonth = useCallback(() => {
     if (dayjs(currentDate).isBefore(MIN_DATE)) return;
     setCurrentDate(dayjs(currentDate).subtract(1, "month").toISOString());
-  }, [currentDate]);
+  }, [currentDate, MIN_DATE]);
 
-  const goToNextMonth = () => {
+  const goToNextMonth = useCallback(() => {
     if (dayjs(currentDate).isAfter(MAX_DATE)) return;
     setCurrentDate(dayjs(currentDate).add(1, "month").toISOString());
-  };
+  }, [currentDate, MAX_DATE]);
 
   return (
     <div
