@@ -50,7 +50,18 @@ export const EquipmentCategoryList: {
   return { key: key as EquipmentCategory, title: value };
 });
 
-export type EquipmentItemWithRentedDates = EquipmentListItemType & {
+export type EquipmentItemWithRentedDates = {
+  equipmentId: EquipmentListItemType["id"];
+  title: string;
+  price: number;
+  category: string;
+  detail: string;
   rentedDates: { startDate: string; endDate: string }[];
   reservationId: ReservationType["id"];
+};
+
+export type EquipmentItemWithRentalDatesParams = {
+  category?: EquipmentCategory;
+  startDate?: string;
+  endDate?: string;
 };

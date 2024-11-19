@@ -21,7 +21,7 @@ export const useUserList = () => {
 
   useEffect(() => {
     fetchUserList();
-  }, [fetchUserList]);
+  }, []);
 
   return { list };
 };

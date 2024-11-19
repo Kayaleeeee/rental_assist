@@ -1,14 +1,20 @@
 "use client";
 
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import {
+  DateTimePicker,
+  DateTimePickerProps,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 type Props = {
   label?: string;
   value?: string | null;
   onChange?: (date: string | null) => void;
   disabled?: boolean;
+  minDateTime?: Dayjs;
+  maxDateTime?: Dayjs;
 };
 
 export const DateTimeSelector = ({
@@ -16,6 +22,8 @@ export const DateTimeSelector = ({
   onChange,
   value,
   disabled = false,
+  maxDateTime,
+  minDateTime,
 }: Props) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -23,6 +31,8 @@ export const DateTimeSelector = ({
         label={label}
         value={value ? dayjs(value) : undefined}
         disabled={disabled}
+        minDateTime={minDateTime}
+        maxDateTime={maxDateTime}
         onChange={(value) => {
           const dateTime = value?.toISOString() || null;
 

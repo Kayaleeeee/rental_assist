@@ -6,6 +6,7 @@ import { UserSearchBar } from "./UserSearchBar/UserSearchBar";
 import { useUserSearchList } from "../hooks/useUserSearchList";
 import { isEmpty } from "lodash";
 import { showToast } from "@/app/utils/toastUtils";
+import { useState } from "react";
 
 const HeaderName = (name: string) => {
   return (
@@ -44,6 +45,9 @@ type Props = {
 };
 
 export const UserSearchModal = ({ onCloseModal, onConfirm }: Props) => {
+  const [selectedUserState, setSelectedUserState] = useState<UserType | null>(
+    null
+  );
   const { list, setKeyword, keyword, searchKey, setSearchKey, fetchUserList } =
     useUserSearchList();
 
@@ -62,7 +66,7 @@ export const UserSearchModal = ({ onCloseModal, onConfirm }: Props) => {
         {
           title: "추가하기",
           onClick: () => {
-            if (isEmpty(list)) {
+            if (isEmpty(list) || !selectedUserState) {
               showToast({
                 message: "사용자를 선택해주세요.",
                 type: "error",
@@ -70,7 +74,7 @@ export const UserSearchModal = ({ onCloseModal, onConfirm }: Props) => {
               return;
             }
 
-            onConfirm(list[0]);
+            onConfirm(selectedUserState);
             onCloseModal();
           },
         },
@@ -78,7 +82,8 @@ export const UserSearchModal = ({ onCloseModal, onConfirm }: Props) => {
     >
       <div
         style={{
-          width: "900px",
+          width: "70vw",
+          maxWidth: "800px",
           minHeight: "300px",
           maxHeight: "80vh",
           display: "flex",
@@ -103,21 +108,19 @@ export const UserSearchModal = ({ onCloseModal, onConfirm }: Props) => {
           onChangeSearchKey={setSearchKey}
           onSearch={fetchUserList}
         />
-        {!isEmpty(list) && (
-          <DataGrid<UserType>
-            columns={columns}
-            onCellClick={({ row }) => onConfirm(row)}
-            rows={list}
-            getRowId={(cell) => cell.id}
-            sx={{
-              background: "white",
-              width: "100%",
-              minHeight: "400px",
-              borderRadius: "16px",
-              marginTop: "24px",
-            }}
-          />
-        )}
+        <DataGrid<UserType>
+          columns={columns}
+          onCellClick={({ row }) => setSelectedUserState(row)}
+          rows={list}
+          getRowId={(cell) => cell.id}
+          sx={{
+            background: "white",
+            width: "100%",
+            minHeight: "200px",
+            borderRadius: "16px",
+            marginTop: "24px",
+          }}
+        />
         <Margin bottom={20} />
       </div>
     </Modal>

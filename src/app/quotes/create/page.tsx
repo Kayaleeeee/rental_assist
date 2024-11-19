@@ -8,7 +8,7 @@ import { Label } from "@/app/components/Form/Label";
 import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 import { useQuoteForm } from "../hooks/useQuoteForm";
 import { Margin } from "@/app/components/Margin";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EquipmentSearchModal } from "../modules/EquipmentSearchModal";
 import { QuotationItemEditor } from "../modules/QuotationItemEditor";
 import {
@@ -19,6 +19,10 @@ import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
+import dayjs from "dayjs";
+import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
+import { isEmpty } from "lodash";
+import { isDateRangeOverlap } from "@/app/utils/timeUtils";
 
 const QuoteCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -38,6 +42,11 @@ const QuoteCreatePage = () => {
     totalPrice,
     totalSupplyPrice,
   } = useQuoteForm();
+
+  const { list: rentedEquipmentList } = useEquipmentListWithRentedDates({
+    startDate: form.startDate,
+    endDate: form.endDate,
+  });
 
   useEffect(() => {
     setIsDiscounted(form.discountPrice > 0);
@@ -61,6 +70,21 @@ const QuoteCreatePage = () => {
     }));
   };
 
+  const unavailableEquipmentIdList = useMemo((): number[] => {
+    if (!form.startDate || !form.endDate) return [];
+
+    const idList = [...quoteItemListState].map((item) => item.equipmentId);
+
+    if (isEmpty(rentedEquipmentList)) return idList;
+
+    rentedEquipmentList.forEach((item) => {
+      if (idList.includes(item.equipmentId)) return;
+      idList.push(item.equipmentId);
+    });
+
+    return idList;
+  }, [quoteItemListState, form.startDate, form.endDate, rentedEquipmentList]);
+
   return (
     <div>
       <FormWrapper title="견적서 생성">
@@ -72,21 +96,17 @@ const QuoteCreatePage = () => {
             size="Medium"
             onClick={() => setIsOpenUserModal(true)}
           >
-            회원 찾기
+            {form.userId ? "회원 변경" : "회원 찾기"}
           </Button>
-          <Label title="이름" />
-          <EditableField
-            value={form.guestName}
-            onChange={(e) => onChangeForm("guestName", e.target.value)}
-          />
-          <Margin top={10} />
-          <Label title="전화번호" />
-          <EditableField
-            value={form.guestPhoneNumber || ""}
-            onChange={(e) => {
-              onChangeForm("guestPhoneNumber", e.target.value);
-            }}
-          />
+          {form.userId && (
+            <div className={formStyles.sectionWrapper}>
+              <Label title="이름" />
+              <EditableField aria-readonly value={form.guestName} />
+              <Margin top={10} />
+              <Label title="전화번호" />
+              <EditableField value={form.guestPhoneNumber || ""} />
+            </div>
+          )}
         </div>
         <div className={formStyles.sectionWrapper}>
           <Label title={`기간 설정 (총 ${rentalDays}일)`} />
@@ -100,7 +120,9 @@ const QuoteCreatePage = () => {
             <div className={styles.separator}>~</div>
             <DateTimeSelector
               label="반납 시간"
+              disabled={!form.startDate}
               value={form.endDate}
+              minDateTime={dayjs(form.startDate)}
               onChange={(value) => onChangeForm("endDate", value)}
             />
           </div>
@@ -201,9 +223,9 @@ const QuoteCreatePage = () => {
           </Button>
         </div>
       </FormWrapper>
-      {isOpenSearchModal && (
+      {isOpenSearchModal && form.startDate && form.endDate && (
         <EquipmentSearchModal
-          disabledIdList={quoteItemListState.map((quote) => quote.equipmentId)}
+          disabledIdList={unavailableEquipmentIdList}
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={onAddQuoteItemList}
         />

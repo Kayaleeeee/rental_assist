@@ -24,7 +24,7 @@ export const useEquipmentList = () => {
 
   useEffect(() => {
     fetchList();
-  }, [fetchList]);
+  }, []);
 
   const toggleEquipmentCategory = (
     categoryKey: EquipmentCategory | undefined

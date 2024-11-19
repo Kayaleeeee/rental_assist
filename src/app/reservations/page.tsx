@@ -18,6 +18,7 @@ import { ReservationStatusChangeModal } from "./modules/StatusChangeModal";
 import { formatLocaleString } from "../utils/priceUtils";
 import { showToast } from "../utils/toastUtils";
 import { CategoryList } from "../components/Category/CategoryList";
+import { formatDateTime } from "../utils/timeUtils";
 
 const getColumns = (
   onClickStatusButton: (reservation: ReservationType) => void
@@ -35,10 +36,12 @@ const getColumns = (
   {
     field: "startDate",
     renderHeader: () => HeaderName("대여 시작일"),
+    renderCell: ({ row }) => <>{formatDateTime(row.startDate)}</>,
     flex: 1,
   },
   {
     field: "endDate",
+    renderCell: ({ row }) => <>{formatDateTime(row.endDate)}</>,
     renderHeader: () => HeaderName("대여 종료일"),
     flex: 1,
   },

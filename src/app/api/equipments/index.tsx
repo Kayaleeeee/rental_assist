@@ -1,5 +1,6 @@
 import {
   EquipmentDetailType,
+  EquipmentItemWithRentalDatesParams,
   EquipmentItemWithRentedDates,
   EquipmentListItemType,
   EquipmentListParams,
@@ -22,12 +23,21 @@ export const getEquipmentDetail = (id: number) => {
   return apiGet<EquipmentDetailType[]>(apiUrl, { id });
 };
 
-export const getEquipmentListWithRentedDates = (params?: {
-  equipmentId: EquipmentListItemType["id"];
-}) => {
+export const getEquipmentListWithRentedDates = (
+  params?: EquipmentItemWithRentalDatesParams
+) => {
+  const convertParams = () => {
+    if (!params?.startDate || !params?.endDate) return {};
+
+    return {
+      start_date: `gte.${params.startDate}`,
+      end_date: `lte.${params.endDate}`,
+    };
+  };
+
   return apiGet<EquipmentItemWithRentedDates[]>(
-    `/equipment_with_rented_dates`,
-    params
+    `/equipment_rental_history`,
+    convertParams()
   );
 };
 

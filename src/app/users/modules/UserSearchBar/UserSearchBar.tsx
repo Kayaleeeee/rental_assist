@@ -56,6 +56,11 @@ export const UserSearchBar = ({
         fullWidth
         value={keyword}
         onChange={(e) => onChangeKeyword(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            onSearch();
+          }
+        }}
       />
       <Button
         size="Medium"

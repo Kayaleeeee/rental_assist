@@ -36,11 +36,22 @@ export const apiInstance = axios.create({
     "Content-Type": "application/json",
     apikey: anonKey,
   },
+
   paramsSerializer: (params) => {
+    const prefix = ["lt.", "lte.", "gt.", "gte.", "eq."];
+
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
-      searchParams.append(key, `eq.${value}`);
+      if (
+        typeof value === "string" &&
+        prefix.some((item) => value.startsWith(item))
+      ) {
+        searchParams.append(key, value);
+      } else {
+        searchParams.append(key, `eq.${value}`);
+      }
     }
+
     return searchParams.toString();
   },
 });

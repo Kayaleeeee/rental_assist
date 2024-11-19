@@ -1,7 +1,9 @@
+import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { Label } from "@/app/components/Form/Label";
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
 import { useEquipmentList } from "@/app/equipments/hooks/useEquipmentList";
+
 import {
   EquipmentCategory,
   EquipmentCategoryList,
@@ -14,17 +16,6 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
 
 const allString = "all";
-const HeaderName = (name: string) => {
-  return (
-    <div
-      style={{
-        fontWeight: 900,
-      }}
-    >
-      {name}
-    </div>
-  );
-};
 
 const columns: GridColDef<EquipmentListItemType>[] = [
   {
@@ -86,7 +77,8 @@ export const EquipmentSearchModal = ({
     >
       <div
         style={{
-          width: "900px",
+          width: "80vw",
+          maxWidth: "900px",
           maxHeight: "80vh",
         }}
       >
@@ -141,7 +133,7 @@ export const EquipmentSearchModal = ({
           sx={{
             background: "white",
             width: "100%",
-            minHeight: "400px",
+            maxHeight: "60vh",
             borderRadius: "16px",
             marginTop: "24px",
           }}
