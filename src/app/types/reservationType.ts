@@ -54,6 +54,7 @@ export type ReservationDetailType = ReservationType & {
 export type ReservationSearchParams = {
   status?: string;
   userName?: string;
+  userId?: UserType["id"];
 };
 
 export type ReservationPutPayload = {

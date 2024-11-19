@@ -34,7 +34,7 @@ const initialCategoryList = [
   },
 ];
 
-export const useReservationList = () => {
+export const useReservationList = (fetchOnMount = true) => {
   const [list, setList] = useState<ReservationType[]>([]);
   const [categoryList, setCategoryList] =
     useState<{ key: string; title: string; count: number }[]>(
@@ -84,9 +84,10 @@ export const useReservationList = () => {
   };
 
   useEffect(() => {
+    if (!fetchOnMount) return;
     fetchReservationCount();
     fetchReservationList();
-  }, []);
+  }, [fetchOnMount]);
 
   const onChangeCategory = (key: string) => {
     setSelectedCategory(key);
@@ -99,5 +100,6 @@ export const useReservationList = () => {
     categoryList,
     selectedCategory,
     onChangeCategory,
+    fetchReservationList,
   };
 };
