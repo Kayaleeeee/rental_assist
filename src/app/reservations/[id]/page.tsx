@@ -2,7 +2,7 @@
 
 import { ListButton } from "@/app/components/Button/ListButton";
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import formStyles from "@components/Form/index.module.scss";
 import { Label } from "@/app/components/Form/Label";
 import { EditableField } from "@/app/components/EditableField";
@@ -40,20 +40,18 @@ const ReservationDetailPage = () => {
   const router = useRouter();
   const params = useParams();
 
-  const searchParams = useSearchParams();
-  const quoteParams = searchParams.get("quoteId");
-  const quoteId = Number(quoteParams);
-
   const reservationId = Number(params.id);
+
+  const { detail: reservationDetail, setDetail: setReservationDetail } =
+    useReservationDetail(reservationId);
+
+  const quoteId = Number(reservationDetail?.quoteId);
 
   const {
     detail: quoteDetail,
     quoteItemList,
     rentalDays,
   } = useQuoteDetail(isNaN(quoteId) ? undefined : quoteId);
-
-  const { detail: reservationDetail, setDetail: setReservationDetail } =
-    useReservationDetail(reservationId);
 
   const formWrapperStyle = {
     width: "200px",

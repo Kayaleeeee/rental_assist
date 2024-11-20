@@ -8,7 +8,7 @@ import { Label } from "@/app/components/Form/Label";
 import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 import { useQuoteForm } from "../hooks/useQuoteForm";
 import { Margin } from "@/app/components/Margin";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EquipmentSearchModal } from "../modules/EquipmentSearchModal";
 import { QuotationItemEditor } from "../modules/QuotationItemEditor";
 import {
@@ -22,13 +22,17 @@ import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { isEmpty } from "lodash";
-import { isDateRangeOverlap } from "@/app/utils/timeUtils";
+import { useCartStore } from "@/app/store/useCartStore";
+import { useUnmount } from "usehooks-ts";
 
 const QuoteCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const [isOpenUserModal, setIsOpenUserModal] = useState(false);
   const [isDiscounted, setIsDiscounted] = useState<boolean>(false);
   const [discountPriceState, setDiscountPriceState] = useState<number>(0);
+
+  const { list, resetCart } = useCartStore();
+
   const {
     form,
     setForm,
@@ -47,10 +51,22 @@ const QuoteCreatePage = () => {
     startDate: form.startDate,
     endDate: form.endDate,
   });
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     setIsDiscounted(form.discountPrice > 0);
   }, [form]);
+
+  useUnmount(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    resetCart();
+  });
+
+  console.log("list", list);
 
   const onClickEquipmentModal = () => {
     if (rentalDays === 0) {

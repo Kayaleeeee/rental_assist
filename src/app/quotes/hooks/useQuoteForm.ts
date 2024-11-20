@@ -1,8 +1,8 @@
 import { createQuote } from "@/app/api/quote";
 import { createQuoteItemList } from "@/app/api/quoteItems";
+import { useAuthStore } from "@/app/store/useAuthStore";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { QuoteItemPostPayload, QuotePostPayload } from "@/app/types/quoteType";
-import { createClient } from "@/app/utils/supabase/client";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ type QuotePostStateType = {
 
 export const useQuoteForm = () => {
   const router = useRouter();
+  const { user } = useAuthStore();
   const [form, setForm] = useState<QuotePostStateType>({
     guestName: "",
     guestPhoneNumber: "",
@@ -108,11 +109,6 @@ export const useQuoteForm = () => {
   );
 
   const onCreateQuote = useCallback(async () => {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     if (!user) return;
 
     if (!form.startDate || !form.endDate) return;
@@ -151,7 +147,7 @@ export const useQuoteForm = () => {
         type: "error",
       });
     }
-  }, [form, quoteItemListState, totalPrice, totalSupplyPrice, router]);
+  }, [form, quoteItemListState, totalPrice, totalSupplyPrice, router, user]);
 
   return {
     form,

@@ -1,0 +1,96 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cartContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 600px;
+  height: 100vh;
+  background: #fff;
+  z-index: 100;
+  padding: 24px;
+}
+
+.dateWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 220px;
+}
+
+.equipmentListWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: scroll;
+  gap: 12px;
+  height: 300px;
+}
+
+.title {
+  flex: 1;
+  font-weight: 700;
+  color: var(--color, var(--primary));
+  cursor: pointer;
+}
+
+.equipmentItem {
+  font-size: 14px;
+  display: inline-flex;
+  padding: 16px 16px;
+  border: 1px solid var(--grey-1);
+  border-radius: 8px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.unavailableItem {
+  @extend .equipmentItem;
+  border: 1px solid var(--error);
+}
+
+.availableItem {
+  @extend .equipmentItem;
+  border: 1px solid var(--green);
+}
+
+.footer {
+  height: 60px;
+  margin: 24px 0;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.closeButton {
+  width: 20px;
+  cursor: pointer;
+}
+
+.closeButtonWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+
+  &:hover {
+    border: 1px solid var(--primary);
+    border-radius: 50%;
+  }
+}

@@ -61,6 +61,7 @@ export type EquipmentItemWithRentedDates = {
 };
 
 export type EquipmentItemWithRentalDatesParams = {
+  equipmentId?: EquipmentListItemType["id"];
   category?: EquipmentCategory;
   startDate?: string;
   endDate?: string;

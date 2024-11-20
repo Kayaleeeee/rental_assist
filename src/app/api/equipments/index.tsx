@@ -27,11 +27,15 @@ export const getEquipmentListWithRentedDates = (
   params?: EquipmentItemWithRentalDatesParams
 ) => {
   const convertParams = () => {
-    if (!params?.startDate || !params?.endDate) return {};
+    if (!params) return {};
+
+    const { startDate, endDate, ...rest } = params;
+    if (!startDate || !endDate) return { ...rest };
 
     return {
       start_date: `gte.${params.startDate}`,
       end_date: `lte.${params.endDate}`,
+      ...rest,
     };
   };
 

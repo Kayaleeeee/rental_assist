@@ -10,12 +10,16 @@ import {
   EquipmentCategoryList,
   EquipmentListItemType,
 } from "../types/equipmentType";
-import styles from "./page.module.scss";
 import { formatLocaleString } from "../utils/priceUtils";
 import { Margin } from "../components/Margin";
 import formStyles from "@components/Form/index.module.scss";
 import { HeaderName } from "../components/DataTable/HeaderName";
 import { CategoryList } from "../components/Category/CategoryList";
+import Link from "next/link";
+import { useCallback, useState } from "react";
+import { isEmpty, some } from "lodash";
+import { useCartStore } from "../store/useCartStore";
+import { Cart } from "../components/Cart";
 
 const columns: GridColDef<EquipmentListItemType>[] = [
   {
@@ -26,6 +30,16 @@ const columns: GridColDef<EquipmentListItemType>[] = [
   {
     field: "title",
     renderHeader: () => HeaderName("장비명"),
+    renderCell: ({ row }) => (
+      <Link
+        href={`/equipments/${row.id}`}
+        style={{
+          fontWeight: 700,
+        }}
+      >
+        {row.title}
+      </Link>
+    ),
     flex: 1,
   },
   {
@@ -38,8 +52,36 @@ const columns: GridColDef<EquipmentListItemType>[] = [
 
 export default function EquipmentPage() {
   const router = useRouter();
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+  const [selectedEquipmentList, setSelectedEquipmentList] = useState<
+    EquipmentListItemType[]
+  >([]);
+  const { addEquipment } = useCartStore();
+
   const { list, selectedCategory, toggleEquipmentCategory } =
     useEquipmentList();
+
+  const handleAddToCart = useCallback(async () => {
+    if (isEmpty(selectedEquipmentList)) return;
+
+    await addEquipment(selectedEquipmentList);
+    setIsCartOpen(true);
+  }, [addEquipment, selectedEquipmentList]);
+
+  const toggleEquipmentList = useCallback(
+    (item: EquipmentListItemType) => {
+      if (
+        some(selectedEquipmentList, (equipment) => equipment.id === item.id)
+      ) {
+        setSelectedEquipmentList((prev) =>
+          prev.filter((equipment) => equipment.id !== item.id)
+        );
+      } else {
+        setSelectedEquipmentList((prev) => [...prev, item]);
+      }
+    },
+    [selectedEquipmentList]
+  );
 
   return (
     <div>
@@ -49,8 +91,22 @@ export default function EquipmentPage() {
           size="Medium"
           onClick={() => router.push("/equipments/create")}
         >
-          장비 추가
+          장비 등록
         </Button>
+        {!isEmpty(selectedEquipmentList) && (
+          <Margin left={16}>
+            <div>
+              <Button
+                size="Medium"
+                variant="outlined"
+                style={{ width: "200px" }}
+                onClick={handleAddToCart}
+              >
+                장바구니 추가
+              </Button>
+            </div>
+          </Margin>
+        )}
       </div>
 
       <Margin top={40} />
@@ -64,10 +120,11 @@ export default function EquipmentPage() {
       />
 
       <DataGrid<EquipmentListItemType>
+        checkboxSelection
+        onCellClick={({ row }) => toggleEquipmentList(row)}
         columns={columns}
         rows={list}
         getRowId={(cell) => cell.id}
-        onCellClick={(cell) => router.push(`/equipments/${cell.id}`)}
         sx={{
           background: "white",
           width: "100%",
@@ -76,6 +133,7 @@ export default function EquipmentPage() {
           marginTop: "24px",
         }}
       />
+      {isCartOpen && <Cart onCloseCart={() => setIsCartOpen(false)} />}
     </div>
   );
 }
