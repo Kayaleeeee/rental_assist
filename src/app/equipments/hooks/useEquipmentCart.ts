@@ -66,9 +66,7 @@ export const useEquipmentCart = () => {
       });
       setAvailableListState(checkedList);
       setIsChecked(true);
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }, [availableListState, dateRange]);
 
   const checkAvailabilityById = async (

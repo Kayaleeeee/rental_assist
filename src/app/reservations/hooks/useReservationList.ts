@@ -7,6 +7,7 @@ import {
   ReservationStatus,
   ReservationType,
 } from "@/app/types/reservationType";
+import { useOnMount } from "@mui/x-data-grid";
 import { showToast } from "@utils/toastUtils";
 import { useCallback, useEffect, useState } from "react";
 
@@ -34,7 +35,13 @@ const initialCategoryList = [
   },
 ];
 
-export const useReservationList = (fetchOnMount = true) => {
+const searchMenu = [{ key: "userName", title: "회원이름" }];
+
+export const useReservationList = () => {
+  const [selectedSearchKey, setSelectedSearchKey] = useState<string>(
+    searchMenu[0].key
+  );
+  const [keyword, setKeyword] = useState<string>("");
   const [list, setList] = useState<ReservationType[]>([]);
   const [categoryList, setCategoryList] =
     useState<{ key: string; title: string; count: number }[]>(
@@ -44,10 +51,19 @@ export const useReservationList = (fetchOnMount = true) => {
     categoryList[0].key
   );
 
-  const getSearchParams = useCallback((): ReservationSearchParams => {
-    if (selectedCategory === categoryList[0].key) return {};
-    return { status: selectedCategory };
-  }, [categoryList, selectedCategory]);
+  const getSearchParams = (params = {}): ReservationSearchParams => {
+    const categoryParams =
+      selectedCategory === categoryList[0].key
+        ? {}
+        : { status: selectedCategory };
+
+    const keywordParams =
+      keyword && selectedSearchKey
+        ? { [selectedSearchKey]: `ilike.%keyword%` }
+        : {};
+
+    return { ...categoryParams, ...keywordParams, order: "id.desc", ...params };
+  };
 
   const fetchReservationList = useCallback(
     async (params?: ReservationSearchParams) => {
@@ -83,15 +99,19 @@ export const useReservationList = (fetchOnMount = true) => {
     }
   };
 
-  useEffect(() => {
-    if (!fetchOnMount) return;
-    fetchReservationCount();
-    fetchReservationList();
-  }, [fetchOnMount]);
-
   const onChangeCategory = (key: string) => {
     setSelectedCategory(key);
-    fetchReservationList(key === allString ? {} : { status: key });
+    fetchReservationList(
+      key === categoryList[0].key ? {} : getSearchParams({ status: key })
+    );
+  };
+
+  const onChangeKeyword = (keyword: string) => {
+    setKeyword(keyword);
+  };
+
+  const onChangeSearchKey = (key: string) => {
+    setSelectedSearchKey(key);
   };
 
   return {
@@ -101,5 +121,12 @@ export const useReservationList = (fetchOnMount = true) => {
     selectedCategory,
     onChangeCategory,
     fetchReservationList,
+    fetchReservationCount,
+    getSearchParams,
+    onChangeKeyword,
+    onChangeSearchKey,
+    keyword,
+    selectedSearchKey,
+    searchMenu,
   };
 };

@@ -4,7 +4,7 @@ import {
   EquipmentItemWithRentalDatesParams,
   EquipmentItemWithRentedDates,
 } from "@/app/types/equipmentType";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 export const useEquipmentListWithRentedDates = ({
   startDate,
@@ -38,12 +38,6 @@ export const useEquipmentListWithRentedDates = ({
     }
   }, [getParams]);
 
-  useEffect(() => {
-    if (!startDate || !endDate) return;
-
-    fetchList();
-  }, [fetchList, startDate, endDate]);
-
   const toggleEquipmentCategory = (
     categoryKey: EquipmentCategory | undefined
   ) => {
@@ -58,5 +52,6 @@ export const useEquipmentListWithRentedDates = ({
     list,
     selectedCategory,
     toggleEquipmentCategory,
+    fetchList,
   };
 };

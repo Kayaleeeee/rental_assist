@@ -38,7 +38,7 @@ export const apiInstance = axios.create({
   },
 
   paramsSerializer: (params) => {
-    const prefix = ["lt.", "lte.", "gt.", "gte.", "eq.", "ilike."];
+    const prefix = ["lt.", "lte.", "gt.", "gte.", "eq.", "ilike.", "id."];
 
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {

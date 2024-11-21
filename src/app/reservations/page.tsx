@@ -14,6 +14,7 @@ import { formatLocaleString } from "../utils/priceUtils";
 import { CategoryList } from "../components/Category/CategoryList";
 import { formatDateTime } from "../utils/timeUtils";
 import { useRouter } from "next/navigation";
+import { SearchBar } from "../components/SearchBar";
 
 const getColumns = (): GridColDef<ReservationType>[] => [
   {
@@ -60,12 +61,30 @@ const getColumns = (): GridColDef<ReservationType>[] => [
 
 export default function ReservationListPage() {
   const router = useRouter();
-  const { list, categoryList, selectedCategory, onChangeCategory } =
-    useReservationList();
+  const {
+    list,
+    categoryList,
+    selectedCategory,
+    onChangeCategory,
+    fetchReservationList,
+    fetchReservationCount,
+    getSearchParams,
+    onChangeKeyword,
+    onChangeSearchKey,
+    keyword,
+    selectedSearchKey,
+    searchMenu,
+  } = useReservationList();
 
   useEffect(() => {
-    getReservationStatusCount();
+    fetchReservationList();
+    fetchReservationCount();
   }, []);
+
+  const onSearch = () => {
+    const params = getSearchParams();
+    fetchReservationList(params);
+  };
 
   const columns = getColumns();
 
@@ -77,7 +96,23 @@ export default function ReservationListPage() {
         selectedCategory={selectedCategory}
         onChangeCategory={onChangeCategory}
       />
-      <Margin top={24} />
+      <Margin
+        top={24}
+        bottom={24}
+        style={{
+          maxWidth: "600px",
+        }}
+      >
+        <SearchBar
+          menuList={searchMenu}
+          keyword={keyword}
+          selectedKey={selectedSearchKey}
+          onChangeKeyword={onChangeKeyword}
+          onChangeSearchKey={onChangeSearchKey}
+          onSearch={onSearch}
+        />
+      </Margin>
+
       <DataGrid<ReservationType>
         columns={columns}
         rows={list}
@@ -87,7 +122,8 @@ export default function ReservationListPage() {
         sx={{
           background: "white",
           width: "100%",
-          height: "600px",
+          minHeight: "400px",
+          flex: 1,
           borderRadius: "16px",
         }}
       />

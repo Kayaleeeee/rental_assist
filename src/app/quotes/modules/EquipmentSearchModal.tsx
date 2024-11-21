@@ -134,6 +134,7 @@ export const EquipmentSearchModal = ({
             background: "white",
             width: "100%",
             maxHeight: "60vh",
+
             borderRadius: "16px",
             marginTop: "24px",
           }}

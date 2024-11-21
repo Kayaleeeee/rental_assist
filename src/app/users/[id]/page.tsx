@@ -67,7 +67,7 @@ const UserDetailPage = () => {
 
   const { detail } = useUserDetail(userId);
   const { list: reservationHistoryList, fetchReservationList } =
-    useReservationList(false);
+    useReservationList();
 
   useEffect(() => {
     if (!userId) return;
@@ -130,7 +130,8 @@ const UserDetailPage = () => {
                 }}
                 sx={{
                   background: "white",
-
+                  minHeight: "400px",
+                  flex: 1,
                   height: "600px",
                   borderRadius: "16px",
                 }}

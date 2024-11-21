@@ -66,7 +66,8 @@ const QuoteListPage = () => {
         sx={{
           background: "white",
           width: "100%",
-          height: "600px",
+          flex: 1,
+          minHeight: "400px",
           borderRadius: "16px",
           marginTop: "24px",
         }}

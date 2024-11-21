@@ -51,6 +51,7 @@ const QuoteCreatePage = () => {
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
   });
+
   const isFirstRender = useRef(true);
 
   useEffect(() => {
