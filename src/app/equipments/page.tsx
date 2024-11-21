@@ -18,8 +18,9 @@ import { CategoryList } from "../components/Category/CategoryList";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { isEmpty, some } from "lodash";
-import { useCartStore } from "../store/useCartStore";
+import { EquipmentListItemState, useCartStore } from "../store/useCartStore";
 import { Cart } from "../components/Cart";
+import { SearchBar } from "../components/SearchBar";
 
 const columns: GridColDef<EquipmentListItemType>[] = [
   {
@@ -58,13 +59,31 @@ export default function EquipmentPage() {
   >([]);
   const { addEquipment } = useCartStore();
 
-  const { list, selectedCategory, toggleEquipmentCategory } =
-    useEquipmentList();
+  const {
+    list,
+    selectedCategory,
+    searchMenu,
+    selectedSearchKey,
+    keyword,
+    toggleEquipmentCategory,
+    onChangeKeyword,
+    onChangeSearchKey,
+    onSearch,
+  } = useEquipmentList();
 
   const handleAddToCart = useCallback(async () => {
     if (isEmpty(selectedEquipmentList)) return;
 
-    await addEquipment(selectedEquipmentList);
+    const convertedList: EquipmentListItemState[] = selectedEquipmentList.map(
+      (equipment) => ({
+        equipmentId: equipment.id,
+        title: equipment.title,
+        price: equipment.price,
+        quantity: 1,
+        totalPrice: equipment.price,
+      })
+    );
+    addEquipment(convertedList);
     setIsCartOpen(true);
   }, [addEquipment, selectedEquipmentList]);
 
@@ -118,6 +137,22 @@ export default function EquipmentPage() {
           toggleEquipmentCategory(key as EquipmentCategory)
         }
       />
+      <Margin
+        top={40}
+        bottom={20}
+        style={{
+          maxWidth: "800px",
+        }}
+      >
+        <SearchBar
+          menuList={searchMenu}
+          onChangeKeyword={onChangeKeyword}
+          onChangeSearchKey={onChangeSearchKey}
+          keyword={keyword}
+          selectedKey={selectedSearchKey}
+          onSearch={onSearch}
+        />
+      </Margin>
 
       <DataGrid<EquipmentListItemType>
         checkboxSelection

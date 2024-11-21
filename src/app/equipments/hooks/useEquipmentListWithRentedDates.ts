@@ -10,8 +10,8 @@ export const useEquipmentListWithRentedDates = ({
   startDate,
   endDate,
 }: {
-  startDate: string | null;
-  endDate: string | null;
+  startDate: string | undefined;
+  endDate: string | undefined;
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<
     EquipmentCategory | undefined

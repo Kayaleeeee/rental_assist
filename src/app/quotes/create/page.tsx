@@ -22,7 +22,6 @@ import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { isEmpty } from "lodash";
-import { useCartStore } from "@/app/store/useCartStore";
 import { useUnmount } from "usehooks-ts";
 
 const QuoteCreatePage = () => {
@@ -30,8 +29,6 @@ const QuoteCreatePage = () => {
   const [isOpenUserModal, setIsOpenUserModal] = useState(false);
   const [isDiscounted, setIsDiscounted] = useState<boolean>(false);
   const [discountPriceState, setDiscountPriceState] = useState<number>(0);
-
-  const { list, resetCart } = useCartStore();
 
   const {
     form,
@@ -45,11 +42,14 @@ const QuoteCreatePage = () => {
     onCreateQuote,
     totalPrice,
     totalSupplyPrice,
+    resetCart,
+    onChangeDate,
+    dateRange,
   } = useQuoteForm();
 
   const { list: rentedEquipmentList } = useEquipmentListWithRentedDates({
-    startDate: form.startDate,
-    endDate: form.endDate,
+    startDate: dateRange.startDate,
+    endDate: dateRange.endDate,
   });
   const isFirstRender = useRef(true);
 
@@ -65,8 +65,6 @@ const QuoteCreatePage = () => {
 
     resetCart();
   });
-
-  console.log("list", list);
 
   const onClickEquipmentModal = () => {
     if (rentalDays === 0) {
@@ -87,7 +85,7 @@ const QuoteCreatePage = () => {
   };
 
   const unavailableEquipmentIdList = useMemo((): number[] => {
-    if (!form.startDate || !form.endDate) return [];
+    if (!dateRange.startDate || !dateRange.endDate) return [];
 
     const idList = [...quoteItemListState].map((item) => item.equipmentId);
 
@@ -99,7 +97,12 @@ const QuoteCreatePage = () => {
     });
 
     return idList;
-  }, [quoteItemListState, form.startDate, form.endDate, rentedEquipmentList]);
+  }, [
+    quoteItemListState,
+    dateRange.startDate,
+    dateRange.endDate,
+    rentedEquipmentList,
+  ]);
 
   return (
     <div>
@@ -130,16 +133,22 @@ const QuoteCreatePage = () => {
           <div className={styles.inlineWrapper}>
             <DateTimeSelector
               label="대여 시작 시간"
-              value={form.startDate}
-              onChange={(value) => onChangeForm("startDate", value)}
+              value={dateRange.startDate}
+              onChange={(value) => {
+                if (!value) return;
+                onChangeDate("startDate", value);
+              }}
             />
             <div className={styles.separator}>~</div>
             <DateTimeSelector
               label="반납 시간"
-              disabled={!form.startDate}
-              value={form.endDate}
-              minDateTime={dayjs(form.startDate)}
-              onChange={(value) => onChangeForm("endDate", value)}
+              disabled={!dateRange.startDate}
+              value={dateRange.endDate}
+              minDateTime={dayjs(dateRange.startDate)}
+              onChange={(value) => {
+                if (!value) return;
+                onChangeDate("endDate", value);
+              }}
             />
           </div>
           <Margin top={20} />
@@ -191,6 +200,7 @@ const QuoteCreatePage = () => {
                   <Label title="할인 금액" />
                   <EditableField
                     value={discountPriceState}
+                    size="small"
                     onChange={(e) => {
                       const value = Number(e.target.value);
 
@@ -232,14 +242,14 @@ const QuoteCreatePage = () => {
         <div className={styles.buttonWrapper}>
           <Button
             size="Medium"
-            style={{ width: "150px" }}
+            style={{ width: "250px" }}
             onClick={onCreateQuote}
           >
             생성하기
           </Button>
         </div>
       </FormWrapper>
-      {isOpenSearchModal && form.startDate && form.endDate && (
+      {isOpenSearchModal && dateRange.startDate && dateRange.endDate && (
         <EquipmentSearchModal
           disabledIdList={unavailableEquipmentIdList}
           onCloseModal={() => setIsOpenSearchModal(false)}

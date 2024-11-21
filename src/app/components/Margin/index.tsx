@@ -1,11 +1,11 @@
-import { PropsWithChildren } from "react";
+import { HTMLAttributes, PropsWithChildren } from "react";
 
 type Props = {
   top?: number;
   right?: number;
   bottom?: number;
   left?: number;
-};
+} & HTMLAttributes<HTMLDivElement>;
 
 export const Margin = ({
   top,
@@ -13,6 +13,8 @@ export const Margin = ({
   bottom,
   left,
   children,
+  style,
+  ...props
 }: PropsWithChildren<Props>) => {
   return (
     <div
@@ -21,7 +23,9 @@ export const Margin = ({
         marginRight: `${right}px`,
         marginBottom: `${bottom}px`,
         marginLeft: `${left}px`,
+        ...style,
       }}
+      {...props}
     >
       {children}
     </div>

@@ -8,13 +8,18 @@ import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 
 type Props = {
   onCloseCart: () => void;
 };
 
 export const Cart = ({ onCloseCart }: Props) => {
+  const router = useRouter();
   const {
+    hasUnavailableItem,
     onChangeDate,
     dateRange,
     checkAvailability,
@@ -22,12 +27,40 @@ export const Cart = ({ onCloseCart }: Props) => {
     resetCart,
     isChecked,
     removeItem,
+    setList,
+    rentalDays,
   } = useEquipmentCart();
 
   const handleCloseCart = () => {
     resetCart();
     onCloseCart();
   };
+
+  const isOkToMakeReservation = !hasUnavailableItem && isChecked;
+
+  const onClickButton = useCallback(() => {
+    if (!isOkToMakeReservation) {
+      checkAvailability();
+    } else {
+      setList(
+        availableListState.map((item) => ({
+          equipmentId: item.equipmentId,
+          title: item.title,
+          price: item.price,
+          quantity: 1,
+          totalPrice: item.price * rentalDays,
+        }))
+      );
+      router.push("/quotes/create");
+    }
+  }, [
+    isOkToMakeReservation,
+    availableListState,
+    checkAvailability,
+    setList,
+    router,
+    rentalDays,
+  ]);
 
   return (
     <>
@@ -49,6 +82,8 @@ export const Cart = ({ onCloseCart }: Props) => {
 
             <Label title="반납일" />
             <DateTimeSelector
+              disabled={!dateRange.startDate}
+              minDateTime={dayjs(dateRange.startDate)}
               value={dateRange.endDate}
               onChange={(value) => {
                 if (!value) return;
@@ -76,7 +111,7 @@ export const Cart = ({ onCloseCart }: Props) => {
 
               return (
                 <div
-                  key={item.id}
+                  key={item.equipmentId}
                   className={className}
                   onClick={
                     unavailable
@@ -104,7 +139,7 @@ export const Cart = ({ onCloseCart }: Props) => {
                     className={styles.closeButtonWrapper}
                     onClick={(e) => {
                       e.stopPropagation();
-                      removeItem(item.id);
+                      removeItem(item.equipmentId);
                     }}
                   >
                     <CloseOutlinedIcon className={styles.closeButton} />
@@ -118,13 +153,15 @@ export const Cart = ({ onCloseCart }: Props) => {
           <Button
             variant="outlined"
             size="Medium"
-            onClick={checkAvailability}
+            onClick={onClickButton}
             style={{
               flex: 1,
               width: "100%",
             }}
           >
-            예약 가능 여부 확인하기
+            {isOkToMakeReservation
+              ? "이 리스트로 예약만들기"
+              : "예약 가능 여부 확인하기"}
           </Button>
         </section>
       </div>
