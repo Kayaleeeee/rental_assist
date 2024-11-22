@@ -10,7 +10,7 @@ import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
-import { useEquipmentDetail } from "../hooks/useEquipmentDetail";
+import { useEquipmentDetail } from "./hooks/useEquipmentDetail";
 import { useParams, useRouter } from "next/navigation";
 import { EquipmentCategoryList } from "@/app/types/equipmentType";
 import { useMemo } from "react";

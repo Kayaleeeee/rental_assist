@@ -1,23 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "../components/Button";
-import { useEquipmentList } from "./hooks/useEquipmentList";
+import { Button } from "@components/Button";
+import { useEquipmentList } from "../hooks/useEquipmentList";
 import {
   EquipmentCategory,
   EquipmentCategoryList,
   EquipmentListItemType,
-} from "../types/equipmentType";
-import { Margin } from "../components/Margin";
+} from "../../types/equipmentType";
+import { Margin } from "@components/Margin";
 import formStyles from "@components/Form/index.module.scss";
-import { CategoryList } from "../components/Category/CategoryList";
+import { CategoryList } from "@components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
 import { isEmpty, some } from "lodash";
-import { EquipmentListItemState, useCartStore } from "../store/useCartStore";
-import { Cart } from "../components/Cart";
-import { EquipmentListTable } from "./modules/EquipmentListTable";
+import { EquipmentListItemState, useCartStore } from "@stores/useCartStore";
+import { Cart } from "@components/Cart";
+import { EquipmentListTable } from "../modules/EquipmentListTable";
 
-export default function EquipmentPage() {
+export default function EquipmentSetPage() {
   const router = useRouter();
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
@@ -81,7 +81,7 @@ export default function EquipmentPage() {
           size="Medium"
           onClick={() => router.push("/equipments/create")}
         >
-          장비 등록
+          풀세트 등록
         </Button>
         {!isEmpty(selectedEquipmentList) && (
           <Margin left={16}>
@@ -108,7 +108,6 @@ export default function EquipmentPage() {
           toggleEquipmentCategory(key as EquipmentCategory)
         }
       />
-
       <EquipmentListTable
         list={list}
         searchMenu={searchMenu}

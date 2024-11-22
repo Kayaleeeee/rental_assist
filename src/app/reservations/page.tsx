@@ -90,7 +90,7 @@ export default function ReservationListPage() {
 
   return (
     <div>
-      <Margin top={24} />
+      <Margin top={85} />
       <CategoryList
         categoryList={categoryList}
         selectedCategory={selectedCategory}
@@ -100,7 +100,7 @@ export default function ReservationListPage() {
         top={24}
         bottom={24}
         style={{
-          maxWidth: "600px",
+          maxWidth: "800px",
         }}
       >
         <SearchBar

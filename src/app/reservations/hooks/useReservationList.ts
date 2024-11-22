@@ -7,9 +7,9 @@ import {
   ReservationStatus,
   ReservationType,
 } from "@/app/types/reservationType";
-import { useOnMount } from "@mui/x-data-grid";
+
 import { showToast } from "@utils/toastUtils";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 const allString = "all";
 const initialCategoryList = [

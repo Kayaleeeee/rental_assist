@@ -5,12 +5,13 @@ import {
   EquipmentPostBody,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
+import { isEmpty, isNil } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 const categoryMenu = EquipmentCategoryList;
 
-export const useCreateForm = () => {
+export const useEquipmentForm = () => {
   const router = useRouter();
   const [category, setCategory] = useState<{
     key: EquipmentCategory;
@@ -31,7 +32,38 @@ export const useCreateForm = () => {
     setCategory(categoryMenu[selectedCategoryIndex]);
   };
 
+  const getIsValidForm = useCallback(() => {
+    console.log(title, price, category);
+    if (isEmpty(title)) {
+      showToast({
+        message: "장비명을 입력해주세요.",
+        type: "error",
+      });
+      return false;
+    }
+
+    if (isNil(price)) {
+      showToast({
+        message: "렌탈 가격을 입력해주세요.",
+        type: "error",
+      });
+      return;
+    }
+
+    if (isEmpty(category.key)) {
+      showToast({
+        message: "카테고리를 선택해주세요.",
+        type: "error",
+      });
+      return false;
+    }
+
+    return true;
+  }, [title, price, category]);
+
   const submitEquipmentForm = useCallback(async () => {
+    if (!getIsValidForm()) return;
+
     const form: EquipmentPostBody = {
       category: category.key,
       title,
@@ -53,7 +85,7 @@ export const useCreateForm = () => {
         type: "error",
       });
     }
-  }, [category, title, price, detail, router]);
+  }, [category, title, price, detail, router, getIsValidForm]);
 
   return {
     categoryMenu,

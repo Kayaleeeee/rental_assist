@@ -22,7 +22,8 @@
   display: inline-flex;
   align-items: center;
   padding: 16px;
-  height: 60px;
+  font-size: 14px;
+  height: 50px;
 
   &:hover {
     font-weight: 700;
@@ -32,6 +33,11 @@
 .selectedItem {
   @extend .item;
   font-weight: 700;
+}
+
+.subItem {
+  @extend .item;
+  margin-left: 15px;
 }
 
 .icon {

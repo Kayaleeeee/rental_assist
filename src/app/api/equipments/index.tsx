@@ -55,3 +55,16 @@ export const getEquipmentRentedDates = async (
 
   return isEmpty(result) ? null : result[0];
 };
+
+export const postSetEquipment = async (payload: {}) => {
+  const result = await apiPost<{}[]>("equipment_sets", payload);
+  if (isEmpty(result)) {
+    throw new Error("No data found");
+  } else {
+    return result[0];
+  }
+};
+
+export const getSetEquipmentList = () => {
+  return apiGet(`/equipment_sets`);
+};

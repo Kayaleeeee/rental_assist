@@ -2,13 +2,13 @@
 
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
 import { MenuItem, Select, TextField } from "@mui/material";
-import { useCreateForm } from "../hooks/useCreateForm";
 import { Label } from "@/app/components/Form/Label";
 import styles from "../page.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
+import { useEquipmentForm } from "./hooks/useEquipmentForm";
 
 const EquipmentCreatePage = () => {
   const {
@@ -22,7 +22,7 @@ const EquipmentCreatePage = () => {
     submitEquipmentForm,
     detail,
     setDetail,
-  } = useCreateForm();
+  } = useEquipmentForm();
 
   return (
     <FormWrapper title="장비 등록">
