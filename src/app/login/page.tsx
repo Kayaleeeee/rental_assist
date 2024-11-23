@@ -20,7 +20,7 @@ const LoginPage = () => {
     try {
       await login({ email, password });
       showToast({ message: "로그인 성공", type: "success" });
-    } catch (e) {
+    } catch {
       showToast({ message: "로그인에 실패했습니다", type: "error" });
     }
   };

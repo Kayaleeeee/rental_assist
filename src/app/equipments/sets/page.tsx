@@ -12,7 +12,7 @@ import formStyles from "@components/Form/index.module.scss";
 import { CategoryList } from "@components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
 import { isEmpty, some } from "lodash";
-import { useCartStore } from "@stores/useCartStore";
+// import { useCartStore } from "@stores/useCartStore";
 import { Cart } from "@components/Cart";
 import { useSetEquipmentList } from "./hooks/useSetEquipmentList";
 import { FullSetListTable } from "./modules/FullSetListTable";
@@ -23,7 +23,7 @@ export default function EquipmentSetPage() {
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     SetEquipmentListItemType[]
   >([]);
-  const { addEquipment } = useCartStore();
+  // const { addEquipment } = useCartStore();
 
   const {
     list,

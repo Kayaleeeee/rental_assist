@@ -22,7 +22,6 @@ import {
 } from "@/app/components/Calendar";
 import { useEquipmentRentalDates } from "../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
-import { Event } from "react-big-calendar";
 import { deleteEquipment } from "@/app/api/equipments";
 import { showToast } from "@/app/utils/toastUtils";
 
