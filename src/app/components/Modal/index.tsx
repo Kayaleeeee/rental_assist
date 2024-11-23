@@ -7,7 +7,7 @@ type Props = {
   ButtonListWrapperStyle?: HtmlHTMLAttributes<HTMLDivElement>["style"];
   ButtonProps?: {
     title: string;
-    onClick: HtmlHTMLAttributes<HTMLButtonElement>["onClick"];
+    onClick: () => void | Promise<void>;
     buttonStyle?: HtmlHTMLAttributes<HTMLButtonElement>["style"];
   }[];
 };

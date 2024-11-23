@@ -11,7 +11,7 @@ import {
 import { Margin } from "../components/Margin";
 import { CategoryList } from "../components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
-import { forEach, isEmpty, some } from "lodash";
+import { isEmpty } from "lodash";
 import { EquipmentListItemState, useCartStore } from "../store/useCartStore";
 import { Cart } from "../components/Cart";
 import { EquipmentListTable } from "./modules/EquipmentListTable";

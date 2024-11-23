@@ -66,7 +66,12 @@ export const useEquipmentCart = () => {
       });
       setAvailableListState(checkedList);
       setIsChecked(true);
-    } catch (e) {}
+    } catch {
+      showToast({
+        message: "장비 검색에 실패했습니다.",
+        type: "error",
+      });
+    }
   }, [availableListState, dateRange]);
 
   const checkAvailabilityById = async (

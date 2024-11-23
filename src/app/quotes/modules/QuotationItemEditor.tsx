@@ -1,13 +1,14 @@
 import styles from "./quotationItemEditor.module.scss";
 
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { QuotItemStateType } from "../hooks/useQuoteForm";
+
 import { formatLocaleString } from "@/app/utils/priceUtils";
+import { EquipmentListItemState } from "@/app/store/useCartStore";
 
 type Props = {
   rentalDays: number;
-  quoteState: QuotItemStateType;
-  onChangeField: (item: QuotItemStateType) => void;
+  quoteState: EquipmentListItemState;
+  onChangeField: (item: EquipmentListItemState) => void;
   onDeleteEquipment: () => void;
 };
 

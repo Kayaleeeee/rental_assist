@@ -29,7 +29,7 @@ export const useEquipmentRentalDates = (id?: EquipmentListItemType["id"]) => {
           userName: result.userName,
         });
       }
-    } catch (e) {
+    } catch {
       showToast({
         message: "예약 히스토리를 조회하는데 실패했습니다.",
         type: "error",

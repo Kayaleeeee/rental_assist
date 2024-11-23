@@ -8,7 +8,7 @@ import {
   SetEquipmentListItemType,
   SetEquipmentListParams,
 } from "@/app/types/equipmentType";
-import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "..";
+import { apiDelete, apiGet, apiPatch, apiPost } from "..";
 import { isEmpty } from "lodash";
 
 const apiUrl = "/equipments";
