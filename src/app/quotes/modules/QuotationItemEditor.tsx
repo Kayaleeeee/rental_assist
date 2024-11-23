@@ -1,7 +1,5 @@
 import styles from "./quotationItemEditor.module.scss";
-
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
 

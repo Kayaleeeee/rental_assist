@@ -1,9 +1,13 @@
 import axios from "axios";
 import { createClient } from "../utils/supabase/client";
 import { camelCase, isArray, isObject, snakeCase } from "lodash";
+import {
+  NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  NEXT_PUBLIC_SUPABASE_URL,
+} from "../constants";
 
-const apiUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const apiUrl = NEXT_PUBLIC_SUPABASE_URL;
+const anonKey = NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const toCamelCase = (obj: any): any => {
   if (isArray(obj)) {
