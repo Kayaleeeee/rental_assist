@@ -2,26 +2,26 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@components/Button";
-import { useEquipmentList } from "../hooks/useEquipmentList";
 import {
   EquipmentCategory,
   EquipmentCategoryList,
-  EquipmentListItemType,
+  SetEquipmentListItemType,
 } from "../../types/equipmentType";
 import { Margin } from "@components/Margin";
 import formStyles from "@components/Form/index.module.scss";
 import { CategoryList } from "@components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
 import { isEmpty, some } from "lodash";
-import { EquipmentListItemState, useCartStore } from "@stores/useCartStore";
+import { useCartStore } from "@stores/useCartStore";
 import { Cart } from "@components/Cart";
-import { EquipmentListTable } from "../modules/EquipmentListTable";
+import { useSetEquipmentList } from "./hooks/useSetEquipmentList";
+import { FullSetListTable } from "./modules/FullSetListTable";
 
 export default function EquipmentSetPage() {
   const router = useRouter();
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
-    EquipmentListItemType[]
+    SetEquipmentListItemType[]
   >([]);
   const { addEquipment } = useCartStore();
 
@@ -36,26 +36,26 @@ export default function EquipmentSetPage() {
     onChangeSearchKey,
     onSearch,
     fetchList,
-  } = useEquipmentList();
+  } = useSetEquipmentList();
 
-  const handleAddToCart = useCallback(async () => {
-    if (isEmpty(selectedEquipmentList)) return;
+  // const handleAddToCart = useCallback(async () => {
+  //   if (isEmpty(selectedEquipmentList)) return;
 
-    const convertedList: EquipmentListItemState[] = selectedEquipmentList.map(
-      (equipment) => ({
-        equipmentId: equipment.id,
-        title: equipment.title,
-        price: equipment.price,
-        quantity: 1,
-        totalPrice: equipment.price,
-      })
-    );
-    addEquipment(convertedList);
-    setIsCartOpen(true);
-  }, [addEquipment, selectedEquipmentList]);
+  //   const convertedList: EquipmentListItemState[] = selectedEquipmentList.map(
+  //     (equipment) => ({
+  //       equipmentId: equipment.id,
+  //       title: equipment.title,
+  //       price: equipment.price,
+  //       quantity: 1,
+  //       totalPrice: equipment.price,
+  //     })
+  //   );
+  //   addEquipment(convertedList);
+  //   setIsCartOpen(true);
+  // }, [addEquipment, selectedEquipmentList]);
 
   const toggleEquipmentList = useCallback(
-    (item: EquipmentListItemType) => {
+    (item: SetEquipmentListItemType) => {
       if (
         some(selectedEquipmentList, (equipment) => equipment.id === item.id)
       ) {
@@ -90,7 +90,7 @@ export default function EquipmentSetPage() {
                 size="Medium"
                 variant="outlined"
                 style={{ width: "200px" }}
-                onClick={handleAddToCart}
+                // onClick={handleAddToCart}
               >
                 장바구니 추가
               </Button>
@@ -108,7 +108,7 @@ export default function EquipmentSetPage() {
           toggleEquipmentCategory(key as EquipmentCategory)
         }
       />
-      <EquipmentListTable
+      <FullSetListTable
         list={list}
         searchMenu={searchMenu}
         selectedSearchKey={selectedSearchKey}

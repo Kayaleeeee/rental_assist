@@ -9,13 +9,14 @@ import {
   EquipmentListItemType,
 } from "../types/equipmentType";
 import { Margin } from "../components/Margin";
-import formStyles from "@components/Form/index.module.scss";
 import { CategoryList } from "../components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
-import { isEmpty, some } from "lodash";
+import { forEach, isEmpty, some } from "lodash";
 import { EquipmentListItemState, useCartStore } from "../store/useCartStore";
 import { Cart } from "../components/Cart";
 import { EquipmentListTable } from "./modules/EquipmentListTable";
+import styles from "./page.module.scss";
+import formStyles from "@components/Form/index.module.scss";
 
 export default function EquipmentPage() {
   const router = useRouter();
@@ -55,18 +56,10 @@ export default function EquipmentPage() {
   }, [addEquipment, selectedEquipmentList]);
 
   const toggleEquipmentList = useCallback(
-    (item: EquipmentListItemType) => {
-      if (
-        some(selectedEquipmentList, (equipment) => equipment.id === item.id)
-      ) {
-        setSelectedEquipmentList((prev) =>
-          prev.filter((equipment) => equipment.id !== item.id)
-        );
-      } else {
-        setSelectedEquipmentList((prev) => [...prev, item]);
-      }
+    (itemList: EquipmentListItemType[]) => {
+      setSelectedEquipmentList(itemList);
     },
-    [selectedEquipmentList]
+    []
   );
 
   useEffect(() => {
@@ -75,28 +68,31 @@ export default function EquipmentPage() {
 
   return (
     <div>
-      <div className={formStyles.rightAlignButtonWrapper}>
-        <Button
-          style={{ width: "200px" }}
-          size="Medium"
-          onClick={() => router.push("/equipments/create")}
-        >
-          장비 등록
-        </Button>
-        {!isEmpty(selectedEquipmentList) && (
-          <Margin left={16}>
-            <div>
-              <Button
-                size="Medium"
-                variant="outlined"
-                style={{ width: "200px" }}
-                onClick={handleAddToCart}
-              >
-                장바구니 추가
-              </Button>
-            </div>
-          </Margin>
-        )}
+      <div className={styles.headerTitleButtonWrapper}>
+        <h3></h3>
+        <div className={formStyles.rightAlignButtonWrapper}>
+          <Button
+            style={{ width: "150px" }}
+            size="Medium"
+            onClick={() => router.push("/equipments/create")}
+          >
+            장비 등록
+          </Button>
+          {!isEmpty(selectedEquipmentList) && (
+            <Margin left={16}>
+              <div>
+                <Button
+                  size="Medium"
+                  variant="outlined"
+                  style={{ width: "150px" }}
+                  onClick={handleAddToCart}
+                >
+                  장바구니 추가
+                </Button>
+              </div>
+            </Margin>
+          )}
+        </div>
       </div>
 
       <Margin top={40} />

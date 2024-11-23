@@ -13,13 +13,18 @@ import {
 import { useEquipmentDetail } from "./hooks/useEquipmentDetail";
 import { useParams, useRouter } from "next/navigation";
 import { EquipmentCategoryList } from "@/app/types/equipmentType";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
-import { CalendarComponent } from "@/app/components/Calendar";
-import { useEquipmentRentalDates } from "../hooks/useEquipmenRentalDates";
+import {
+  CalendarComponent,
+  CalendarEventType,
+} from "@/app/components/Calendar";
+import { useEquipmentRentalDates } from "../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
 import { Event } from "react-big-calendar";
+import { deleteEquipment } from "@/app/api/equipments";
+import { showToast } from "@/app/utils/toastUtils";
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
@@ -29,12 +34,14 @@ const EquipmentDetailPage = () => {
   const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
   const { rentalInfo } = useEquipmentRentalDates(equipmentId);
 
-  const eventDateList: Event[] = useMemo(() => {
+  const eventDateList: CalendarEventType[] = useMemo(() => {
     if (!rentalInfo) return [];
+
     return rentalInfo.rentedDates.map((item) => ({
       start: dayjs(item.startDate).toDate(),
       end: dayjs(item.endDate).toDate(),
-      title: rentalInfo.reservationId,
+      title: rentalInfo.userName,
+      id: rentalInfo.reservationId,
     }));
   }, [rentalInfo]);
 
@@ -47,6 +54,21 @@ const EquipmentDetailPage = () => {
       )?.title || ""
     );
   }, [equipmentDetail]);
+
+  const handleDeleteEquipment = useCallback(async () => {
+    if (!equipmentDetail || !equipmentId) return;
+
+    if (!confirm("장비를 삭제하시겠습니까?")) return;
+
+    try {
+      await deleteEquipment(equipmentId);
+
+      showToast({ message: "장비를 삭제했습니다", type: "success" });
+      router.push(`/equipments`);
+    } catch {
+      showToast({ message: "장비를 삭제할 수 없습니다.", type: "error" });
+    }
+  }, [equipmentDetail, equipmentId, router]);
 
   if (!equipmentDetail) return null;
 
@@ -109,14 +131,29 @@ const EquipmentDetailPage = () => {
           </div>
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />
-            <CalendarComponent size={500} eventDateList={eventDateList} />
+            <CalendarComponent
+              size={500}
+              eventDateList={eventDateList}
+              onClickEvent={(event) => {
+                window.open(`/reservations/${event.id}`, "_blank");
+              }}
+            />
           </div>
         </div>
 
         <div className={styles.buttonWrapper}>
           <Button
-            size="Medium"
-            style={{ width: "150px" }}
+            size="Small"
+            style={{ width: "100px" }}
+            variant="outlined"
+            onClick={handleDeleteEquipment}
+          >
+            삭제
+          </Button>
+          <Margin right={12} />
+          <Button
+            size="Small"
+            style={{ width: "100px" }}
             onClick={() => router.push(`/equipments/${equipmentId}/edit`)}
           >
             수정

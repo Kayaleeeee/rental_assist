@@ -1,14 +1,14 @@
-import { getEquipmentList } from "@/app/api/equipments";
+import { getSetEquipmentList } from "@/app/api/equipments";
 import {
   EquipmentCategory,
-  EquipmentListItemType,
-  EquipmentListParams,
+  SetEquipmentListItemType,
+  SetEquipmentListParams,
 } from "@/app/types/equipmentType";
 import { useCallback, useMemo, useState } from "react";
 
 const searchMenu = [{ key: "title", title: "장비명" }];
 
-export const useEquipmentList = () => {
+export const useSetEquipmentList = () => {
   const [selectedCategory, setSelectedCategory] = useState<
     EquipmentCategory | undefined
   >(undefined);
@@ -16,11 +16,11 @@ export const useEquipmentList = () => {
     searchMenu[0].key
   );
   const [keyword, setKeyword] = useState<string>("");
-  const [list, setList] = useState<EquipmentListItemType[]>([]);
+  const [list, setList] = useState<SetEquipmentListItemType[]>([]);
 
-  const fetchList = useCallback(async (params?: EquipmentListParams) => {
+  const fetchList = useCallback(async (params?: SetEquipmentListParams) => {
     try {
-      const result = await getEquipmentList(params);
+      const result = await getSetEquipmentList(params);
       setList(result || []);
     } catch {
       setList([]);

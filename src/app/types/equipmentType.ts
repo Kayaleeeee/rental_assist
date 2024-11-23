@@ -1,4 +1,5 @@
 import { ReservationType } from "./reservationType";
+import { UserType } from "./userType";
 
 export type EquipmentListItemType = {
   id: number;
@@ -84,6 +85,7 @@ export type EquipmentItemWithRentedDates = {
   detail: string;
   rentedDates: { startDate: string; endDate: string }[];
   reservationId: ReservationType["id"];
+  userName: UserType["name"];
 };
 
 export type EquipmentItemWithRentalDatesParams = {
@@ -100,6 +102,13 @@ export type SetEquipmentType = {
   equipmentList: [];
 };
 
+export type SetEquipmentListItemType = {
+  id: string;
+  title: string;
+  detail: string;
+  price: number;
+};
+
 export type SetEquipmentPayload = {
   title: string;
   detail: string;
@@ -114,3 +123,7 @@ export type SetEquipmentItemType = {
 
 export type SetEquipmentItemPostPayload = Omit<SetEquipmentItemType, "id">;
 export type SetEquipmentItemPutPayload = Partial<SetEquipmentItemPostPayload>;
+export type SetEquipmentListParams = {
+  category?: EquipmentCategory;
+  title?: string;
+};

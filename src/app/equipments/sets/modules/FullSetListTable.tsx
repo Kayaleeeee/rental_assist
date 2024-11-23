@@ -1,12 +1,12 @@
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { Margin } from "@/app/components/Margin";
 import { SearchBar } from "@/app/components/SearchBar";
-import { EquipmentListItemType } from "@/app/types/equipmentType";
+import { SetEquipmentListItemType } from "@/app/types/equipmentType";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
 
-const columns: GridColDef<EquipmentListItemType>[] = [
+const columns: GridColDef<SetEquipmentListItemType>[] = [
   {
     field: "id",
     width: 80,
@@ -36,14 +36,14 @@ const columns: GridColDef<EquipmentListItemType>[] = [
 ];
 
 type Props = {
-  list: EquipmentListItemType[];
+  list: SetEquipmentListItemType[];
   searchMenu: { title: string; key: string }[];
   onChangeKeyword: (value: string) => void;
   onChangeSearchKey: (value: string) => void;
   keyword: string;
   selectedSearchKey: string;
   onSearch: () => void;
-  onSelectCell: (row: EquipmentListItemType) => void;
+  onSelectCell: (row: SetEquipmentListItemType) => void;
 };
 
 export const FullSetListTable = ({
@@ -75,7 +75,7 @@ export const FullSetListTable = ({
         />
       </Margin>
 
-      <DataGrid<EquipmentListItemType>
+      <DataGrid<SetEquipmentListItemType>
         checkboxSelection
         onCellClick={({ row }) => onSelectCell(row)}
         columns={columns}

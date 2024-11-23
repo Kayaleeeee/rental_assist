@@ -1,9 +1,12 @@
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { Margin } from "@/app/components/Margin";
 import { SearchBar } from "@/app/components/SearchBar";
+
+import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { formatLocaleString } from "@/app/utils/priceUtils";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
+
 import Link from "next/link";
 
 const columns: GridColDef<EquipmentListItemType>[] = [
@@ -45,7 +48,7 @@ type Props = {
   keyword: string;
   selectedSearchKey: string;
   onSearch: () => void;
-  onSelectCell: (row: EquipmentListItemType) => void;
+  onSelectCell: (idList: EquipmentListItemType[]) => void;
 };
 
 export const EquipmentListTable = ({
@@ -77,20 +80,21 @@ export const EquipmentListTable = ({
         />
       </Margin>
 
-      <DataGrid<EquipmentListItemType>
+      <GridTable<EquipmentListItemType>
         checkboxSelection
-        onCellClick={({ row }) => onSelectCell(row)}
+        onRowSelectionModelChange={(selected, details) => {
+          const valueList = Array.from(
+            details.api.getRowModels().values()
+          ) as EquipmentListItemType[];
+          const selectedList = valueList.filter((item) =>
+            selected.includes(item.id)
+          );
+
+          onSelectCell(selectedList);
+        }}
         columns={columns}
         rows={list}
         getRowId={(cell) => cell.id}
-        sx={{
-          background: "white",
-          width: "100%",
-          flex: 1,
-          minHeight: "400px",
-          borderRadius: "16px",
-          marginTop: "24px",
-        }}
       />
     </>
   );

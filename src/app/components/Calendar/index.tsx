@@ -9,14 +9,20 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 // to the correct localizer.
 const localizer = dayjsLocalizer(dayjs); // or globalizeLocalizer
 
+export interface CalendarEventType extends Event {
+  id: number;
+}
+
 type Props = {
   size?: number;
-  eventDateList?: Event[];
+  eventDateList?: CalendarEventType[];
+  onClickEvent?: (event: CalendarEventType) => void;
 };
 
 export const CalendarComponent = ({
   size = 400,
   eventDateList = [],
+  onClickEvent,
 }: Props) => {
   const today = useMemo(() => dayjs(), []);
 
@@ -56,11 +62,12 @@ export const CalendarComponent = ({
           <ArrowForwardOutlinedIcon />
         </button>
       </div>
-      <Calendar
+      <Calendar<CalendarEventType>
         toolbar={false}
         culture="ko"
         localizer={localizer}
         events={eventDateList}
+        onSelectEvent={onClickEvent}
         date={currentDate}
         min={dayjs(MIN_DATE).toDate()}
         startAccessor="start"

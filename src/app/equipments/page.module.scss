@@ -18,6 +18,13 @@
   }
 }
 
+.headerTitleButtonWrapper {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .reservationCalendarWrapper {
   display: flex;
   flex-direction: column;

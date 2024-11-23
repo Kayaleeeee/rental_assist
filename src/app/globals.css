@@ -8,6 +8,7 @@
   --error: #ff4d4f;
   --green: #27b67b;
   --green-1: #eaf5ef;
+  --default-font: "NotoSansKR", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {

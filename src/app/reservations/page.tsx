@@ -1,6 +1,6 @@
 "use client";
 
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import { useReservationList } from "./\bhooks/useReservationList";
 import { ReservationType } from "../types/reservationType";
 import { HeaderName } from "../components/DataTable/HeaderName";
@@ -8,13 +8,13 @@ import { PaymentStatusText } from "./modules/PaymentStatusText";
 import { ReservationStatusText } from "./modules/ReservationStatusText";
 import { Margin } from "../components/Margin";
 import { useEffect } from "react";
-import { getReservationStatusCount } from "../api/reservation";
 import { formatLocaleString } from "../utils/priceUtils";
 
 import { CategoryList } from "../components/Category/CategoryList";
 import { formatDateTime } from "../utils/timeUtils";
 import { useRouter } from "next/navigation";
 import { SearchBar } from "../components/SearchBar";
+import { GridTable } from "../components/Table/GridTable";
 
 const getColumns = (): GridColDef<ReservationType>[] => [
   {
@@ -67,7 +67,6 @@ export default function ReservationListPage() {
     selectedCategory,
     onChangeCategory,
     fetchReservationList,
-    fetchReservationCount,
     getSearchParams,
     onChangeKeyword,
     onChangeSearchKey,
@@ -78,7 +77,6 @@ export default function ReservationListPage() {
 
   useEffect(() => {
     fetchReservationList();
-    fetchReservationCount();
   }, []);
 
   const onSearch = () => {
@@ -112,20 +110,12 @@ export default function ReservationListPage() {
           onSearch={onSearch}
         />
       </Margin>
-
-      <DataGrid<ReservationType>
+      <GridTable<ReservationType>
         columns={columns}
         rows={list}
         onCellClick={({ row }) =>
           router.push(`/reservations/${row.id}?quoteId=${row.quoteId}`)
         }
-        sx={{
-          background: "white",
-          width: "100%",
-          minHeight: "400px",
-          flex: 1,
-          borderRadius: "16px",
-        }}
       />
     </div>
   );

@@ -5,8 +5,10 @@ import {
   EquipmentListItemType,
   EquipmentListParams,
   EquipmentPostBody,
+  SetEquipmentListItemType,
+  SetEquipmentListParams,
 } from "@/app/types/equipmentType";
-import { apiGet, apiPost } from "..";
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "..";
 import { isEmpty } from "lodash";
 
 const apiUrl = "/equipments";
@@ -19,8 +21,19 @@ export const createEquipment = (payload: EquipmentPostBody) => {
   return apiPost(apiUrl, payload);
 };
 
-export const getEquipmentDetail = (id: number) => {
+export const editEquipment = (
+  id: EquipmentListItemType["id"],
+  payload: EquipmentPostBody
+) => {
+  return apiPatch(`${apiUrl}`, payload, { params: { id } });
+};
+
+export const getEquipmentDetail = (id: EquipmentListItemType["id"]) => {
   return apiGet<EquipmentDetailType[]>(apiUrl, { id });
+};
+
+export const deleteEquipment = (id: EquipmentListItemType["id"]) => {
+  return apiDelete(`${apiUrl}`, { params: { id } });
 };
 
 export const getEquipmentListWithRentedDates = (
@@ -65,6 +78,6 @@ export const postSetEquipment = async (payload: {}) => {
   }
 };
 
-export const getSetEquipmentList = () => {
-  return apiGet(`/equipment_sets`);
+export const getSetEquipmentList = (params?: SetEquipmentListParams) => {
+  return apiGet<SetEquipmentListItemType[]>(`/equipment_sets`, params);
 };

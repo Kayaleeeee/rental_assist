@@ -1,7 +1,8 @@
-import { createEquipment } from "@/app/api/equipments";
+import { createEquipment, editEquipment } from "@/app/api/equipments";
 import {
   EquipmentCategory,
   EquipmentCategoryList,
+  EquipmentListItemType,
   EquipmentPostBody,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
@@ -33,7 +34,6 @@ export const useEquipmentForm = () => {
   };
 
   const getIsValidForm = useCallback(() => {
-    console.log(title, price, category);
     if (isEmpty(title)) {
       showToast({
         message: "장비명을 입력해주세요.",
@@ -87,6 +87,35 @@ export const useEquipmentForm = () => {
     }
   }, [category, title, price, detail, router, getIsValidForm]);
 
+  const editEquipmentForm = useCallback(
+    async (id: EquipmentListItemType["id"]) => {
+      if (!getIsValidForm()) return;
+
+      const form: EquipmentPostBody = {
+        category: category.key,
+        title,
+        price,
+        detail,
+      };
+
+      try {
+        await editEquipment(id, form);
+        showToast({
+          message: "장비가 수정되었습니다.",
+          type: "success",
+        });
+        router.push("/equipments");
+      } catch (e) {
+        console.log("등록 실패", e);
+        showToast({
+          message: "장비 수정에 실패했습니다.",
+          type: "error",
+        });
+      }
+    },
+    [category, title, price, detail, router, getIsValidForm]
+  );
+
   return {
     categoryMenu,
     category,
@@ -98,5 +127,6 @@ export const useEquipmentForm = () => {
     detail,
     setDetail,
     submitEquipmentForm,
+    editEquipmentForm,
   };
 };

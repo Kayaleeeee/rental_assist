@@ -11,6 +11,7 @@ export const useEquipmentRentalDates = (id?: EquipmentListItemType["id"]) => {
     | {
         rentedDates: EquipmentItemWithRentedDates["rentedDates"];
         reservationId: EquipmentItemWithRentedDates["reservationId"];
+        userName: EquipmentItemWithRentedDates["userName"];
       }
     | undefined
   >(undefined);
@@ -25,6 +26,7 @@ export const useEquipmentRentalDates = (id?: EquipmentListItemType["id"]) => {
         setRentalInfo({
           rentedDates: result.rentedDates,
           reservationId: result.reservationId,
+          userName: result.userName,
         });
       }
     } catch (e) {
