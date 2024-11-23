@@ -1,0 +1,19 @@
+.buttonListWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewButton {
+  padding: 6px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  border: 1px solid var(--grey-1);
+  cursor: pointer;
+}
+
+.selectedViewButton {
+  @extend .viewButton;
+  background-color: var(--primary);
+  color: white;
+}

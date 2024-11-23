@@ -56,6 +56,8 @@ export type ReservationSearchParams = {
   userName?: string;
   userId?: UserType["id"];
   order?: string;
+  startDate?: string;
+  endDate?: string;
 };
 
 export type ReservationPutPayload = {

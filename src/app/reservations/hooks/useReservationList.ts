@@ -51,7 +51,22 @@ export const useReservationList = () => {
     categoryList[0].key
   );
 
+  const [dateRange, setDateRange] = useState<{
+    startDate: string | undefined;
+    endDate: string | undefined;
+  }>({
+    startDate: undefined,
+    endDate: undefined,
+  });
+
   const getSearchParams = (params = {}): ReservationSearchParams => {
+    const dateParams =
+      dateRange.startDate && dateRange.endDate
+        ? {
+            startDate: `gte.${dateRange.startDate}`,
+            endDate: `lte.${dateRange.endDate}`,
+          }
+        : {};
     const categoryParams =
       selectedCategory === categoryList[0].key
         ? {}
@@ -62,7 +77,13 @@ export const useReservationList = () => {
         ? { [selectedSearchKey]: `ilike.%keyword%` }
         : {};
 
-    return { ...categoryParams, ...keywordParams, order: "id.desc", ...params };
+    return {
+      ...categoryParams,
+      ...keywordParams,
+      ...dateParams,
+      order: "id.desc",
+      ...params,
+    };
   };
 
   const fetchReservationList = useCallback(
@@ -128,5 +149,7 @@ export const useReservationList = () => {
     keyword,
     selectedSearchKey,
     searchMenu,
+    setDateRange,
+    dateRange,
   };
 };

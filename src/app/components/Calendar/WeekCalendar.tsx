@@ -1,10 +1,11 @@
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { Calendar, Event, dayjsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./index.scss";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import ArrowForwardOutlinedIcon from "@mui/icons-material/ArrowForwardOutlined";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
+import { CalendarProps } from ".";
 // Setup the localizer by providing the moment (or globalize, or Luxon) Object
 // to the correct localizer.
 const localizer = dayjsLocalizer(dayjs); // or globalizeLocalizer
@@ -13,20 +14,12 @@ export interface CalendarEventType extends Event {
   id: number;
 }
 
-export type CalendarProps = {
-  size?: number;
-  eventDateList?: CalendarEventType[];
-  onClickEvent?: (event: CalendarEventType) => void;
-  currentDate: Dayjs;
-  setCurrentDate: (date: Dayjs) => void;
-  onChangePrev?: () => void;
-  onChangeNext?: () => void;
-};
-
-export const CalendarComponent = ({
+export const WeekCalendar = ({
   size = 400,
   eventDateList = [],
   onClickEvent,
+  onChangePrev,
+  onChangeNext,
   currentDate,
   setCurrentDate,
 }: CalendarProps) => {
@@ -36,50 +29,49 @@ export const CalendarComponent = ({
   const MIN_DATE = useMemo(() => today.subtract(1, "year"), [today]);
 
   const month = useMemo(() => dayjs(currentDate).month() + 1, [currentDate]);
-  const year = useMemo(() => dayjs(currentDate).year(), [currentDate]);
 
-  const goToPrevMonth = useCallback(() => {
+  const startOfMonth = dayjs(currentDate).startOf("month");
+  const weekOfMonth =
+    Math.ceil(dayjs(currentDate).diff(startOfMonth, "day") / 7) + 1;
+
+  const goToPrevWeek = useCallback(() => {
     if (dayjs(currentDate).isBefore(MIN_DATE)) return;
-    setCurrentDate(dayjs(currentDate).subtract(1, "month"));
+    setCurrentDate(dayjs(currentDate).subtract(1, "week"));
+    onChangePrev?.();
   }, [currentDate, MIN_DATE]);
 
-  const goToNextMonth = useCallback(() => {
+  const goToNextWeek = useCallback(() => {
     if (dayjs(currentDate).isAfter(MAX_DATE)) return;
-    setCurrentDate(dayjs(currentDate).add(1, "month"));
+    setCurrentDate(dayjs(currentDate).add(1, "week"));
+    onChangeNext?.();
   }, [currentDate, MAX_DATE]);
 
   return (
     <div
-      className="wrapper"
+      className={"weekCalendarWrapper"}
       style={{
         width: `${size}px`,
       }}
     >
       <div className="header">
-        <button className="arrowButton" onClick={goToPrevMonth}>
+        <button className="arrowButton" onClick={goToPrevWeek}>
           <ArrowBackOutlinedIcon />
         </button>
         <h4>
-          {year}년 {month}월
+          {month}월 {weekOfMonth}주차
         </h4>
-        <button className="arrowButton" onClick={goToNextMonth}>
+        <button className="arrowButton" onClick={goToNextWeek}>
           <ArrowForwardOutlinedIcon />
         </button>
       </div>
       <Calendar<CalendarEventType>
         toolbar={false}
         culture="ko"
+        view="week"
+        date={currentDate.toISOString()}
         localizer={localizer}
         events={eventDateList}
         onSelectEvent={onClickEvent}
-        date={currentDate.toISOString()}
-        min={dayjs(MIN_DATE).toDate()}
-        startAccessor="start"
-        endAccessor="end"
-        style={{
-          width: `${size}px`,
-          height: `${size * 0.8}px`,
-        }}
       />
     </div>
   );
