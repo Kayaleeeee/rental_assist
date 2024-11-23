@@ -1,4 +1,3 @@
-export const NEXT_PUBLIC_SUPABASE_URL =
-  "https://pzmfznuiyiedzryrjrpu.supabase.co";
+export const NEXT_PUBLIC_SUPABASE_URL = process.env.SUPABASE_URL || "";
 export const NEXT_PUBLIC_SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6bWZ6bnVpeWllZHpyeXJqcnB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzAyMTQyNzIsImV4cCI6MjA0NTc5MDI3Mn0.-03UeQKOjTaGl2bi16K9W2sdIV-XS1pdcFczXb-DdLc";
+  process.env.SUPABASE_ANON_KEY || "";
