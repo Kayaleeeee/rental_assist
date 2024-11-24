@@ -5,6 +5,7 @@ import {
   QuoteType,
 } from "@/app/types/quoteType";
 import { apiGet, apiPatch, apiPost } from "..";
+import { isEmpty } from "lodash";
 
 const apiUrl = "/quotes";
 const detailUrl = "/quote_detail";
@@ -39,5 +40,9 @@ export const updateQuote = async (
     params: { id },
   });
 
-  return data[0];
+  if (isEmpty(data)) {
+    throw new Error("no data found");
+  } else {
+    return data[0];
+  }
 };

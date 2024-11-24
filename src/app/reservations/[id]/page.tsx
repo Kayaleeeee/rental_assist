@@ -7,15 +7,14 @@ import formStyles from "@components/Form/index.module.scss";
 import { Label } from "@/app/components/Form/Label";
 import { EditableField } from "@/app/components/EditableField";
 import { Margin } from "@/app/components/Margin";
-import { formatDateTime } from "@/app/utils/timeUtils";
+import { formatDateTime, getDiffDays } from "@/app/utils/timeUtils";
 import { QuotationItem } from "@/app/quotes/modules/QuotationItem";
 import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
 import styles from "../reservationPage.module.scss";
-import { useQuoteDetail } from "@/app/quotes/hooks/useQuoteDetail";
-import { isNaN } from "lodash";
+
 import { useReservationDetail } from "../\bhooks/useReservationDetail";
 import { PaymentStatusText } from "../modules/PaymentStatusText";
 import {
@@ -23,19 +22,23 @@ import {
   PaymentStatus,
   ReservationStatus,
 } from "@/app/types/reservationType";
-import { HTMLAttributes, useCallback, useState } from "react";
+import { HTMLAttributes, useCallback, useMemo, useState } from "react";
 import { showToast } from "@/app/utils/toastUtils";
 import { updateReservation } from "@/app/api/reservation";
 import { Button } from "@/app/components/Button";
 import { ReservationStatusChangeModal } from "../modules/StatusChangeModal";
 import { ReservationStatusText } from "../modules/ReservationStatusText";
 import { PaymentStatusChangeModal } from "../modules/PaymentStatusChangeModal";
+import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
+import { RentalDateChangeModal } from "../modules/RentalDateChangeModal";
 
 const defaultString = "-";
 
 const ReservationDetailPage = () => {
   const [isOpenStatusModal, setIsOpenStatusModal] = useState<boolean>(false);
   const [isOpenPaymentModal, setIsOpenPaymentModal] = useState<boolean>(false);
+  const [isOpenRentalDateModal, setIsOpenRentalDateModal] =
+    useState<boolean>(false);
 
   const router = useRouter();
   const params = useParams();
@@ -45,13 +48,10 @@ const ReservationDetailPage = () => {
   const { detail: reservationDetail, setDetail: setReservationDetail } =
     useReservationDetail(reservationId);
 
-  const quoteId = Number(reservationDetail?.quoteId);
-
-  const {
-    detail: quoteDetail,
-    quoteItemList,
-    rentalDays,
-  } = useQuoteDetail(isNaN(quoteId) ? undefined : quoteId);
+  const rentalDays = useMemo(() => {
+    if (!reservationDetail) return 0;
+    return getDiffDays(reservationDetail.startDate, reservationDetail.endDate);
+  }, [reservationDetail]);
 
   const formWrapperStyle = {
     width: "200px",
@@ -118,7 +118,7 @@ const ReservationDetailPage = () => {
     },
     [reservationDetail]
   );
-  if (!quoteDetail || !reservationDetail) return null;
+  if (!reservationDetail) return null;
 
   return (
     <div>
@@ -136,18 +136,11 @@ const ReservationDetailPage = () => {
           {reservationDetail.status !== ReservationStatus.canceled && (
             <div className={styles.headerButtonWrapper}>
               <Button
-                variant="outlined"
                 size="Small"
-                onClick={() => setIsOpenPaymentModal(true)}
+                style={{ width: "150px" }}
+                //   onClick={onCreateQuote}
               >
-                결제 상태 변경
-              </Button>
-              <Button
-                variant="outlined"
-                size="Small"
-                onClick={() => setIsOpenStatusModal(true)}
-              >
-                예약 상태 변경
+                예약 수정
               </Button>
             </div>
           )}
@@ -163,19 +156,37 @@ const ReservationDetailPage = () => {
 
         <div className={styles.inlineWrapper}>
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
-            <Label title="예약 상태" />
+            <div
+              className={styles.clickableLabelWrapper}
+              onClick={() => setIsOpenStatusModal(true)}
+            >
+              <Label title="예약 상태" />
+              <ArrowDropDownOutlinedIcon />
+            </div>
             <div>
               <ReservationStatusText status={reservationDetail.status} />
             </div>
           </div>
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
-            <Label title="결제 상태" />
+            <div
+              className={styles.clickableLabelWrapper}
+              onClick={() => setIsOpenPaymentModal(true)}
+            >
+              <Label title="결제 상태" />
+              <ArrowDropDownOutlinedIcon />
+            </div>
             <div>
               <PaymentStatusText status={reservationDetail.paymentStatus} />
             </div>
           </div>
           <div className={formStyles.sectionWrapper}>
-            <Label title={`대여 기간 (총 ${rentalDays}일)`} />
+            <div
+              className={styles.clickableLabelWrapper}
+              onClick={() => setIsOpenRentalDateModal(true)}
+            >
+              <Label title={`대여 기간 (총 ${rentalDays}일)`} />
+              <ArrowDropDownOutlinedIcon />
+            </div>
             <span
               style={{
                 display: "inline-flex",
@@ -183,12 +194,12 @@ const ReservationDetailPage = () => {
             >
               <EditableField
                 isEditable={false}
-                value={formatDateTime(quoteDetail.startDate)}
+                value={formatDateTime(reservationDetail.startDate)}
               />
               <div className={styles.separator}>~</div>
               <EditableField
                 isEditable={false}
-                value={formatDateTime(quoteDetail.endDate)}
+                value={formatDateTime(reservationDetail.endDate)}
               />
             </span>
           </div>
@@ -200,14 +211,14 @@ const ReservationDetailPage = () => {
             <Label title="이름" />
             <EditableField
               isEditable={false}
-              value={quoteDetail.userName || defaultString}
+              value={reservationDetail.userName || defaultString}
             />
           </div>
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <Label title="전화번호" />
             <EditableField
               isEditable={false}
-              value={quoteDetail.guestPhoneNumber || defaultString}
+              value={reservationDetail.phoneNumber || defaultString}
             />
           </div>
         </div>
@@ -222,7 +233,7 @@ const ReservationDetailPage = () => {
               <Label title="대여 장비 목록" />
 
               <div className={styles.equipmentListWrapper}>
-                {quoteItemList.map((quote) => {
+                {reservationDetail.quoteItems.map((quote) => {
                   return (
                     <QuotationItem
                       key={quote.id}
@@ -235,32 +246,37 @@ const ReservationDetailPage = () => {
             </div>
           )}
 
-          {quoteItemList.length > 0 && (
+          {reservationDetail.quoteItems.length > 0 && (
             <div className={styles.priceSection}>
               <div className={styles.discountPriceWrapper}>
                 <Label title="정가" />
-                <div>{formatLocaleString(quoteDetail.supplyPrice)}원</div>
+                <div>{formatLocaleString(reservationDetail.supplyPrice)}원</div>
               </div>
 
-              {!!quoteDetail.discountPrice && quoteDetail.discountPrice > 0 && (
-                <div className={styles.discountPriceWrapper}>
-                  <Label title="할인 금액" />
-                  <EditableField
-                    isEditable={false}
-                    value={`-${formatLocaleString(
-                      quoteDetail.discountPrice
-                    )}원`}
-                  />
-                </div>
-              )}
+              {!!reservationDetail.discountPrice &&
+                reservationDetail.discountPrice > 0 && (
+                  <div className={styles.discountPriceWrapper}>
+                    <Label title="할인 금액" />
+                    <EditableField
+                      isEditable={false}
+                      value={`-${formatLocaleString(
+                        reservationDetail.discountPrice
+                      )}원`}
+                    />
+                  </div>
+                )}
               <div className={styles.totalPriceWrapper}>
                 <div className={styles.totalPrice}>
-                  총 {formatLocaleString(quoteDetail.totalPrice)}원 (
+                  총 {formatLocaleString(reservationDetail.totalPrice)}원 (
                 </div>
-                <div> {formatKoreanCurrency(quoteDetail.totalPrice)})</div>
+                <div>
+                  {" "}
+                  {formatKoreanCurrency(reservationDetail.totalPrice)})
+                </div>
               </div>
             </div>
           )}
+          <Margin top={20} />
         </div>
       </FormWrapper>
       {isOpenStatusModal && reservationDetail && (
@@ -275,6 +291,23 @@ const ReservationDetailPage = () => {
           currentStatus={reservationDetail.paymentStatus}
           onCloseModal={() => setIsOpenPaymentModal(false)}
           onChangeStatus={onChangePaymentStatus}
+        />
+      )}
+      {isOpenRentalDateModal && (
+        <RentalDateChangeModal
+          onCloseModal={() => setIsOpenRentalDateModal(false)}
+          dateRange={{
+            startDate: reservationDetail.startDate,
+            endDate: reservationDetail.endDate,
+          }}
+          onChangeDate={(dateRange) =>
+            setReservationDetail({
+              ...reservationDetail,
+              startDate: dateRange.startDate,
+              endDate: dateRange.endDate,
+            })
+          }
+          quoteId={reservationDetail.quoteId}
         />
       )}
     </div>

@@ -16,6 +16,9 @@ import { useRouter } from "next/navigation";
 import { SearchBar } from "../components/SearchBar";
 import { GridTable } from "../components/Table/GridTable";
 
+import formStyle from "@components/Form/index.module.scss";
+import { Button } from "../components/Button";
+
 const getColumns = (): GridColDef<ReservationType>[] => [
   {
     field: "id",
@@ -88,7 +91,16 @@ export default function ReservationListPage() {
 
   return (
     <div>
-      <Margin top={85} />
+      <div className={formStyle.rightAlignButtonWrapper}>
+        <Button
+          style={{ width: "200px" }}
+          size="Medium"
+          onClick={() => router.push("/quotes/create")}
+        >
+          예약 만들기
+        </Button>
+      </div>
+      <Margin top={45} />
       <CategoryList
         categoryList={categoryList}
         selectedCategory={selectedCategory}

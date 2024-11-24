@@ -7,7 +7,6 @@ import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBullet
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import React from "react";
 import { usePathname } from "next/navigation";
-import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { isEmpty } from "lodash";
 import { Margin } from "../Margin";
 
@@ -39,12 +38,11 @@ const menuList = [
       },
     ],
   },
-
-  {
-    path: "/quotes",
-    title: "견적서 리스트",
-    renderIcon: () => <ReceiptLongOutlinedIcon />,
-  },
+  // {
+  //   path: "/quotes",
+  //   title: "견적서 리스트",
+  //   renderIcon: () => <ReceiptLongOutlinedIcon />,
+  // },
   {
     path: "/users",
     title: "회원 관리",
