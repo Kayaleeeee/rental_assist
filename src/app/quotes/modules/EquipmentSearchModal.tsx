@@ -13,7 +13,7 @@ import { formatLocaleString } from "@/app/utils/priceUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { MenuItem, Select } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const allString = "all";
 
@@ -51,8 +51,12 @@ export const EquipmentSearchModal = ({
     EquipmentListItemType[]
   >([]);
 
-  const { list, selectedCategory, toggleEquipmentCategory } =
+  const { list, selectedCategory, toggleEquipmentCategory, fetchList } =
     useEquipmentList();
+
+  useEffect(() => {
+    fetchList();
+  }, []);
 
   return (
     <Modal

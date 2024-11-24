@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { Calendar, Event, dayjsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./index.scss";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import ArrowForwardOutlinedIcon from "@mui/icons-material/ArrowForwardOutlined";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 // Setup the localizer by providing the moment (or globalize, or Luxon) Object

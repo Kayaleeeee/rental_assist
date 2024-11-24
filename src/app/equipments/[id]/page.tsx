@@ -13,7 +13,7 @@ import {
 import { useEquipmentDetail } from "./hooks/useEquipmentDetail";
 import { useParams, useRouter } from "next/navigation";
 import { EquipmentCategoryList } from "@/app/types/equipmentType";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
 import {
@@ -29,9 +29,9 @@ const EquipmentDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const equipmentId = Number(params.id);
-
   const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
   const { rentalInfo } = useEquipmentRentalDates(equipmentId);
+  const [currentDate, setCurrentDate] = useState(dayjs());
 
   const eventDateList: CalendarEventType[] = useMemo(() => {
     if (!rentalInfo) return [];
@@ -132,6 +132,8 @@ const EquipmentDetailPage = () => {
             <Label title="예약 현황" />
             <CalendarComponent
               size={500}
+              currentDate={currentDate}
+              setCurrentDate={setCurrentDate}
               eventDateList={eventDateList}
               onClickEvent={(event) => {
                 window.open(`/reservations/${event.id}`, "_blank");
