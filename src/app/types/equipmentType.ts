@@ -7,6 +7,7 @@ export type EquipmentListItemType = {
   price: number;
   category: string;
   detail: string;
+  disabled: boolean;
 };
 
 export type EquipmentDetailType = {
@@ -15,6 +16,7 @@ export type EquipmentDetailType = {
   price: number;
   category: string;
   detail: string;
+  disabled: boolean;
 };
 
 export type EquipmentPostBody = {
@@ -22,11 +24,13 @@ export type EquipmentPostBody = {
   price: number;
   category: EquipmentCategory;
   detail: string;
+  disabled?: boolean;
 };
 
 export type EquipmentListParams = {
   category?: EquipmentCategory;
   title?: string;
+  disabled?: boolean;
 };
 
 export enum EquipmentCategory {

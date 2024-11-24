@@ -13,6 +13,7 @@ export type ReservationType = {
   startDate: string;
   endDate: string;
   userName: string;
+  memo?: string;
   paymentMethod?: PaymentMethod;
 };
 

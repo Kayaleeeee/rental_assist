@@ -51,7 +51,7 @@ export const apiInstance = axios.create({
         prefix.some((item) => value.startsWith(item))
       ) {
         searchParams.append(key, value);
-      } else {
+      } else if (value !== undefined) {
         searchParams.append(key, `eq.${value}`);
       }
     }

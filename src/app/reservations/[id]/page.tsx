@@ -211,6 +211,8 @@ const ReservationDetailPage = () => {
             />
           </div>
         </div>
+        <Label title="메모" />
+        <div>{reservationDetail.memo || "-"}</div>
 
         <div className={formStyles.sectionWrapper}>
           <Margin top={20} />

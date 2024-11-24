@@ -2,6 +2,7 @@ import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { Label } from "@/app/components/Form/Label";
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
+import { GridTable } from "@/app/components/Table/GridTable";
 import { useEquipmentList } from "@/app/equipments/hooks/useEquipmentList";
 
 import {
@@ -12,7 +13,7 @@ import {
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { MenuItem, Select } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 
 const allString = "all";
@@ -37,7 +38,8 @@ const columns: GridColDef<EquipmentListItemType>[] = [
 ];
 
 type Props = {
-  disabledIdList: number[];
+  existIdList: number[];
+  occupiedIdList: number[];
   onCloseModal: () => void;
   onConfirm: (list: EquipmentListItemType[]) => void;
 };
@@ -45,7 +47,8 @@ type Props = {
 export const EquipmentSearchModal = ({
   onCloseModal,
   onConfirm,
-  disabledIdList,
+  existIdList,
+  occupiedIdList,
 }: Props) => {
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     EquipmentListItemType[]
@@ -110,14 +113,23 @@ export const EquipmentSearchModal = ({
             );
           })}
         </Select>
-        <DataGrid<EquipmentListItemType>
+        <GridTable<EquipmentListItemType>
           checkboxSelection
           columns={columns}
-          isRowSelectable={(row) => !disabledIdList.includes(Number(row.id))}
+          isRowSelectable={(row) =>
+            ![...existIdList, ...occupiedIdList].includes(Number(row.id))
+          }
           onCellClick={({ row }) => {
-            if (disabledIdList.includes(row.id)) {
+            if (existIdList.includes(row.id)) {
               showToast({ message: "이미 추가된 장비입니다.", type: "error" });
               return;
+            }
+
+            if (occupiedIdList.includes(row.id)) {
+              showToast({
+                message: "이미 예약중인 장비입니다.",
+                type: "error",
+              });
             }
 
             const equipmentIndex = selectedEquipmentList
@@ -134,14 +146,6 @@ export const EquipmentSearchModal = ({
           }}
           rows={list}
           getRowId={(cell) => cell.id}
-          sx={{
-            background: "white",
-            width: "100%",
-            maxHeight: "60vh",
-
-            borderRadius: "16px",
-            marginTop: "24px",
-          }}
         />
         <Margin bottom={20} />
       </div>

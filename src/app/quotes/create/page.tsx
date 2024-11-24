@@ -47,16 +47,23 @@ const QuoteCreatePage = () => {
     dateRange,
   } = useQuoteForm();
 
-  const { list: rentedEquipmentList } = useEquipmentListWithRentedDates({
-    startDate: dateRange.startDate,
-    endDate: dateRange.endDate,
-  });
+  const { list: rentedEquipmentList, fetchList: fetchEquipmentRentedDateList } =
+    useEquipmentListWithRentedDates({
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate,
+    });
 
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     setIsDiscounted(form.discountPrice > 0);
   }, [form]);
+
+  useEffect(() => {
+    if (isOpenSearchModal) {
+      fetchEquipmentRentedDateList();
+    }
+  }, [isOpenSearchModal]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -85,25 +92,13 @@ const QuoteCreatePage = () => {
     }));
   };
 
-  const unavailableEquipmentIdList = useMemo((): number[] => {
-    if (!dateRange.startDate || !dateRange.endDate) return [];
+  const rentedEquipmentIdList = useMemo(() => {
+    return rentedEquipmentList.map((item) => item.equipmentId);
+  }, [rentedEquipmentList]);
 
-    const idList = [...quoteItemListState].map((item) => item.equipmentId);
-
-    if (isEmpty(rentedEquipmentList)) return idList;
-
-    rentedEquipmentList.forEach((item) => {
-      if (idList.includes(item.equipmentId)) return;
-      idList.push(item.equipmentId);
-    });
-
-    return idList;
-  }, [
-    quoteItemListState,
-    dateRange.startDate,
-    dateRange.endDate,
-    rentedEquipmentList,
-  ]);
+  const existIdList = useMemo(() => {
+    return quoteItemListState.map((item) => item.equipmentId);
+  }, [quoteItemListState]);
 
   return (
     <div>
@@ -252,7 +247,8 @@ const QuoteCreatePage = () => {
       </FormWrapper>
       {isOpenSearchModal && dateRange.startDate && dateRange.endDate && (
         <EquipmentSearchModal
-          disabledIdList={unavailableEquipmentIdList}
+          existIdList={existIdList}
+          occupiedIdList={rentedEquipmentIdList}
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={onAddQuoteItemList}
         />
