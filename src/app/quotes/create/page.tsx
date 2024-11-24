@@ -21,8 +21,8 @@ import { UserSearchModal } from "../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
-import { isEmpty } from "lodash";
 import { useUnmount } from "usehooks-ts";
+import { formatDateTime } from "@/app/utils/timeUtils";
 
 const QuoteCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -99,6 +99,8 @@ const QuoteCreatePage = () => {
   const existIdList = useMemo(() => {
     return quoteItemListState.map((item) => item.equipmentId);
   }, [quoteItemListState]);
+
+  console.log(dateRange, formatDateTime("2024-11-20T15:00"));
 
   return (
     <div>

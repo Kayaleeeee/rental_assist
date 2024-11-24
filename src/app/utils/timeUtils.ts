@@ -1,12 +1,15 @@
 import dayjs from "dayjs";
 
 export const getDiffDays = (startTime: string, endTime: string) => {
-  const diffDays = dayjs(startTime).diff(dayjs(endTime), "day");
-  return Math.abs(diffDays) + 1;
+  const diffHours = Math.abs(dayjs(startTime).diff(dayjs(endTime), "hour"));
+  const diffDays = Math.ceil(diffHours / 24);
+
+  if (diffDays === 0) return 1;
+  return Math.abs(diffDays);
 };
 
 export const formatDateTime = (dateTime: string) => {
-  return dayjs(dateTime).format("YYYY-MM-DD HH:mm");
+  return dayjs(dateTime).locale("ko").format("YYYY-MM-DD HH:mm");
 };
 
 export const isDateRangeOverlap = (
