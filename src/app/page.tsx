@@ -20,7 +20,7 @@ export default function Home() {
   const [mode, setMode] = useState<string>("month");
   const size = 600;
   const [eventList, setEventList] = useState<CalendarEventType[]>([]);
-  const [currentDate, setCurrentDate] = useState(dayjs());
+  const [currentDate, setCurrentDate] = useState(dayjs().startOf("day"));
 
   const {
     dateRange,
@@ -31,27 +31,11 @@ export default function Home() {
   } = useReservationList();
 
   const setDateRangeByMode = (mode: string) => {
-    if (mode === "month") {
-      setMode("month");
+    if (mode === "month" || mode === "week" || mode === "day") {
+      setMode(mode);
       setDateRange({
-        startDate: currentDate.startOf("month").toISOString(),
-        endDate: currentDate.endOf("month").toISOString(),
-      });
-    }
-
-    if (mode === "week") {
-      setMode("week");
-      setDateRange({
-        startDate: currentDate.startOf("week").toISOString(),
-        endDate: currentDate.endOf("week").toISOString(),
-      });
-    }
-
-    if (mode === "day") {
-      setMode("day");
-      setDateRange({
-        startDate: currentDate.startOf("day").toISOString(),
-        endDate: currentDate.endOf("day").toISOString(),
+        startDate: currentDate.startOf(mode).toISOString(),
+        endDate: currentDate.endOf(mode).toISOString(),
       });
     }
   };
@@ -76,6 +60,23 @@ export default function Home() {
     setEventList(convertedEventList);
   }, [list]);
 
+  const handleChangeCalendarDate = (
+    mode: string,
+    direction: "prev" | "next"
+  ) => {
+    if (mode === "month" || mode === "week" || mode === "day") {
+      const changedMonthDate =
+        direction === "prev"
+          ? currentDate.subtract(1, mode)
+          : currentDate.add(1, mode);
+
+      setDateRange({
+        startDate: changedMonthDate.startOf(mode).toISOString(),
+        endDate: changedMonthDate.endOf(mode).toISOString(),
+      });
+    }
+  };
+
   useOnMount(() => {
     setDateRangeByMode(mode);
   });
@@ -95,6 +96,8 @@ export default function Home() {
             eventDateList={eventList}
             currentDate={currentDate}
             setCurrentDate={setCurrentDate}
+            onChangeNext={() => handleChangeCalendarDate("month", "next")}
+            onChangePrev={() => handleChangeCalendarDate("month", "prev")}
           />
         )}
         {mode === "week" && (
@@ -103,6 +106,8 @@ export default function Home() {
             eventDateList={eventList}
             currentDate={currentDate}
             setCurrentDate={setCurrentDate}
+            onChangeNext={() => handleChangeCalendarDate("week", "next")}
+            onChangePrev={() => handleChangeCalendarDate("week", "prev")}
           />
         )}
         {mode === "day" && (
@@ -111,6 +116,8 @@ export default function Home() {
             eventDateList={eventList}
             currentDate={currentDate}
             setCurrentDate={setCurrentDate}
+            onChangeNext={() => handleChangeCalendarDate("day", "next")}
+            onChangePrev={() => handleChangeCalendarDate("day", "prev")}
           />
         )}
       </main>

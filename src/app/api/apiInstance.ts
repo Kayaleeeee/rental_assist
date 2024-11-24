@@ -46,7 +46,9 @@ export const apiInstance = axios.create({
 
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
-      if (
+      if (key === "or" && typeof value === "string") {
+        searchParams.append(key, value);
+      } else if (
         typeof value === "string" &&
         prefix.some((item) => value.startsWith(item))
       ) {

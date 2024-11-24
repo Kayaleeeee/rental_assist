@@ -46,8 +46,8 @@ export const getEquipmentListWithRentedDates = (
     if (!startDate || !endDate) return { ...rest };
 
     return {
-      start_date: `gte.${params.startDate}`,
-      end_date: `lte.${params.endDate}`,
+      start_date: `lte.${params.endDate}`,
+      end_date: `gte.${params.startDate}`,
       ...rest,
     };
   };

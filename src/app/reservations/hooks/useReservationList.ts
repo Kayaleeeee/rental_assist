@@ -63,8 +63,8 @@ export const useReservationList = () => {
     const dateParams =
       dateRange.startDate && dateRange.endDate
         ? {
-            startDate: `gte.${dateRange.startDate}`,
-            endDate: `lte.${dateRange.endDate}`,
+            startDate: `lte.${dateRange.endDate}`,
+            endDate: `gte.${dateRange.startDate}`,
           }
         : {};
     const categoryParams =
