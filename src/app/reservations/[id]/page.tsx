@@ -8,14 +8,14 @@ import { Label } from "@/app/components/Form/Label";
 import { EditableField } from "@/app/components/EditableField";
 import { Margin } from "@/app/components/Margin";
 import { formatDateTime, getDiffDays } from "@/app/utils/timeUtils";
-import { QuotationItem } from "@/app/quotes/modules/QuotationItem";
+
 import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
 import styles from "../reservationPage.module.scss";
 
-import { useReservationDetail } from "../\bhooks/useReservationDetail";
+import { useReservationDetail } from "../hooks/useReservationDetail";
 import { PaymentStatusText } from "../modules/PaymentStatusText";
 import {
   PaymentMethod,
@@ -26,11 +26,12 @@ import { HTMLAttributes, useCallback, useMemo, useState } from "react";
 import { showToast } from "@/app/utils/toastUtils";
 import { updateReservation } from "@/app/api/reservation";
 import { Button } from "@/app/components/Button";
-import { ReservationStatusChangeModal } from "../modules/StatusChangeModal";
+import { ReservationStatusChangeModal } from "../modules/list/StatusChangeModal";
 import { ReservationStatusText } from "../modules/ReservationStatusText";
-import { PaymentStatusChangeModal } from "../modules/PaymentStatusChangeModal";
+import { PaymentStatusChangeModal } from "../modules/list/PaymentStatusChangeModal";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
-import { RentalDateChangeModal } from "../modules/RentalDateChangeModal";
+import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
+import { QuotationItem } from "../modules/form/QuotationItem";
 
 const defaultString = "-";
 
@@ -118,6 +119,7 @@ const ReservationDetailPage = () => {
     },
     [reservationDetail]
   );
+
   if (!reservationDetail) return null;
 
   return (
@@ -138,7 +140,9 @@ const ReservationDetailPage = () => {
               <Button
                 size="Small"
                 style={{ width: "150px" }}
-                //   onClick={onCreateQuote}
+                onClick={() =>
+                  router.push(`/reservations/${reservationId}/edit`)
+                }
               >
                 예약 수정
               </Button>

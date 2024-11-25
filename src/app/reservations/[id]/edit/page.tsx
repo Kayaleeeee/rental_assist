@@ -1,59 +1,66 @@
 "use client";
 
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
-import styles from "../quotePage.module.scss";
+import styles from "../../reservationPage.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { Label } from "@/app/components/Form/Label";
 import { DateTimeSelector } from "@/app/components/DateTimeSelector";
-import { useQuoteForm } from "../hooks/useQuoteForm";
+
 import { Margin } from "@/app/components/Margin";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { EquipmentSearchModal } from "../modules/EquipmentSearchModal";
-import { QuotationItemEditor } from "../modules/QuotationItemEditor";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { EquipmentSearchModal } from "../../modules/form/EquipmentSearchModal";
+import { QuotationItemEditor } from "../../modules/form/QuotationItemEditor";
 import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
-import { UserSearchModal } from "../../users/modules/UserSearchModal";
+import { UserSearchModal } from "../../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { useUnmount } from "usehooks-ts";
-import { formatDateTime } from "@/app/utils/timeUtils";
+import { useQuoteForm } from "../../hooks/useQuoteForm";
+import { useParams } from "next/navigation";
+import { useReservationDetail } from "../../hooks/useReservationDetail";
 
-const QuoteCreatePage = () => {
+const ReservationEditPage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const [isOpenUserModal, setIsOpenUserModal] = useState(false);
   const [isDiscounted, setIsDiscounted] = useState<boolean>(false);
   const [discountPriceState, setDiscountPriceState] = useState<number>(0);
+  const { id } = useParams();
+  const reservationId = Number(id);
+  const isFirstRender = useRef(true);
 
   const {
     form,
     setForm,
     onChangeForm,
     quoteItemListState,
+    setDateRange,
+    setQuoteItemListState,
     onChangeQuoteItem,
     onDeleteQuoteItem,
     onAddQuoteItemList,
     rentalDays,
-    onCreateQuote,
     totalPrice,
     totalSupplyPrice,
     resetCart,
     onChangeDate,
+    onEditQuote,
     dateRange,
   } = useQuoteForm();
+
+  const { detail } = useReservationDetail(reservationId);
 
   const { list: rentedEquipmentList, fetchList: fetchEquipmentRentedDateList } =
     useEquipmentListWithRentedDates({
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
     });
-
-  const isFirstRender = useRef(true);
 
   useEffect(() => {
     setIsDiscounted(form.discountPrice > 0);
@@ -64,6 +71,27 @@ const QuoteCreatePage = () => {
       fetchEquipmentRentedDateList();
     }
   }, [isOpenSearchModal]);
+
+  useEffect(() => {
+    if (!reservationId || !detail) return;
+
+    setForm({
+      userId: detail.userId,
+      guestName: detail.userName,
+      guestPhoneNumber: detail.phoneNumber || "",
+      discountPrice: detail.discountPrice ?? 0,
+    });
+    setQuoteItemListState(
+      detail.quoteItems.map((item) => ({
+        equipmentId: item.equipmentId,
+        price: item.price,
+        quantity: item.quantity,
+        totalPrice: item.price * item.quantity * rentalDays,
+        title: item.equipmentName,
+      }))
+    );
+    setDateRange({ startDate: detail.startDate, endDate: detail.endDate });
+  }, [detail, rentalDays]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -92,6 +120,12 @@ const QuoteCreatePage = () => {
     }));
   };
 
+  const handleSaveForm = useCallback(() => {
+    if (!detail?.quoteId) return;
+
+    onEditQuote(detail.quoteId, reservationId);
+  }, [detail?.quoteId, reservationId]);
+
   const rentedEquipmentIdList = useMemo(() => {
     return rentedEquipmentList.map((item) => item.equipmentId);
   }, [rentedEquipmentList]);
@@ -100,11 +134,9 @@ const QuoteCreatePage = () => {
     return quoteItemListState.map((item) => item.equipmentId);
   }, [quoteItemListState]);
 
-  console.log(dateRange, formatDateTime("2024-11-20T15:00"));
-
   return (
     <div>
-      <FormWrapper title="견적서 생성">
+      <FormWrapper title="예약 수정">
         <div className={formStyles.sectionWrapper}>
           <Label title="고객 정보" />
 
@@ -241,9 +273,9 @@ const QuoteCreatePage = () => {
           <Button
             size="Medium"
             style={{ width: "250px" }}
-            onClick={onCreateQuote}
+            onClick={handleSaveForm}
           >
-            생성하기
+            저장하기
           </Button>
         </div>
       </FormWrapper>
@@ -265,4 +297,4 @@ const QuoteCreatePage = () => {
   );
 };
 
-export default QuoteCreatePage;
+export default ReservationEditPage;

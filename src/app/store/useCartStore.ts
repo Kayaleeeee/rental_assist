@@ -16,6 +16,7 @@ type CartState = {
   removeEquipment: (equipmentId: EquipmentListItemState["equipmentId"]) => void;
   dateRange: { startDate: string | undefined; endDate: string | undefined };
   onChangeDate: (key: "startDate" | "endDate", date: string) => void;
+  setDateRange: (dateRange: { startDate: string; endDate: string }) => void;
 };
 
 const initialState = {
@@ -29,6 +30,9 @@ export const useCartStore = create<CartState>((set, get) => ({
   dateRange: { startDate: undefined, endDate: undefined },
   onChangeDate: (key, date) => {
     set({ dateRange: { ...get().dateRange, [key]: date } });
+  },
+  setDateRange: (dateRange) => {
+    set({ dateRange });
   },
   resetCart: () => {
     set(initialState);

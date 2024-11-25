@@ -9,10 +9,11 @@ import {
   MonthCalendar,
 } from "./components/Calendar/MonthCalendar";
 import { Margin } from "./components/Margin";
-import { useReservationList } from "./reservations/\bhooks/useReservationList";
+import { useReservationList } from "./reservations/hooks/useReservationList";
 import dayjs from "dayjs";
 import { useOnMount } from "@mui/x-data-grid";
 import { getRandomHexColor } from "./utils/colorUtils";
+import { ReservationStatus } from "./types/reservationType";
 
 const menu = [
   { key: "month", title: "월별" },
@@ -47,7 +48,7 @@ export default function Home() {
   useEffect(() => {
     if (!dateRange.startDate || !dateRange.endDate) return;
 
-    const params = getSearchParams();
+    const params = getSearchParams({ status: ReservationStatus.confirmed });
     fetchReservationList(params);
   }, [dateRange]);
 

@@ -27,6 +27,7 @@ export const useQuoteForm = () => {
     removeEquipment,
     setList: setQuoteItemListState,
     resetCart,
+    setDateRange,
   } = useCartStore();
 
   const supabase = createClient();
@@ -191,6 +192,76 @@ export const useQuoteForm = () => {
     router,
   ]);
 
+  const onEditQuote = useCallback(
+    async (quoteId: number, reservationId: number) => {
+      const {
+        data: { user: writer },
+      } = await supabase.auth.getUser();
+
+      if (!writer) return;
+
+      if (!form.userId) {
+        showToast({
+          message: "회원을 선택해주세요.",
+          type: "error",
+        });
+        return;
+      }
+
+      if (!dateRange.startDate || !dateRange.endDate) {
+        showToast({
+          message: "대여일정을 선택해주세요.",
+          type: "error",
+        });
+        return;
+      }
+
+      if (isEmpty(quoteItemListState)) {
+        showToast({
+          message: "장비를 선택해주세요.",
+          type: "error",
+        });
+        return;
+      }
+
+      try {
+        const payload: QuotePostPayload = {
+          ...form,
+          totalPrice,
+          supplyPrice: totalSupplyPrice,
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
+          createdBy: writer.id,
+        };
+
+        const quoteResult = await updateQuote(quoteId, payload);
+
+        const quoteItemList: QuoteItemPostPayload = quoteItemListState.map(
+          (item) => ({
+            equipmentId: item.equipmentId,
+            quantity: item.quantity,
+            price: item.price,
+            quoteId: quoteResult.id,
+          })
+        );
+
+        await createQuoteItemList(quoteItemList);
+        showToast({
+          message: "예약이 수정되었습니다.",
+          type: "success",
+        });
+
+        router.replace(`/reservations/${reservationId}`);
+      } catch {
+        showToast({
+          message: "예약 생성에 오류가 발생했습니다.",
+          type: "error",
+        });
+      }
+    },
+    [form, dateRange, quoteItemListState, totalPrice, totalSupplyPrice, router]
+  );
+
   return {
     form,
     setForm,
@@ -198,13 +269,16 @@ export const useQuoteForm = () => {
     onChangeQuoteItem,
     onDeleteQuoteItem,
     quoteItemListState,
+    setQuoteItemListState,
     onAddQuoteItemList,
     rentalDays,
     onCreateQuote,
+    onEditQuote,
     totalPrice,
     totalSupplyPrice,
     resetCart,
     onChangeDate,
     dateRange,
+    setDateRange,
   };
 };

@@ -84,6 +84,7 @@ export const MonthCalendar = ({
         events={eventDateList}
         onSelectEvent={onClickEvent}
         date={currentDate.toISOString()}
+        showMultiDayTimes
         min={dayjs(MIN_DATE).toDate()}
         startAccessor="start"
         endAccessor="end"

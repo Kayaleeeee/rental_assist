@@ -1,7 +1,7 @@
 "use client";
 
 import { GridColDef } from "@mui/x-data-grid";
-import { useReservationList } from "./\bhooks/useReservationList";
+import { useReservationList } from "./hooks/useReservationList";
 import { ReservationType } from "../types/reservationType";
 import { HeaderName } from "../components/DataTable/HeaderName";
 import { PaymentStatusText } from "./modules/PaymentStatusText";
@@ -95,7 +95,7 @@ export default function ReservationListPage() {
         <Button
           style={{ width: "200px" }}
           size="Medium"
-          onClick={() => router.push("/quotes/create")}
+          onClick={() => router.push("/reservations/create")}
         >
           예약 만들기
         </Button>

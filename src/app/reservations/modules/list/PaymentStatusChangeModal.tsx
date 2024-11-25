@@ -3,7 +3,7 @@ import { PaymentMethod, PaymentStatus } from "@/app/types/reservationType";
 import { Modal } from "@components/Modal";
 import { MenuItem, Select } from "@mui/material";
 import { useCallback, useState } from "react";
-import { getPaymentStatusText } from "./PaymentStatusText";
+import { getPaymentStatusText } from "../PaymentStatusText";
 import { Label } from "@/app/components/Form/Label";
 
 const statusMenu = [

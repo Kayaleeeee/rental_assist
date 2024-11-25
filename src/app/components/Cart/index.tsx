@@ -51,7 +51,7 @@ export const Cart = ({ onCloseCart }: Props) => {
           totalPrice: item.price * rentalDays,
         }))
       );
-      router.push("/quotes/create");
+      router.push("/reservations/create");
     }
   }, [
     isOkToMakeReservation,

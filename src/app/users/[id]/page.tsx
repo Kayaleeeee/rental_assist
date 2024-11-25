@@ -9,7 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { useUserDetail } from "../hooks/useUserDetail";
-import { useReservationList } from "@/app/reservations/\bhooks/useReservationList";
+import { useReservationList } from "@/app/reservations/hooks/useReservationList";
 import { useEffect } from "react";
 import { isEmpty } from "lodash";
 import styles from "../index.module.scss";
