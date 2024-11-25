@@ -55,8 +55,7 @@
 }
 
 .rbc-event {
-  background: var(--green);
-  // height: 15px;
+  background: var(--event-color, var(--green));
   display: flex;
   align-items: center;
   justify-content: center;

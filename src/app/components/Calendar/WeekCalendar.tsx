@@ -1,18 +1,14 @@
 import dayjs from "dayjs";
-import { Calendar, Event, dayjsLocalizer } from "react-big-calendar";
+import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./index.scss";
 import { useCallback, useMemo } from "react";
 import ArrowForwardOutlinedIcon from "@mui/icons-material/ArrowForwardOutlined";
 import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
-import { CalendarProps } from ".";
+import { CalendarEventType, CalendarProps } from "./MonthCalendar";
 // Setup the localizer by providing the moment (or globalize, or Luxon) Object
 // to the correct localizer.
 const localizer = dayjsLocalizer(dayjs); // or globalizeLocalizer
-
-export interface CalendarEventType extends Event {
-  id: number;
-}
 
 export const WeekCalendar = ({
   size = 400,
@@ -46,6 +42,16 @@ export const WeekCalendar = ({
     onChangeNext?.();
   }, [currentDate, MAX_DATE]);
 
+  const eventStyleGetter = (
+    event: CalendarEventType
+  ): { className?: string | undefined; style?: React.CSSProperties } => {
+    return {
+      style: {
+        backgroundColor: event.color,
+      },
+    };
+  };
+
   return (
     <div
       className={"weekCalendarWrapper"}
@@ -72,6 +78,7 @@ export const WeekCalendar = ({
         localizer={localizer}
         events={eventDateList}
         onSelectEvent={onClickEvent}
+        eventPropGetter={eventStyleGetter}
       />
     </div>
   );

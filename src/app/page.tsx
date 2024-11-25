@@ -4,11 +4,15 @@ import { useEffect, useState } from "react";
 import { WeekCalendar } from "./components/Calendar/WeekCalendar";
 import { DayCalendar } from "./components/Calendar/DayCalendar";
 import { CategoryList } from "./components/Category/CategoryList";
-import { CalendarComponent, CalendarEventType } from "./components/Calendar";
+import {
+  CalendarEventType,
+  MonthCalendar,
+} from "./components/Calendar/MonthCalendar";
 import { Margin } from "./components/Margin";
 import { useReservationList } from "./reservations/\bhooks/useReservationList";
 import dayjs from "dayjs";
 import { useOnMount } from "@mui/x-data-grid";
+import { getRandomHexColor } from "./utils/colorUtils";
 
 const menu = [
   { key: "month", title: "월별" },
@@ -54,6 +58,7 @@ export default function Home() {
         title: item.userName,
         start: dayjs(item.startDate).toDate(),
         end: dayjs(item.endDate).toDate(),
+        color: getRandomHexColor(item.userId),
       };
     });
 
@@ -91,7 +96,7 @@ export default function Home() {
         />
         <Margin bottom={30} />
         {mode === "month" && (
-          <CalendarComponent
+          <MonthCalendar
             size={size}
             eventDateList={eventList}
             currentDate={currentDate}

@@ -17,9 +17,9 @@ import { useCallback, useMemo, useState } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
 import {
-  CalendarComponent,
   CalendarEventType,
-} from "@/app/components/Calendar";
+  MonthCalendar,
+} from "@/app/components/Calendar/MonthCalendar";
 import { useEquipmentRentalDates } from "../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
 import { deleteEquipment } from "@/app/api/equipments";
@@ -130,7 +130,7 @@ const EquipmentDetailPage = () => {
           </div>
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />
-            <CalendarComponent
+            <MonthCalendar
               size={500}
               currentDate={currentDate}
               setCurrentDate={setCurrentDate}

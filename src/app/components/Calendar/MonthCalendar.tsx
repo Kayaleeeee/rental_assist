@@ -11,6 +11,7 @@ const localizer = dayjsLocalizer(dayjs); // or globalizeLocalizer
 
 export interface CalendarEventType extends Event {
   id: number;
+  color?: string;
 }
 
 export type CalendarProps = {
@@ -23,7 +24,7 @@ export type CalendarProps = {
   onChangeNext?: () => void;
 };
 
-export const CalendarComponent = ({
+export const MonthCalendar = ({
   size = 400,
   eventDateList = [],
   onClickEvent,
@@ -47,6 +48,16 @@ export const CalendarComponent = ({
     if (dayjs(currentDate).isAfter(MAX_DATE)) return;
     setCurrentDate(dayjs(currentDate).add(1, "month"));
   }, [currentDate, MAX_DATE]);
+
+  const eventStyleGetter = (
+    event: CalendarEventType
+  ): { className?: string | undefined; style?: React.CSSProperties } => {
+    return {
+      style: {
+        backgroundColor: event.color,
+      },
+    };
+  };
 
   return (
     <div
@@ -76,6 +87,7 @@ export const CalendarComponent = ({
         min={dayjs(MIN_DATE).toDate()}
         startAccessor="start"
         endAccessor="end"
+        eventPropGetter={eventStyleGetter}
         style={{
           width: `${size}px`,
           height: `${size * 0.8}px`,
