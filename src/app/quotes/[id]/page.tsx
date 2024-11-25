@@ -13,13 +13,14 @@ import {
   formatLocaleString,
 } from "@/app/utils/priceUtils";
 import { Button } from "@/app/components/Button";
-import { QuotationItem } from "../modules/QuotationItem";
+
 import { ListButton } from "@/app/components/Button/ListButton";
 import { formatDateTime } from "@/app/utils/timeUtils";
 import { useCallback } from "react";
 import { showToast } from "@/app/utils/toastUtils";
 import { postReservation } from "@/app/api/reservation";
 import { updateQuote } from "@/app/api/quote";
+import { QuotationItem } from "@/app/reservations/modules/form/QuotationItem";
 
 const defaultString = "-";
 
