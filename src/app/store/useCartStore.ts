@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { QuoteItemType } from "../types/quoteType";
 
 export type EquipmentListItemState = {
   equipmentId: number;
@@ -6,6 +7,7 @@ export type EquipmentListItemState = {
   price: number;
   quantity: number;
   totalPrice: number;
+  id?: QuoteItemType["id"];
 };
 
 type CartState = {

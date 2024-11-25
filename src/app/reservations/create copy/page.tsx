@@ -1,7 +1,7 @@
 "use client";
 
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
-import styles from "../reservationPage.module.scss";
+import styles from "../quotePage.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { Label } from "@/app/components/Form/Label";
@@ -22,6 +22,7 @@ import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { useUnmount } from "usehooks-ts";
+import { formatDateTime } from "@/app/utils/timeUtils";
 import { useReservationForm } from "../hooks/useReservationForm";
 
 const ReservationCreatePage = () => {
@@ -100,9 +101,11 @@ const ReservationCreatePage = () => {
     return quoteItemListState.map((item) => item.equipmentId);
   }, [quoteItemListState]);
 
+  console.log(dateRange, formatDateTime("2024-11-20T15:00"));
+
   return (
     <div>
-      <FormWrapper title="예약 생성">
+      <FormWrapper title="견적서 생성">
         <div className={formStyles.sectionWrapper}>
           <Label title="고객 정보" />
 

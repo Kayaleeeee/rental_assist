@@ -22,9 +22,11 @@ import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { useUnmount } from "usehooks-ts";
-import { useQuoteForm } from "../../hooks/useQuoteForm";
+import { useReservationForm } from "../../hooks/useReservationForm";
 import { useParams } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
+import { isNil } from "lodash";
+import { EquipmentListItemState } from "@/app/store/useCartStore";
 
 const ReservationEditPage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -34,6 +36,7 @@ const ReservationEditPage = () => {
   const { id } = useParams();
   const reservationId = Number(id);
   const isFirstRender = useRef(true);
+  const quoteItemListStateRef = useRef<EquipmentListItemState[]>([]);
 
   const {
     form,
@@ -52,7 +55,7 @@ const ReservationEditPage = () => {
     onChangeDate,
     onEditQuote,
     dateRange,
-  } = useQuoteForm();
+  } = useReservationForm();
 
   const { detail } = useReservationDetail(reservationId);
 
@@ -61,10 +64,6 @@ const ReservationEditPage = () => {
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
     });
-
-  useEffect(() => {
-    setIsDiscounted(form.discountPrice > 0);
-  }, [form]);
 
   useEffect(() => {
     if (isOpenSearchModal) {
@@ -81,17 +80,21 @@ const ReservationEditPage = () => {
       guestPhoneNumber: detail.phoneNumber || "",
       discountPrice: detail.discountPrice ?? 0,
     });
-    setQuoteItemListState(
-      detail.quoteItems.map((item) => ({
-        equipmentId: item.equipmentId,
-        price: item.price,
-        quantity: item.quantity,
-        totalPrice: item.price * item.quantity * rentalDays,
-        title: item.equipmentName,
-      }))
-    );
     setDateRange({ startDate: detail.startDate, endDate: detail.endDate });
-  }, [detail, rentalDays]);
+
+    setDiscountPriceState(detail.discountPrice ?? 0);
+    setIsDiscounted(!isNil(detail.discountPrice) && detail.discountPrice > 0);
+    const quoteItemList = detail.quoteItems.map((item) => ({
+      equipmentId: item.equipmentId,
+      price: item.price,
+      quantity: item.quantity,
+      totalPrice: item.price * item.quantity * rentalDays,
+      title: item.equipmentName,
+      id: item.id,
+    }));
+    setQuoteItemListState(quoteItemList);
+    quoteItemListStateRef.current = quoteItemList;
+  }, [detail, reservationId, rentalDays]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -123,8 +126,10 @@ const ReservationEditPage = () => {
   const handleSaveForm = useCallback(() => {
     if (!detail?.quoteId) return;
 
-    onEditQuote(detail.quoteId, reservationId);
-  }, [detail?.quoteId, reservationId]);
+    onEditQuote(detail.quoteId, reservationId, [
+      ...quoteItemListStateRef.current,
+    ]);
+  }, [detail?.quoteId, reservationId, onEditQuote]);
 
   const rentedEquipmentIdList = useMemo(() => {
     return rentedEquipmentList.map((item) => item.equipmentId);

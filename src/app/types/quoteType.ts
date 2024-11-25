@@ -44,7 +44,7 @@ export type QuotePostPayload = {
   supplyPrice: number;
   startDate: string;
   endDate: string;
-  createdBy: string;
+  createdBy?: string;
   reservationId?: ReservationType["id"];
 };
 
@@ -54,3 +54,10 @@ export type QuoteItemPostPayload = {
   quantity: number;
   price: number;
 }[];
+
+export type QuoteItemPutPayload = {
+  equipmentId?: number;
+  quantity?: number;
+  price?: number;
+  quoteId: number;
+};

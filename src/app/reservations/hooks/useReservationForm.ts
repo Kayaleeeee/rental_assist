@@ -1,11 +1,9 @@
 import { createQuote, updateQuote } from "@/app/api/quote";
-import { createQuoteItemList } from "@/app/api/quoteItems";
+import { createQuoteItemList, deleteQuoteItemList } from "@/app/api/quoteItems";
 import { postReservation } from "@/app/api/reservation";
 import { EquipmentListItemState, useCartStore } from "@/app/store/useCartStore";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { QuoteItemPostPayload, QuotePostPayload } from "@/app/types/quoteType";
-import { createClient } from "@/app/utils/supabase/client";
-
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
@@ -19,7 +17,7 @@ type QuotePostStateType = {
   discountPrice: number;
 };
 
-export const useQuoteForm = () => {
+export const useReservationForm = () => {
   const {
     list: quoteItemListState,
     dateRange,
@@ -30,7 +28,6 @@ export const useQuoteForm = () => {
     setDateRange,
   } = useCartStore();
 
-  const supabase = createClient();
   const router = useRouter();
   const [form, setForm] = useState<QuotePostStateType>({
     userId: undefined,
@@ -45,16 +42,6 @@ export const useQuoteForm = () => {
     return getDiffDays(dateRange.startDate, dateRange.endDate);
   }, [dateRange.startDate, dateRange.endDate]);
 
-  const totalPrice = useMemo(() => {
-    if (!rentalDays) return 0;
-
-    const sumOfPrice = quoteItemListState.reduce(
-      (prev, acc) => (prev += acc.totalPrice),
-      0
-    );
-    return sumOfPrice - form.discountPrice;
-  }, [quoteItemListState, rentalDays, form.discountPrice]);
-
   const totalSupplyPrice = useMemo(() => {
     if (!rentalDays) return 0;
 
@@ -62,8 +49,12 @@ export const useQuoteForm = () => {
       (prev, acc) => (prev += acc.price * rentalDays * acc.quantity),
       0
     );
-    return sumOfPrice - form.discountPrice;
-  }, [quoteItemListState, rentalDays, form.discountPrice]);
+    return sumOfPrice;
+  }, [quoteItemListState, rentalDays]);
+
+  const totalPrice = useMemo(() => {
+    return totalSupplyPrice - form.discountPrice;
+  }, [totalSupplyPrice, form.discountPrice]);
 
   const onChangeForm = (
     key: keyof QuotePostStateType,
@@ -107,48 +98,48 @@ export const useQuoteForm = () => {
     [rentalDays, quoteItemListState, setQuoteItemListState]
   );
 
-  const onCreateQuote = useCallback(async () => {
-    const {
-      data: { user: writer },
-    } = await supabase.auth.getUser();
+  const validateForm =
+    useCallback(async (): Promise<QuotePostPayload | null> => {
+      if (!form.userId) {
+        showToast({
+          message: "회원을 선택해주세요.",
+          type: "error",
+        });
+        return null;
+      }
 
-    if (!writer) return;
+      if (!dateRange.startDate || !dateRange.endDate) {
+        showToast({
+          message: "대여일정을 선택해주세요.",
+          type: "error",
+        });
+        return null;
+      }
 
-    if (!form.userId) {
-      showToast({
-        message: "회원을 선택해주세요.",
-        type: "error",
-      });
-      return;
-    }
+      if (isEmpty(quoteItemListState)) {
+        showToast({
+          message: "장비를 선택해주세요.",
+          type: "error",
+        });
+        return null;
+      }
 
-    if (!dateRange.startDate || !dateRange.endDate) {
-      showToast({
-        message: "대여일정을 선택해주세요.",
-        type: "error",
-      });
-      return;
-    }
-
-    if (isEmpty(quoteItemListState)) {
-      showToast({
-        message: "장비를 선택해주세요.",
-        type: "error",
-      });
-      return;
-    }
-
-    try {
-      const payload: QuotePostPayload = {
+      return {
         ...form,
         totalPrice,
         supplyPrice: totalSupplyPrice,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
-        createdBy: writer.id,
       };
+    }, [totalSupplyPrice, form, totalPrice, dateRange, quoteItemListState]);
 
-      const quoteResult = await createQuote(payload);
+  const onCreateQuote = useCallback(async () => {
+    const validForm = await validateForm();
+
+    if (!validForm) return;
+
+    try {
+      const quoteResult = await createQuote(validForm);
 
       const quoteItemList: QuoteItemPostPayload = quoteItemListState.map(
         (item) => ({
@@ -183,58 +174,24 @@ export const useQuoteForm = () => {
         type: "error",
       });
     }
-  }, [
-    form,
-    dateRange,
-    quoteItemListState,
-    totalPrice,
-    totalSupplyPrice,
-    router,
-  ]);
+  }, [router, validateForm]);
 
   const onEditQuote = useCallback(
-    async (quoteId: number, reservationId: number) => {
-      const {
-        data: { user: writer },
-      } = await supabase.auth.getUser();
+    async (
+      quoteId: number,
+      reservationId: number,
+      originQuoteItemList: EquipmentListItemState[]
+    ) => {
+      const validForm = await validateForm();
 
-      if (!writer) return;
+      if (!validForm) return;
 
-      if (!form.userId) {
-        showToast({
-          message: "회원을 선택해주세요.",
-          type: "error",
-        });
-        return;
-      }
-
-      if (!dateRange.startDate || !dateRange.endDate) {
-        showToast({
-          message: "대여일정을 선택해주세요.",
-          type: "error",
-        });
-        return;
-      }
-
-      if (isEmpty(quoteItemListState)) {
-        showToast({
-          message: "장비를 선택해주세요.",
-          type: "error",
-        });
-        return;
-      }
+      const removedQuoteItemList = originQuoteItemList
+        .map((item) => item.id)
+        .join(",");
 
       try {
-        const payload: QuotePostPayload = {
-          ...form,
-          totalPrice,
-          supplyPrice: totalSupplyPrice,
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-          createdBy: writer.id,
-        };
-
-        const quoteResult = await updateQuote(quoteId, payload);
+        const quoteResult = await updateQuote(quoteId, validForm);
 
         const quoteItemList: QuoteItemPostPayload = quoteItemListState.map(
           (item) => ({
@@ -244,6 +201,8 @@ export const useQuoteForm = () => {
             quoteId: quoteResult.id,
           })
         );
+
+        await deleteQuoteItemList(removedQuoteItemList);
 
         await createQuoteItemList(quoteItemList);
         showToast({
@@ -259,7 +218,7 @@ export const useQuoteForm = () => {
         });
       }
     },
-    [form, dateRange, quoteItemListState, totalPrice, totalSupplyPrice, router]
+    [router, validateForm]
   );
 
   return {
