@@ -147,8 +147,11 @@ const ReservationEditPage = () => {
 
           <Button
             variant="outlined"
-            size="Medium"
+            size="Small"
             onClick={() => setIsOpenUserModal(true)}
+            style={{
+              width: "200px",
+            }}
           >
             {form.userId ? "회원 변경" : "회원 찾기"}
           </Button>

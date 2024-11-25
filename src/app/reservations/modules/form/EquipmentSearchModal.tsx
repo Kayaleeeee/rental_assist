@@ -130,6 +130,7 @@ export const EquipmentSearchModal = ({
                 message: "이미 예약중인 장비입니다.",
                 type: "error",
               });
+              return;
             }
 
             const equipmentIndex = selectedEquipmentList
