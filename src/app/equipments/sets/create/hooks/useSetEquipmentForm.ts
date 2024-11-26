@@ -2,6 +2,7 @@ import { createEquipment } from "@/app/api/equipments";
 import {
   EquipmentCategory,
   EquipmentCategoryList,
+  EquipmentListItemType,
   EquipmentPostBody,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
@@ -11,7 +12,7 @@ import { useCallback, useState } from "react";
 
 const categoryMenu = EquipmentCategoryList;
 
-export const useEquipmentForm = () => {
+export const useSetEquipmentForm = () => {
   const router = useRouter();
   const [category, setCategory] = useState<{
     key: EquipmentCategory;
@@ -21,6 +22,9 @@ export const useEquipmentForm = () => {
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [detail, setDetail] = useState<string>("");
+  const [equipmentList, setEquipmentList] = useState<EquipmentListItemType[]>(
+    []
+  );
 
   const onChangeCategory = (key: string) => {
     const selectedCategoryIndex = categoryMenu.findIndex(
