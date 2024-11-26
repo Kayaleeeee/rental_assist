@@ -1,3 +1,4 @@
+import { ListParamsType } from "./listType";
 import { QuoteItemType } from "./quoteType";
 import { UserType } from "./userType";
 
@@ -52,14 +53,14 @@ export type ReservationDetailType = ReservationType & {
   paymentMethod?: PaymentMethod;
 };
 
-export type ReservationSearchParams = {
+export type ReservationSearchParams = ListParamsType<{
   status?: string;
   userName?: string;
   userId?: UserType["id"];
   order?: string;
   startDate?: string;
   endDate?: string;
-};
+}>;
 
 export type ReservationPutPayload = {
   status?: ReservationStatus;

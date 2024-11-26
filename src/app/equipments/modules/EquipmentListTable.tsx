@@ -4,9 +4,9 @@ import { SearchBar } from "@/app/components/SearchBar";
 
 import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
+import { PageModelType } from "@/app/types/listType";
 import { formatLocaleString } from "@/app/utils/priceUtils";
-import { GridColDef } from "@mui/x-data-grid";
-
+import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Link from "next/link";
 
 const columns: GridColDef<EquipmentListItemType>[] = [
@@ -49,6 +49,9 @@ type Props = {
   selectedSearchKey: string;
   onSearch: () => void;
   onSelectCell: (idList: EquipmentListItemType[]) => void;
+  setPageModel: (model: PageModelType) => void;
+  pageModel: PageModelType;
+  totalElements: number;
 };
 
 export const EquipmentListTable = ({
@@ -60,6 +63,9 @@ export const EquipmentListTable = ({
   selectedSearchKey,
   onSearch,
   onSelectCell,
+  setPageModel,
+  pageModel,
+  totalElements,
 }: Props) => {
   return (
     <>
@@ -95,6 +101,19 @@ export const EquipmentListTable = ({
         columns={columns}
         rows={list}
         getRowId={(cell) => cell.id}
+        paginationModel={{
+          pageSize: pageModel.limit,
+          page: pageModel.offset,
+        }}
+        pagination
+        paginationMode="server"
+        rowCount={totalElements}
+        onPaginationModelChange={(model: GridPaginationModel) => {
+          setPageModel({
+            offset: model.page,
+            limit: model.pageSize,
+          });
+        }}
       />
     </>
   );

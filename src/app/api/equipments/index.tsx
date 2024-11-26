@@ -10,11 +10,57 @@ import {
 } from "@/app/types/equipmentType";
 import { apiDelete, apiGet, apiPatch, apiPost } from "..";
 import { isEmpty } from "lodash";
+import { createClient } from "@/app/utils/supabase/client";
+import { DEFAULT_LIMIT } from "@/app/types/listType";
 
 const apiUrl = "/equipments";
 
-export const getEquipmentList = (params?: EquipmentListParams) => {
-  return apiGet<EquipmentListItemType[]>(apiUrl, params);
+const applyFilters = (query: any, params?: EquipmentListParams) => {
+  if (!params) return query;
+
+  if (params.category) {
+    query = query.eq("category", params.category);
+  }
+  if (params.title) {
+    query = query.ilike("title", `%${params.title}%`);
+  }
+  if (params.disabled !== undefined) {
+    query = query.eq("disabled", params.disabled);
+  }
+  if (params.order) {
+    query = query.order(params.order, {
+      ascending: params.order === "asc",
+    });
+  }
+
+  return query.order("id", { ascending: false });
+};
+
+export const getEquipmentList = async (params?: EquipmentListParams) => {
+  const supabase = await createClient();
+
+  let query = supabase.from("equipments").select("*", { count: "exact" });
+
+  query = applyFilters(query, params);
+
+  const offset = params?.offset || 0;
+  const limit = params?.limit || DEFAULT_LIMIT;
+
+  const { data, count, error } = await query.range(offset, offset + limit - 1);
+
+  if (error) {
+    return {
+      data: [],
+      totalElements: 0,
+      error,
+    };
+  }
+
+  return {
+    data: data || [],
+    totalElements: count || 0,
+    error: null,
+  };
 };
 
 export const createEquipment = (payload: EquipmentPostBody) => {

@@ -1,3 +1,4 @@
+import { ListParamsType } from "./listType";
 import { ReservationType } from "./reservationType";
 import { UserType } from "./userType";
 
@@ -27,11 +28,12 @@ export type EquipmentPostBody = {
   disabled?: boolean;
 };
 
-export type EquipmentListParams = {
+export type EquipmentListParams = ListParamsType<{
   category?: EquipmentCategory;
   title?: string;
   disabled?: boolean;
-};
+  order?: string;
+}>;
 
 export enum EquipmentCategory {
   camera = "camera",

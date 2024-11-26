@@ -4,6 +4,7 @@ import {
   EquipmentListItemType,
   EquipmentListParams,
 } from "@/app/types/equipmentType";
+import { DEFAULT_LIMIT, PageModelType } from "@/app/types/listType";
 import { useCallback, useMemo, useState } from "react";
 
 const searchMenu = [{ key: "title", title: "장비명" }];
@@ -17,13 +18,23 @@ export const useEquipmentList = () => {
   );
   const [keyword, setKeyword] = useState<string>("");
   const [list, setList] = useState<EquipmentListItemType[]>([]);
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const [pageModel, setPageModel] = useState<PageModelType>({
+    offset: 0,
+    limit: DEFAULT_LIMIT,
+  });
 
   const fetchList = useCallback(async (params?: EquipmentListParams) => {
     try {
       const result = await getEquipmentList(params);
-      setList(result || []);
+      setList(result.data || []);
+      setTotalElements(result.totalElements || 0);
     } catch {
       setList([]);
+      setPageModel({
+        offset: 0,
+        limit: DEFAULT_LIMIT,
+      });
     }
   }, []);
 
@@ -32,10 +43,8 @@ export const useEquipmentList = () => {
   ) => {
     if (selectedCategory === categoryKey) {
       setSelectedCategory(undefined);
-      fetchList();
     } else {
       setSelectedCategory(categoryKey);
-      fetchList(categoryKey ? { category: categoryKey } : undefined);
     }
   };
 
@@ -49,22 +58,26 @@ export const useEquipmentList = () => {
 
   const searchParams = useMemo(
     (params = {}) => {
+      const defaultParams = {
+        ...pageModel,
+        order: "id",
+      };
+
       const categoryParams = selectedCategory
         ? { category: selectedCategory }
         : {};
 
       const keywordParams =
-        keyword && selectedSearchKey
-          ? { [selectedSearchKey]: `ilike.%${keyword}%` }
-          : {};
+        keyword && selectedSearchKey ? { [selectedSearchKey]: keyword } : {};
 
       return {
+        ...defaultParams,
         ...categoryParams,
         ...keywordParams,
         ...params,
       };
     },
-    [selectedCategory, selectedSearchKey, keyword]
+    [selectedCategory, selectedSearchKey, keyword, pageModel]
   );
 
   const onSearch = useCallback(() => {
@@ -82,5 +95,9 @@ export const useEquipmentList = () => {
     onChangeSearchKey,
     onSearch,
     fetchList,
+    setPageModel,
+    pageModel,
+    searchParams,
+    totalElements,
   };
 };

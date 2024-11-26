@@ -42,7 +42,8 @@ export const apiInstance = axios.create({
   },
 
   paramsSerializer: (params) => {
-    const prefix = [
+    const keyPrefix = ["or", "offset", "limit", "select", "count"];
+    const valuePrefix = [
       "lt.",
       "lte.",
       "gt.",
@@ -55,11 +56,11 @@ export const apiInstance = axios.create({
 
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
-      if (key === "or" && typeof value === "string") {
+      if (keyPrefix.some((item) => item === key)) {
         searchParams.append(key, value);
       } else if (
         typeof value === "string" &&
-        prefix.some((item) => value.startsWith(item))
+        valuePrefix.some((item) => value.startsWith(item))
       ) {
         searchParams.append(key, value);
       } else if (value !== undefined) {

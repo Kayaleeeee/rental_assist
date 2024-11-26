@@ -1,8 +1,12 @@
 import { AxiosRequestConfig } from "axios";
 import { apiInstance } from "./apiInstance";
 
-export const apiGet = async <T,>(url: string, params = {}): Promise<T> => {
-  const response = await apiInstance.get<T>(url, { params });
+export const apiGet = async <T,>(
+  url: string,
+  params = {},
+  options?: AxiosRequestConfig<any>
+): Promise<T> => {
+  const response = await apiInstance.get<T>(url, { ...options, params });
   return response.data;
 };
 

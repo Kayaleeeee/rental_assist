@@ -37,6 +37,10 @@ export default function EquipmentPage() {
     onChangeSearchKey,
     onSearch,
     fetchList,
+    setPageModel,
+    pageModel,
+    searchParams,
+    totalElements,
   } = useEquipmentList();
 
   const handleAddToCart = useCallback(async () => {
@@ -63,8 +67,8 @@ export default function EquipmentPage() {
   );
 
   useEffect(() => {
-    fetchList();
-  }, []);
+    fetchList(searchParams);
+  }, [searchParams]);
 
   return (
     <div>
@@ -114,6 +118,9 @@ export default function EquipmentPage() {
         onChangeSearchKey={onChangeSearchKey}
         onSearch={onSearch}
         onSelectCell={toggleEquipmentList}
+        setPageModel={setPageModel}
+        pageModel={pageModel}
+        totalElements={totalElements}
       />
 
       {isCartOpen && <Cart onCloseCart={() => setIsCartOpen(false)} />}
