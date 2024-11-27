@@ -1,40 +1,48 @@
+"use client";
+
 import { Button } from "../Button";
 import styles from "./index.module.scss";
 import { Label } from "../Form/Label";
 import { Margin } from "../Margin";
 import { DateTimeSelector } from "../DateTimeSelector";
-import { formatLocaleString } from "@/app/utils/priceUtils";
 import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import CancelIcon from "@mui/icons-material/Cancel";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
+import { QuotationItemEditor } from "@/app/reservations/modules/form/QuotationItemEditor";
 
-type Props = {
-  onCloseCart: () => void;
-};
-
-export const Cart = ({ onCloseCart }: Props) => {
+export const Cart = () => {
   const router = useRouter();
+
   const {
     hasUnavailableItem,
     onChangeDate,
     dateRange,
     checkAvailability,
     availableListState,
-    resetCart,
     isChecked,
     removeItem,
     setList,
     rentalDays,
+    setIsCartOpen,
+    isCartOpen,
   } = useEquipmentCart();
 
   const handleCloseCart = () => {
-    resetCart();
-    onCloseCart();
+    setIsCartOpen(false);
   };
+
+  useEffect(() => {
+    const mainWrapper = document.getElementsByClassName("mainWrapper")[0];
+
+    if (isCartOpen) {
+      mainWrapper.setAttribute("style", "overflow: hidden");
+      mainWrapper.setAttribute("style", "height: 100vh");
+    } else {
+      mainWrapper.setAttribute("style", "overflow: scroll");
+      mainWrapper.setAttribute("style", "height: auto");
+    }
+  }, [isCartOpen]);
 
   const isOkToMakeReservation = !hasUnavailableItem && isChecked;
 
@@ -61,6 +69,8 @@ export const Cart = ({ onCloseCart }: Props) => {
     router,
     rentalDays,
   ]);
+
+  if (!isCartOpen) return null;
 
   return (
     <>
@@ -94,7 +104,7 @@ export const Cart = ({ onCloseCart }: Props) => {
 
           <Label title="장비 리스트" />
           <div className={styles.equipmentListWrapper}>
-            {availableListState.map((item) => {
+            {/* {availableListState.map((item) => {
               const isAvailable = isChecked && item.isAvailable;
               const unavailable = isChecked && !item.isAvailable;
               const color = !isChecked
@@ -145,6 +155,25 @@ export const Cart = ({ onCloseCart }: Props) => {
                     <CloseOutlinedIcon className={styles.closeButton} />
                   </div>
                 </div>
+              );
+            })} */}
+
+            {availableListState.map((item) => {
+              return (
+                <QuotationItemEditor
+                  key={item.equipmentId}
+                  quoteState={item}
+                  rentalDays={rentalDays}
+                  onChangeField={() => {}}
+                  onDeleteEquipment={() => removeItem(item.equipmentId)}
+                  availableStatus={
+                    item.isAvailable
+                      ? "available"
+                      : isChecked
+                      ? "unavailable"
+                      : "unknown"
+                  }
+                />
               );
             })}
           </div>

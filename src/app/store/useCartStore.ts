@@ -19,6 +19,8 @@ type CartState = {
   dateRange: { startDate: string | undefined; endDate: string | undefined };
   onChangeDate: (key: "startDate" | "endDate", date: string) => void;
   setDateRange: (dateRange: { startDate: string; endDate: string }) => void;
+  isCartOpen: boolean;
+  setIsCartOpen: (isOpen: boolean) => void;
 };
 
 const initialState = {
@@ -27,6 +29,8 @@ const initialState = {
 };
 
 export const useCartStore = create<CartState>((set, get) => ({
+  isCartOpen: false,
+  setIsCartOpen: (isOpen) => set({ isCartOpen: isOpen }),
   list: [],
   setList: (list) => set({ list }),
   dateRange: { startDate: undefined, endDate: undefined },

@@ -1,5 +1,4 @@
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
-import { Margin } from "@/app/components/Margin";
 import { SearchBar } from "@/app/components/SearchBar";
 
 import { GridTable } from "@/app/components/Table/GridTable";
@@ -8,6 +7,7 @@ import { PageModelType } from "@/app/types/listType";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Link from "next/link";
+import styles from "./equipmentListTable.module.scss";
 
 const columns: GridColDef<EquipmentListItemType>[] = [
   {
@@ -42,6 +42,7 @@ const columns: GridColDef<EquipmentListItemType>[] = [
 
 type Props = {
   list: EquipmentListItemType[];
+  selectedList: EquipmentListItemType[];
   searchMenu: { title: string; key: string }[];
   onChangeKeyword: (value: string) => void;
   onChangeSearchKey: (value: string) => void;
@@ -56,6 +57,7 @@ type Props = {
 
 export const EquipmentListTable = ({
   list,
+  selectedList,
   searchMenu,
   onChangeKeyword,
   onChangeSearchKey,
@@ -69,13 +71,7 @@ export const EquipmentListTable = ({
 }: Props) => {
   return (
     <>
-      <Margin
-        top={40}
-        bottom={20}
-        style={{
-          maxWidth: "800px",
-        }}
-      >
+      <div className={styles.searchBarWrapper}>
         <SearchBar
           menuList={searchMenu}
           onChangeKeyword={onChangeKeyword}
@@ -84,7 +80,7 @@ export const EquipmentListTable = ({
           selectedKey={selectedSearchKey}
           onSearch={onSearch}
         />
-      </Margin>
+      </div>
 
       <GridTable<EquipmentListItemType>
         checkboxSelection
@@ -98,6 +94,7 @@ export const EquipmentListTable = ({
 
           onSelectCell(selectedList);
         }}
+        rowSelectionModel={selectedList.map((item) => item.id)}
         columns={columns}
         rows={list}
         getRowId={(cell) => cell.id}

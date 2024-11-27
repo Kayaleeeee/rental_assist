@@ -1,5 +1,23 @@
 @import "../styles/mediaQuery.scss";
 
+.relativeWrapper {
+  position: relative;
+}
+
+.fixedFooter {
+  width: calc(100vw - 200px);
+  height: 70px;
+  position: fixed;
+  bottom: 0;
+  left: 200px;
+  background: white;
+  border-top: 1px solid var(--grey-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
 .buttonWrapper {
   width: 100%;
   display: flex;

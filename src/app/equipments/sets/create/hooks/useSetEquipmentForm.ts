@@ -2,7 +2,6 @@ import { createEquipment } from "@/app/api/equipments";
 import {
   EquipmentCategory,
   EquipmentCategoryList,
-  EquipmentListItemType,
   EquipmentPostBody,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
@@ -22,9 +21,6 @@ export const useSetEquipmentForm = () => {
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [detail, setDetail] = useState<string>("");
-  const [equipmentList, setEquipmentList] = useState<EquipmentListItemType[]>(
-    []
-  );
 
   const onChangeCategory = (key: string) => {
     const selectedCategoryIndex = categoryMenu.findIndex(

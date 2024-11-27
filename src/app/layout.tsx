@@ -4,6 +4,7 @@ import "./globals.css";
 import { Menu } from "@components/Menu";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Cart } from "./components/Cart";
 
 const notoSansKR = localFont({
   src: [
@@ -81,6 +82,7 @@ export default function RootLayout({
           </aside>
           <div className="childrenWrapper">{children}</div>
         </div>
+        <Cart />
       </body>
     </html>
   );

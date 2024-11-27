@@ -29,7 +29,7 @@ export type EquipmentPostBody = {
 };
 
 export type EquipmentListParams = ListParamsType<{
-  category?: EquipmentCategory;
+  category?: EquipmentCategory | string;
   title?: string;
   disabled?: boolean;
   order?: string;

@@ -12,7 +12,15 @@ type EquipmentAvailabilityType = EquipmentListItemState & {
 };
 
 export const useEquipmentCart = () => {
-  const { list, resetCart, onChangeDate, dateRange, setList } = useCartStore();
+  const {
+    list,
+    resetCart,
+    onChangeDate,
+    dateRange,
+    setList,
+    isCartOpen,
+    setIsCartOpen,
+  } = useCartStore();
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const [availableListState, setAvailableListState] = useState<
@@ -118,5 +126,7 @@ export const useEquipmentCart = () => {
     removeItem,
     setList,
     rentalDays,
+    isCartOpen,
+    setIsCartOpen,
   };
 };

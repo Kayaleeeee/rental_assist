@@ -51,7 +51,6 @@ const ReservationEditPage = () => {
     rentalDays,
     totalPrice,
     totalSupplyPrice,
-    resetCart,
     onChangeDate,
     onEditQuote,
     dateRange,
@@ -101,8 +100,6 @@ const ReservationEditPage = () => {
       isFirstRender.current = false;
       return;
     }
-
-    resetCart();
   });
 
   const onClickEquipmentModal = () => {
@@ -215,6 +212,7 @@ const ReservationEditPage = () => {
                       key={quote.equipmentId}
                       rentalDays={rentalDays}
                       quoteState={quote}
+                      availableStatus="unknown"
                       onChangeField={(state) =>
                         onChangeQuoteItem(quote.equipmentId, state)
                       }

@@ -2,12 +2,16 @@ import styles from "./quotationItemEditor.module.scss";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
+import { useCallback } from "react";
 
 type Props = {
   rentalDays: number;
   quoteState: EquipmentListItemState;
   onChangeField: (item: EquipmentListItemState) => void;
   onDeleteEquipment: () => void;
+  availableStatus: "available" | "unavailable" | "unknown";
+  onClickItem?: () => void;
+  reservationId?: number;
 };
 
 export const QuotationItemEditor = ({
@@ -15,7 +19,16 @@ export const QuotationItemEditor = ({
   rentalDays,
   onChangeField,
   onDeleteEquipment,
+  availableStatus,
+  onClickItem,
+  reservationId,
 }: Props) => {
+  const handleClickItem = useCallback(() => {
+    if (availableStatus === "unavailable") {
+      window.open(`/reservations/${reservationId}`, "_blank");
+    }
+  }, [onClickItem]);
+
   const onClickPlus = () => {
     const newQuantity = quoteState.quantity + 1;
 
@@ -39,29 +52,33 @@ export const QuotationItemEditor = ({
   };
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} onClick={handleClickItem}>
       <div className={styles.title}>{quoteState.title}</div>
       <div className={styles.quantity}>
         <div className={styles.quantityButton} onClick={onClickMinus}>
-          {" "}
-          -{" "}
+          -
         </div>
         <div className={styles.quantityNumber}>{quoteState.quantity}</div>
         <div className={styles.quantityButton} onClick={onClickPlus}>
-          {" "}
-          +{" "}
+          +
         </div>
       </div>
 
       <div className={styles.days}>{rentalDays}일</div>
       <div className={styles.supplyPrice}>
-        정가: {formatLocaleString(quoteState.price)}원
+        {formatLocaleString(quoteState.price)}원
       </div>
 
       <div className={styles.price}>
-        {formatLocaleString(quoteState.totalPrice)}원
+        총 {formatLocaleString(quoteState.totalPrice)}원
       </div>
-      <div className={styles.deleteButtonWrapper} onClick={onDeleteEquipment}>
+      <div
+        className={styles.deleteButtonWrapper}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDeleteEquipment();
+        }}
+      >
         <CloseOutlinedIcon className={styles.closeButton} />
       </div>
     </div>

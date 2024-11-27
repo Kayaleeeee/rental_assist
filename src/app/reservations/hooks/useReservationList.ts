@@ -50,6 +50,10 @@ export const useReservationList = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categoryList[0].key
   );
+  const [pageModel, setPageModel] = useState({
+    offset: 0,
+    limit: 50,
+  });
 
   const [dateRange, setDateRange] = useState<{
     startDate: string | undefined;
@@ -60,6 +64,11 @@ export const useReservationList = () => {
   });
 
   const getSearchParams = (params = {}): ReservationSearchParams => {
+    const defaultParams = {
+      ...pageModel,
+      order: "id.desc",
+    };
+
     const dateParams =
       dateRange.startDate && dateRange.endDate
         ? {
@@ -74,14 +83,14 @@ export const useReservationList = () => {
 
     const keywordParams =
       keyword && selectedSearchKey
-        ? { [selectedSearchKey]: `ilike.%keyword%` }
+        ? { [selectedSearchKey]: `ilike.%${keyword}%` }
         : {};
 
     return {
+      ...defaultParams,
       ...categoryParams,
       ...keywordParams,
       ...dateParams,
-      order: "id.desc",
       ...params,
     };
   };
@@ -151,5 +160,6 @@ export const useReservationList = () => {
     searchMenu,
     setDateRange,
     dateRange,
+    setPageModel,
   };
 };

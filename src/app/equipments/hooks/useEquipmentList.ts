@@ -11,7 +11,7 @@ const searchMenu = [{ key: "title", title: "장비명" }];
 
 export const useEquipmentList = () => {
   const [selectedCategory, setSelectedCategory] = useState<
-    EquipmentCategory | undefined
+    EquipmentCategory | "full_set" | undefined
   >(undefined);
   const [selectedSearchKey, setSelectedSearchKey] = useState<string>(
     searchMenu[0].key

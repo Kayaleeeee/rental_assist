@@ -9,6 +9,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { isEmpty } from "lodash";
 import { Margin } from "../Margin";
+import { CartMenu } from "./CartMenu";
 
 type MenuItem = {
   path: string;
@@ -65,7 +66,7 @@ export const Menu = () => {
     const isSelected = !isSub && currentPath?.includes(path);
 
     return (
-      <div key={path}>
+      <div key={title}>
         <Link
           className={isSelected ? styles.selectedItem : styles.item}
           href={path}
@@ -93,6 +94,7 @@ export const Menu = () => {
       {menuList.map((item) => {
         return renderMenu(item);
       })}
+      <CartMenu />
     </div>
   );
 };

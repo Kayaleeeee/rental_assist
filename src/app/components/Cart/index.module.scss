@@ -23,6 +23,7 @@
   background: #fff;
   z-index: 100;
   padding: 24px;
+  overflow: scroll;
 }
 
 .dateWrapper {
@@ -37,7 +38,6 @@
   flex: 1;
   overflow-y: scroll;
   gap: 12px;
-  height: 300px;
 }
 
 .title {
@@ -47,50 +47,7 @@
   cursor: pointer;
 }
 
-.equipmentItem {
-  font-size: 14px;
-  display: inline-flex;
-  padding: 16px 16px;
-  border: 1px solid var(--grey-1);
-  border-radius: 8px;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-.unavailableItem {
-  @extend .equipmentItem;
-  border: 1px solid var(--error);
-}
-
-.availableItem {
-  @extend .equipmentItem;
-  border: 1px solid var(--green);
-}
-
 .footer {
   height: 60px;
   margin: 24px 0;
-}
-
-.hiddenInput {
-  display: none;
-}
-
-.closeButton {
-  width: 20px;
-  cursor: pointer;
-}
-
-.closeButtonWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-
-  &:hover {
-    border: 1px solid var(--primary);
-    border-radius: 50%;
-  }
 }

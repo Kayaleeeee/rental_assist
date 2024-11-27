@@ -13,17 +13,19 @@ import { CategoryList } from "../components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
 import { isEmpty } from "lodash";
 import { EquipmentListItemState, useCartStore } from "../store/useCartStore";
-import { Cart } from "../components/Cart";
 import { EquipmentListTable } from "./modules/EquipmentListTable";
 import styles from "./page.module.scss";
 import formStyles from "@components/Form/index.module.scss";
+import { SetEquipmentList } from "./sets/modules/SetEquipmentList";
+import { showToast } from "../utils/toastUtils";
 
 export default function EquipmentPage() {
   const router = useRouter();
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     EquipmentListItemType[]
   >([]);
+  const [isFullSetSelected, setIsFullSetSelected] = useState<boolean>(false);
+
   const { addEquipment } = useCartStore();
 
   const {
@@ -56,7 +58,11 @@ export default function EquipmentPage() {
       })
     );
     addEquipment(convertedList);
-    setIsCartOpen(true);
+    showToast({
+      message: "장바구니에 추가되었습니다.",
+      type: "info",
+    });
+    setSelectedEquipmentList([]);
   }, [addEquipment, selectedEquipmentList]);
 
   const toggleEquipmentList = useCallback(
@@ -71,30 +77,26 @@ export default function EquipmentPage() {
   }, [searchParams]);
 
   return (
-    <div>
+    <div className={styles.relativeWrapper}>
       <div className={styles.headerTitleButtonWrapper}>
         <h3></h3>
         <div className={formStyles.rightAlignButtonWrapper}>
-          <Button
-            style={{ width: "150px" }}
-            size="Medium"
-            onClick={() => router.push("/equipments/create")}
-          >
-            장비 등록
-          </Button>
-          {!isEmpty(selectedEquipmentList) && (
-            <Margin left={16}>
-              <div>
-                <Button
-                  size="Medium"
-                  variant="outlined"
-                  style={{ width: "150px" }}
-                  onClick={handleAddToCart}
-                >
-                  장바구니 추가
-                </Button>
-              </div>
-            </Margin>
+          {isFullSetSelected ? (
+            <Button
+              style={{ width: "150px" }}
+              size="Medium"
+              onClick={() => router.push("/equipments/create")}
+            >
+              풀세트 만들기
+            </Button>
+          ) : (
+            <Button
+              style={{ width: "150px" }}
+              size="Medium"
+              onClick={() => router.push("/equipments/create")}
+            >
+              장비 등록
+            </Button>
           )}
         </div>
       </div>
@@ -102,28 +104,55 @@ export default function EquipmentPage() {
       <Margin top={40} />
 
       <CategoryList
-        categoryList={EquipmentCategoryList}
-        selectedCategory={selectedCategory}
-        onChangeCategory={(key) =>
-          toggleEquipmentCategory(key as EquipmentCategory)
-        }
+        categoryList={[
+          ...EquipmentCategoryList,
+          {
+            key: "full_set",
+            title: "풀세트 보기",
+          },
+        ]}
+        selectedCategory={(isFullSetSelected && "full_set") || selectedCategory}
+        onChangeCategory={(key) => {
+          if (key === "full_set") {
+            setIsFullSetSelected((prev) => !prev);
+          } else {
+            setIsFullSetSelected(false);
+            toggleEquipmentCategory(key as EquipmentCategory);
+          }
+        }}
       />
 
-      <EquipmentListTable
-        list={list}
-        searchMenu={searchMenu}
-        selectedSearchKey={selectedSearchKey}
-        keyword={keyword}
-        onChangeKeyword={onChangeKeyword}
-        onChangeSearchKey={onChangeSearchKey}
-        onSearch={onSearch}
-        onSelectCell={toggleEquipmentList}
-        setPageModel={setPageModel}
-        pageModel={pageModel}
-        totalElements={totalElements}
-      />
+      {!isFullSetSelected && (
+        <EquipmentListTable
+          list={list}
+          selectedList={selectedEquipmentList}
+          searchMenu={searchMenu}
+          selectedSearchKey={selectedSearchKey}
+          keyword={keyword}
+          onChangeKeyword={onChangeKeyword}
+          onChangeSearchKey={onChangeSearchKey}
+          onSearch={onSearch}
+          onSelectCell={toggleEquipmentList}
+          setPageModel={setPageModel}
+          pageModel={pageModel}
+          totalElements={totalElements}
+        />
+      )}
 
-      {isCartOpen && <Cart onCloseCart={() => setIsCartOpen(false)} />}
+      {isFullSetSelected && <SetEquipmentList />}
+      {!isEmpty(selectedEquipmentList) && (
+        <div className={styles.fixedFooter}>
+          <Button
+            size="Medium"
+            style={{
+              width: "250px",
+            }}
+            onClick={handleAddToCart}
+          >
+            장바구니 추가
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

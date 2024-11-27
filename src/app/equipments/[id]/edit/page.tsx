@@ -43,7 +43,7 @@ const EditEquipmentPage = () => {
   }, [equipmentDetail]);
 
   return (
-    <FormWrapper title="장비 등록">
+    <FormWrapper title="장비 수정">
       <div className={formStyles.sectionWrapper}>
         <Label title="카테고리" />
         <Select<string>

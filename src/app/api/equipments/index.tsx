@@ -63,6 +63,33 @@ export const getEquipmentList = async (params?: EquipmentListParams) => {
   };
 };
 
+export const getFullSetList = async (params?: EquipmentListParams) => {
+  const supabase = await createClient();
+
+  let query = supabase.from("equipment_sets").select("*", { count: "exact" });
+
+  query = applyFilters(query, params);
+
+  const offset = params?.offset || 0;
+  const limit = params?.limit || DEFAULT_LIMIT;
+
+  const { data, count, error } = await query.range(offset, offset + limit - 1);
+
+  if (error) {
+    return {
+      data: [],
+      totalElements: 0,
+      error,
+    };
+  }
+
+  return {
+    data: data || [],
+    totalElements: count || 0,
+    error: null,
+  };
+};
+
 export const createEquipment = (payload: EquipmentPostBody) => {
   return apiPost(apiUrl, payload);
 };

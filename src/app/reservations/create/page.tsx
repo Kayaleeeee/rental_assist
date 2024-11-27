@@ -173,6 +173,7 @@ const ReservationCreatePage = () => {
                 {quoteItemListState.map((quote) => {
                   return (
                     <QuotationItemEditor
+                      availableStatus="unknown"
                       key={quote.equipmentId}
                       rentalDays={rentalDays}
                       quoteState={quote}

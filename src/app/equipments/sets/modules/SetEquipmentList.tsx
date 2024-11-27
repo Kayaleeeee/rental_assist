@@ -42,9 +42,7 @@ const columns: GridColDef<SetEquipmentListItemType>[] = [
 ];
 
 export const SetEquipmentList = () => {
-  const [selectedEquipmentList, setSelectedEquipmentList] = useState<
-    SetEquipmentListItemType[]
-  >([]);
+  const [, setSelectedEquipmentList] = useState<SetEquipmentListItemType[]>([]);
 
   const {
     list,
