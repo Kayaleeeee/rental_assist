@@ -1,7 +1,7 @@
-import { getFullSetList } from "@/app/api/equipments";
+import { getEquipmentSetList } from "@/app/api/equipments/setEquipments";
 import {
-  SetEquipmentListItemType,
   EquipmentListParams,
+  SetEquipmentType,
 } from "@/app/types/equipmentType";
 import { DEFAULT_LIMIT, PageModelType } from "@/app/types/listType";
 import { useCallback, useMemo, useState } from "react";
@@ -13,7 +13,7 @@ export const useSetEquipmentList = () => {
     searchMenu[0].key
   );
   const [keyword, setKeyword] = useState<string>("");
-  const [list, setList] = useState<SetEquipmentListItemType[]>([]);
+  const [list, setList] = useState<SetEquipmentType[]>([]);
   const [totalElements, setTotalElements] = useState<number>(0);
   const [pageModel, setPageModel] = useState<PageModelType>({
     offset: 0,
@@ -22,7 +22,8 @@ export const useSetEquipmentList = () => {
 
   const fetchList = useCallback(async (params?: EquipmentListParams) => {
     try {
-      const result = await getFullSetList(params);
+      const result = await getEquipmentSetList(params);
+
       setList(result.data || []);
       setTotalElements(result.totalElements || 0);
     } catch {

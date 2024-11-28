@@ -1,65 +1,65 @@
-import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { Label } from "@/app/components/Form/Label";
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
-import { GridTable } from "@/app/components/Table/GridTable";
 import { useEquipmentList } from "@/app/equipments/hooks/useEquipmentList";
+import { EquipmentListTable } from "@/app/equipments/modules/EquipmentListTable";
 
 import {
   EquipmentCategory,
   EquipmentCategoryList,
   EquipmentListItemType,
 } from "@/app/types/equipmentType";
-import { formatLocaleString } from "@/app/utils/priceUtils";
-import { showToast } from "@/app/utils/toastUtils";
+
 import { MenuItem, Select } from "@mui/material";
-import { GridColDef } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const allString = "all";
 
-const columns: GridColDef<EquipmentListItemType>[] = [
-  {
-    field: "id",
-    width: 80,
-    renderHeader: () => HeaderName("ID"),
-  },
-  {
-    field: "title",
-    renderHeader: () => HeaderName("장비명"),
-    flex: 1,
-  },
-  {
-    field: "price",
-    renderHeader: () => HeaderName("단가"),
-    renderCell: ({ row }) => formatLocaleString(row.price),
-  },
-  { field: "detail", flex: 1, renderHeader: () => HeaderName("상세설명") },
-];
-
 type Props = {
-  existIdList: number[];
-  occupiedIdList: number[];
   onCloseModal: () => void;
   onConfirm: (list: EquipmentListItemType[]) => void;
+  disabledIdList: number[];
 };
 
 export const EquipmentSearchModal = ({
   onCloseModal,
   onConfirm,
-  existIdList,
-  occupiedIdList,
+  disabledIdList,
 }: Props) => {
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     EquipmentListItemType[]
   >([]);
 
-  const { list, selectedCategory, toggleEquipmentCategory, fetchList } =
-    useEquipmentList();
+  const {
+    list,
+    selectedCategory,
+    searchMenu,
+    selectedSearchKey,
+    keyword,
+    toggleEquipmentCategory,
+    onChangeKeyword,
+    onChangeSearchKey,
+    onSearch,
+    fetchList,
+    setPageModel,
+    pageModel,
+    searchParams,
+    totalElements,
+  } = useEquipmentList();
 
   useEffect(() => {
-    fetchList();
-  }, []);
+    fetchList(searchParams);
+  }, [searchParams]);
+
+  const toggleEquipmentList = useCallback(
+    (itemList: EquipmentListItemType[]) => {
+      if (itemList.some((item) => disabledIdList.includes(item.id))) {
+      }
+
+      setSelectedEquipmentList(itemList);
+    },
+    [disabledIdList]
+  );
 
   return (
     <Modal
@@ -113,41 +113,24 @@ export const EquipmentSearchModal = ({
             );
           })}
         </Select>
-        <GridTable<EquipmentListItemType>
-          checkboxSelection
-          columns={columns}
-          isRowSelectable={(row) =>
-            ![...existIdList, ...occupiedIdList].includes(Number(row.id))
-          }
-          onCellClick={({ row }) => {
-            if (existIdList.includes(row.id)) {
-              showToast({ message: "이미 추가된 장비입니다.", type: "error" });
-              return;
-            }
 
-            if (occupiedIdList.includes(row.id)) {
-              showToast({
-                message: "이미 예약중인 장비입니다.",
-                type: "error",
-              });
-              return;
-            }
-
-            const equipmentIndex = selectedEquipmentList
-              .map((item) => item.id)
-              .findIndex((item) => item === row.id);
-
-            if (equipmentIndex === -1) {
-              setSelectedEquipmentList((prev) => [...prev, row]);
-            } else {
-              setSelectedEquipmentList((prev) =>
-                prev.filter((item) => item.id !== row.id)
-              );
-            }
-          }}
-          rows={list}
-          getRowId={(cell) => cell.id}
+        <EquipmentListTable
+          list={list}
+          selectedList={selectedEquipmentList}
+          searchMenu={searchMenu}
+          selectedSearchKey={selectedSearchKey}
+          keyword={keyword}
+          onChangeKeyword={onChangeKeyword}
+          onChangeSearchKey={onChangeSearchKey}
+          onSearch={onSearch}
+          onSelectCell={toggleEquipmentList}
+          setPageModel={setPageModel}
+          pageModel={pageModel}
+          totalElements={totalElements}
+          height={500}
+          isRowClickable={false}
         />
+
         <Margin bottom={20} />
       </div>
     </Modal>

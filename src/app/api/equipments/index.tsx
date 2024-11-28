@@ -5,8 +5,6 @@ import {
   EquipmentListItemType,
   EquipmentListParams,
   EquipmentPostBody,
-  SetEquipmentListItemType,
-  SetEquipmentListParams,
 } from "@/app/types/equipmentType";
 import { apiDelete, apiGet, apiPatch, apiPost } from "..";
 import { isEmpty } from "lodash";
@@ -40,33 +38,6 @@ export const getEquipmentList = async (params?: EquipmentListParams) => {
   const supabase = await createClient();
 
   let query = supabase.from("equipments").select("*", { count: "exact" });
-
-  query = applyFilters(query, params);
-
-  const offset = params?.offset || 0;
-  const limit = params?.limit || DEFAULT_LIMIT;
-
-  const { data, count, error } = await query.range(offset, offset + limit - 1);
-
-  if (error) {
-    return {
-      data: [],
-      totalElements: 0,
-      error,
-    };
-  }
-
-  return {
-    data: data || [],
-    totalElements: count || 0,
-    error: null,
-  };
-};
-
-export const getFullSetList = async (params?: EquipmentListParams) => {
-  const supabase = await createClient();
-
-  let query = supabase.from("equipment_sets").select("*", { count: "exact" });
 
   query = applyFilters(query, params);
 
@@ -149,8 +120,4 @@ export const postSetEquipment = async (payload: {}) => {
   } else {
     return result[0];
   }
-};
-
-export const getSetEquipmentList = (params?: SetEquipmentListParams) => {
-  return apiGet<SetEquipmentListItemType[]>(`/equipment_sets`, params);
 };

@@ -9,6 +9,7 @@ export type EquipmentListItemType = {
   category: string;
   detail: string;
   disabled: boolean;
+  quantity: number;
 };
 
 export type EquipmentDetailType = {
@@ -105,7 +106,9 @@ export type SetEquipmentType = {
   id: string;
   title: string;
   detail: string;
-  equipmentList: [];
+  price: number;
+  equipmentList: EquipmentListItemType[];
+  memo?: string;
 };
 
 export type SetEquipmentListItemType = {
@@ -118,6 +121,8 @@ export type SetEquipmentListItemType = {
 export type SetEquipmentPayload = {
   title: string;
   detail: string;
+  price: number;
+  memo?: string;
 };
 
 export type SetEquipmentItemType = {

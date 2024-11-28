@@ -1,0 +1,94 @@
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--grey-1);
+  border-radius: 12px;
+  font-size: 14px;
+  width: 100%;
+  height: 65px;
+  padding: 16px;
+  gap: 12px;
+}
+
+.unavailableItem {
+  @extend .wrapper;
+  border: 1px solid var(--error);
+}
+
+.availableItem {
+  @extend .wrapper;
+  border: 1px solid var(--green);
+}
+
+@mixin cell {
+  padding: 8px 0;
+}
+
+.title {
+  @include cell();
+  font-weight: 700;
+  flex: 3;
+}
+
+.equipmentTitle {
+  @include cell();
+  font-weight: 700;
+  flex: 3;
+  font-size: 15px;
+}
+
+.days {
+  @include cell();
+}
+
+.price {
+  @include cell();
+}
+
+.supplyPrice {
+  @include cell();
+}
+
+.deleteButtonWrapper {
+  @include cell();
+}
+
+.closeButtonWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+
+  &:hover {
+    border: 1px solid var(--primary);
+    border-radius: 50%;
+  }
+}
+
+.closeButton {
+  color: var(--grey);
+}
+
+.quantity {
+  @include cell();
+  display: inline-flex;
+  align-items: center;
+}
+
+.quantityNumber {
+  margin: 0 8px;
+}
+
+.quantityButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+
+  border: 1px solid var(--grey-1);
+  border-radius: 8px;
+  color: var(--primary);
+  cursor: pointer;
+}

@@ -9,7 +9,7 @@ import {
 const apiUrl = NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-const toCamelCase = (obj: any): any => {
+export const toCamelCase = (obj: any): any => {
   if (isArray(obj)) {
     return obj.map(toCamelCase);
   } else if (isObject(obj)) {

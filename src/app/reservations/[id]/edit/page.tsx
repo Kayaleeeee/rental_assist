@@ -20,7 +20,7 @@ import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
-import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
+// import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../../hooks/useReservationForm";
 import { useParams } from "next/navigation";
@@ -58,17 +58,17 @@ const ReservationEditPage = () => {
 
   const { detail } = useReservationDetail(reservationId);
 
-  const { list: rentedEquipmentList, fetchList: fetchEquipmentRentedDateList } =
-    useEquipmentListWithRentedDates({
-      startDate: dateRange.startDate,
-      endDate: dateRange.endDate,
-    });
+  // const { list: rentedEquipmentList, fetchList: fetchEquipmentRentedDateList } =
+  //   useEquipmentListWithRentedDates({
+  //     startDate: dateRange.startDate,
+  //     endDate: dateRange.endDate,
+  //   });
 
-  useEffect(() => {
-    if (isOpenSearchModal) {
-      fetchEquipmentRentedDateList();
-    }
-  }, [isOpenSearchModal]);
+  // useEffect(() => {
+  //   if (isOpenSearchModal) {
+  //     fetchEquipmentRentedDateList();
+  //   }
+  // }, [isOpenSearchModal]);
 
   useEffect(() => {
     if (!reservationId || !detail) return;
@@ -127,10 +127,6 @@ const ReservationEditPage = () => {
       ...quoteItemListStateRef.current,
     ]);
   }, [detail?.quoteId, reservationId, onEditQuote]);
-
-  const rentedEquipmentIdList = useMemo(() => {
-    return rentedEquipmentList.map((item) => item.equipmentId);
-  }, [rentedEquipmentList]);
 
   const existIdList = useMemo(() => {
     return quoteItemListState.map((item) => item.equipmentId);
@@ -287,8 +283,7 @@ const ReservationEditPage = () => {
       </FormWrapper>
       {isOpenSearchModal && dateRange.startDate && dateRange.endDate && (
         <EquipmentSearchModal
-          existIdList={existIdList}
-          occupiedIdList={rentedEquipmentIdList}
+          disabledIdList={existIdList}
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={onAddQuoteItemList}
         />

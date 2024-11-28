@@ -20,7 +20,7 @@ import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
-import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
+// import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../hooks/useReservationForm";
 
@@ -47,23 +47,17 @@ const ReservationCreatePage = () => {
     dateRange,
   } = useReservationForm();
 
-  const { list: rentedEquipmentList, fetchList: fetchEquipmentRentedDateList } =
-    useEquipmentListWithRentedDates({
-      startDate: dateRange.startDate,
-      endDate: dateRange.endDate,
-    });
+  // const { list: rentedEquipmentList, fetchList: fetchEquipmentRentedDateList } =
+  //   useEquipmentListWithRentedDates({
+  //     startDate: dateRange.startDate,
+  //     endDate: dateRange.endDate,
+  //   });
 
   const isFirstRender = useRef(true);
 
   useEffect(() => {
     setIsDiscounted(form.discountPrice > 0);
   }, [form]);
-
-  useEffect(() => {
-    if (isOpenSearchModal) {
-      fetchEquipmentRentedDateList();
-    }
-  }, [isOpenSearchModal]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -91,10 +85,6 @@ const ReservationCreatePage = () => {
       guestPhoneNumber: user.phoneNumber ?? "",
     }));
   };
-
-  const rentedEquipmentIdList = useMemo(() => {
-    return rentedEquipmentList.map((item) => item.equipmentId);
-  }, [rentedEquipmentList]);
 
   const existIdList = useMemo(() => {
     return quoteItemListState.map((item) => item.equipmentId);
@@ -251,10 +241,9 @@ const ReservationCreatePage = () => {
       </FormWrapper>
       {isOpenSearchModal && dateRange.startDate && dateRange.endDate && (
         <EquipmentSearchModal
-          existIdList={existIdList}
-          occupiedIdList={rentedEquipmentIdList}
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={onAddQuoteItemList}
+          disabledIdList={existIdList}
         />
       )}
       {isOpenUserModal && (

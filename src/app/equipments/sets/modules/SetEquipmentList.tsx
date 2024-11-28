@@ -1,68 +1,89 @@
-import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { Margin } from "@/app/components/Margin";
 import { SearchBar } from "@/app/components/SearchBar";
-import { GridTable } from "@/app/components/Table/GridTable";
-import { SetEquipmentListItemType } from "@/app/types/equipmentType";
-import { formatLocaleString } from "@/app/utils/priceUtils";
-import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
-import Link from "next/link";
+import styles from "./setEquipmentList.module.scss";
+import {
+  SetEquipmentType,
+  EquipmentListItemType,
+} from "@/app/types/equipmentType";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSetEquipmentList } from "../hooks/useSetEquipmentList";
-
-const columns: GridColDef<SetEquipmentListItemType>[] = [
-  {
-    field: "id",
-    width: 80,
-    renderHeader: () => HeaderName("ID"),
-  },
-  {
-    field: "title",
-    renderHeader: () => HeaderName("풀세트 이름"),
-    renderCell: ({ row }) => (
-      <Link
-        href={`/equipments/${row.id}`}
-        style={{
-          flex: 1,
-          fontWeight: 700,
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {row.title}
-      </Link>
-    ),
-    flex: 1,
-  },
-  {
-    field: "price",
-    renderHeader: () => HeaderName("가격"),
-    renderCell: ({ row }) => formatLocaleString(row.price),
-  },
-  { field: "detail", flex: 1, renderHeader: () => HeaderName("상세설명") },
-];
+import { SetEquipmentAccordion } from "./SetEquipmentAccordion";
+import { isEqual } from "lodash";
 
 export const SetEquipmentList = () => {
-  const [, setSelectedEquipmentList] = useState<SetEquipmentListItemType[]>([]);
+  const [selectedEquipmentSetList, setSelectedEquipmentSetList] = useState<
+    SetEquipmentType[]
+  >([]);
 
   const {
-    list,
+    list = [],
     searchMenu,
     onChangeKeyword,
     onChangeSearchKey,
     keyword,
     selectedSearchKey,
     onSearch,
-    setPageModel,
-    pageModel,
-    totalElements,
+    fetchList,
   } = useSetEquipmentList();
 
-  const toggleEquipmentList = useCallback(
-    (itemList: SetEquipmentListItemType[]) => {
-      setSelectedEquipmentList(itemList);
+  console.log(selectedEquipmentSetList);
+
+  const toggleEquipmentSet = useCallback((equipmentSet: SetEquipmentType) => {
+    setSelectedEquipmentSetList((prev) => {
+      const selectedSetIndex = prev.findIndex(
+        (set) => set.id === equipmentSet.id
+      );
+      if (selectedSetIndex === -1) {
+        return [...prev, equipmentSet];
+      } else {
+        return prev.filter((set) => set.id !== equipmentSet.id);
+      }
+    });
+  }, []);
+
+  const addEquipmentToSet = useCallback(
+    (equipment: EquipmentListItemType, targetSet: SetEquipmentType) => {
+      setSelectedEquipmentSetList((prev) =>
+        prev.concat({
+          ...targetSet,
+          equipmentList: [...targetSet.equipmentList, equipment],
+        })
+      );
     },
     []
   );
+
+  const removeEquipmentFromSet = useCallback(
+    (equipment: EquipmentListItemType, targetSet: SetEquipmentType) => {
+      if (
+        targetSet.equipmentList.length === 1 &&
+        targetSet.equipmentList[0].id === equipment.id
+      ) {
+        setSelectedEquipmentSetList((prev) =>
+          prev.filter((set) => set.id !== targetSet.id)
+        );
+      } else {
+        setSelectedEquipmentSetList((prev) =>
+          prev.map((set) =>
+            set.id === targetSet.id
+              ? {
+                  ...set,
+                  equipmentList: set.equipmentList.filter(
+                    (prevEquipment) => prevEquipment.id !== equipment.id
+                  ),
+                }
+              : set
+          )
+        );
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    fetchList();
+  }, []);
 
   return (
     <>
@@ -83,35 +104,49 @@ export const SetEquipmentList = () => {
         />
       </Margin>
 
-      <GridTable<SetEquipmentListItemType>
-        checkboxSelection
-        onRowSelectionModelChange={(selected, details) => {
-          const valueList = Array.from(
-            details.api.getRowModels().values()
-          ) as SetEquipmentListItemType[];
-          const selectedList = valueList.filter((item) =>
-            selected.includes(item.id)
+      <div className={styles.equipmentListWrapper}>
+        {list.map((item) => {
+          const selectedSetIndex = selectedEquipmentSetList.findIndex(
+            (set) => set.id === item.id
           );
+          const isIncludedSet = selectedSetIndex !== -1;
 
-          toggleEquipmentList(selectedList);
-        }}
-        columns={columns}
-        rows={list}
-        getRowId={(cell) => cell.id}
-        paginationModel={{
-          pageSize: pageModel.limit,
-          page: pageModel.offset,
-        }}
-        pagination
-        paginationMode="server"
-        rowCount={totalElements}
-        onPaginationModelChange={(model: GridPaginationModel) => {
-          setPageModel({
-            offset: model.page,
-            limit: model.pageSize,
-          });
-        }}
-      />
+          const selectedEquipmentItemList = isIncludedSet
+            ? selectedEquipmentSetList[selectedSetIndex].equipmentList
+            : [];
+
+          const isAllSelected =
+            isIncludedSet &&
+            isEqual(selectedEquipmentItemList, item.equipmentList);
+
+          return (
+            <SetEquipmentAccordion
+              key={item.id}
+              title={item.title}
+              price={item.price}
+              equipmentList={item.equipmentList || []}
+              selectedEquipmentList={selectedEquipmentItemList}
+              isAllSelected={isAllSelected}
+              toggleSelectAll={() => toggleEquipmentSet(item)}
+              toggleEquipmentItem={(equipment: EquipmentListItemType) => {
+                const targetSet = isIncludedSet
+                  ? selectedEquipmentSetList[selectedSetIndex]
+                  : { ...item, equipmentList: [] };
+
+                const isIncludedEquipment = targetSet.equipmentList.some(
+                  (selectedEquipment) => selectedEquipment.id === equipment.id
+                );
+
+                if (isIncludedEquipment) {
+                  removeEquipmentFromSet(equipment, targetSet);
+                } else {
+                  addEquipmentToSet(equipment, targetSet);
+                }
+              }}
+            />
+          );
+        })}
+      </div>
     </>
   );
 };

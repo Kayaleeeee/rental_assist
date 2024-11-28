@@ -9,7 +9,9 @@ import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Link from "next/link";
 import styles from "./equipmentListTable.module.scss";
 
-const columns: GridColDef<EquipmentListItemType>[] = [
+const getColumns = (
+  isRowClickable: boolean
+): GridColDef<EquipmentListItemType>[] => [
   {
     field: "id",
     width: 80,
@@ -18,18 +20,21 @@ const columns: GridColDef<EquipmentListItemType>[] = [
   {
     field: "title",
     renderHeader: () => HeaderName("장비명"),
-    renderCell: ({ row }) => (
-      <Link
-        href={`/equipments/${row.id}`}
-        style={{
-          flex: 1,
-          fontWeight: 700,
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {row.title}
-      </Link>
-    ),
+    renderCell: ({ row }) =>
+      isRowClickable ? (
+        <Link
+          href={`/equipments/${row.id}`}
+          style={{
+            flex: 1,
+            fontWeight: 700,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {row.title}
+        </Link>
+      ) : (
+        row.title
+      ),
     flex: 1,
   },
   {
@@ -53,6 +58,8 @@ type Props = {
   setPageModel: (model: PageModelType) => void;
   pageModel: PageModelType;
   totalElements: number;
+  height?: number;
+  isRowClickable?: boolean;
 };
 
 export const EquipmentListTable = ({
@@ -68,7 +75,10 @@ export const EquipmentListTable = ({
   setPageModel,
   pageModel,
   totalElements,
+  height,
+  isRowClickable = true,
 }: Props) => {
+  const columns = getColumns(isRowClickable);
   return (
     <>
       <div className={styles.searchBarWrapper}>
@@ -83,6 +93,7 @@ export const EquipmentListTable = ({
       </div>
 
       <GridTable<EquipmentListItemType>
+        height={height}
         checkboxSelection
         onRowSelectionModelChange={(selected, details) => {
           const valueList = Array.from(

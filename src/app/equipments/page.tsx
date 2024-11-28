@@ -85,7 +85,7 @@ export default function EquipmentPage() {
             <Button
               style={{ width: "150px" }}
               size="Medium"
-              onClick={() => router.push("/equipments/create")}
+              onClick={() => router.push("/equipments/sets/create")}
             >
               풀세트 만들기
             </Button>

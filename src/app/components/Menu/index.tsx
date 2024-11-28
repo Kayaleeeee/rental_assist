@@ -28,22 +28,7 @@ const menuList = [
     path: "/equipments",
     title: "장비 리스트",
     renderIcon: () => <FormatListBulletedOutlinedIcon />,
-    children: [
-      {
-        path: "/equipments",
-        title: "개별 장비 리스트",
-      },
-      {
-        path: "/equipments/sets",
-        title: "풀세트 장비 리스트",
-      },
-    ],
   },
-  // {
-  //   path: "/quotes",
-  //   title: "견적서 리스트",
-  //   renderIcon: () => <ReceiptLongOutlinedIcon />,
-  // },
   {
     path: "/users",
     title: "회원 관리",

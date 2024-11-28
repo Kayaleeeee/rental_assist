@@ -1,39 +1,29 @@
-import { createEquipment } from "@/app/api/equipments";
 import {
-  EquipmentCategory,
-  EquipmentCategoryList,
-  EquipmentPostBody,
+  createEquipmentSet,
+  createEquipmentSetItemList,
+} from "@/app/api/equipments/setEquipments";
+import {
+  EquipmentListItemType,
+  SetEquipmentItemPostPayload,
+  SetEquipmentPayload,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty, isNil } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-const categoryMenu = EquipmentCategoryList;
-
 export const useSetEquipmentForm = () => {
   const router = useRouter();
-  const [category, setCategory] = useState<{
-    key: EquipmentCategory;
-    title: string;
-  }>(categoryMenu[0]);
-
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [detail, setDetail] = useState<string>("");
+  const [memo, setMemo] = useState<string>("");
 
-  const onChangeCategory = (key: string) => {
-    const selectedCategoryIndex = categoryMenu.findIndex(
-      (item) => item.key === key
-    );
-
-    if (selectedCategoryIndex === -1) return;
-
-    setCategory(categoryMenu[selectedCategoryIndex]);
-  };
+  const [equipmentList, setEquipmentList] = useState<EquipmentListItemType[]>(
+    []
+  );
 
   const getIsValidForm = useCallback(() => {
-    console.log(title, price, category);
     if (isEmpty(title)) {
       showToast({
         message: "장비명을 입력해주세요.",
@@ -50,53 +40,62 @@ export const useSetEquipmentForm = () => {
       return;
     }
 
-    if (isEmpty(category.key)) {
-      showToast({
-        message: "카테고리를 선택해주세요.",
-        type: "error",
-      });
-      return false;
-    }
-
     return true;
-  }, [title, price, category]);
+  }, [title, price]);
 
-  const submitEquipmentForm = useCallback(async () => {
+  const submitEquipmentSetForm = useCallback(async () => {
     if (!getIsValidForm()) return;
 
-    const form: EquipmentPostBody = {
-      category: category.key,
+    const form: SetEquipmentPayload = {
       title,
       price,
       detail,
     };
 
     try {
-      await createEquipment(form);
+      const setCreateResult = await createEquipmentSet(form);
+
+      const convertedSetEquipmentList: SetEquipmentItemPostPayload[] =
+        equipmentList.map((item) => {
+          return {
+            equipmentId: item.id,
+            quantity: item.quantity,
+            setId: setCreateResult.id,
+          };
+        });
+
+      const listCreateResult = await createEquipmentSetItemList(
+        convertedSetEquipmentList
+      );
+
+      console.log(listCreateResult);
+
       showToast({
         message: "장비가 등록되었습니다.",
         type: "success",
       });
+
       router.push("/equipments");
     } catch (e) {
       console.log("등록 실패", e);
       showToast({
-        message: "장비가 등록에 실패했습니다.",
+        message: "풀 세트 장비 등록에 실패했습니다.",
         type: "error",
       });
     }
-  }, [category, title, price, detail, router, getIsValidForm]);
+  }, [title, price, detail, router, memo, getIsValidForm, equipmentList]);
 
   return {
-    categoryMenu,
-    category,
-    onChangeCategory,
     title,
     setTitle,
     price,
     setPrice,
     detail,
     setDetail,
-    submitEquipmentForm,
+    memo,
+    setMemo,
+    submitEquipmentSetForm,
+    equipmentList,
+    setEquipmentList,
   };
 };
