@@ -134,7 +134,4 @@ export type SetEquipmentItemType = {
 
 export type SetEquipmentItemPostPayload = Omit<SetEquipmentItemType, "id">;
 export type SetEquipmentItemPutPayload = Partial<SetEquipmentItemPostPayload>;
-export type SetEquipmentListParams = {
-  category?: EquipmentCategory;
-  title?: string;
-};
+export type SetEquipmentListParams = Partial<SetEquipmentItemType>;

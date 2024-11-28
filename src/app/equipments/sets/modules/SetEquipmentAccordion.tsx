@@ -1,4 +1,7 @@
-import { EquipmentListItemType } from "@/app/types/equipmentType";
+import {
+  EquipmentListItemType,
+  SetEquipmentType,
+} from "@/app/types/equipmentType";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import styles from "./setEquipmentAccordion.module.scss";
@@ -7,10 +10,12 @@ import { formatLocaleString } from "@/app/utils/priceUtils";
 import { Margin } from "@/app/components/Margin";
 import { Button } from "@/app/components/Button";
 import { SetEquipmentItem } from "./SetEquipmentItem";
+import Link from "next/link";
 
 type Props = {
   title: string;
   price: number;
+  setId: SetEquipmentType["id"];
   equipmentList: EquipmentListItemType[];
   selectedEquipmentList: EquipmentListItemType[];
   isAllSelected: boolean;
@@ -26,6 +31,7 @@ export const SetEquipmentAccordion = ({
   selectedEquipmentList,
   toggleSelectAll,
   toggleEquipmentItem,
+  setId,
 }: Props) => {
   return (
     <Accordion>
@@ -47,6 +53,7 @@ export const SetEquipmentAccordion = ({
             <SetEquipmentItem
               key={item.id}
               item={item}
+              isSelectable
               toggleItem={() => toggleEquipmentItem(item)}
               isSelected={selectedEquipmentList.some(
                 (selectedItem) => selectedItem.id === item.id
@@ -57,9 +64,11 @@ export const SetEquipmentAccordion = ({
         <Margin top={16} />
         <div className={styles.accordionFooter}>
           <div className={styles.price}>{formatLocaleString(price)}원</div>
-          <Button variant="outlined" size="Small">
-            상세보기
-          </Button>
+          <Link href={`/equipments/sets/${setId}`}>
+            <Button variant="outlined" size="Small">
+              상세보기
+            </Button>
+          </Link>
         </div>
       </AccordionDetails>
     </Accordion>

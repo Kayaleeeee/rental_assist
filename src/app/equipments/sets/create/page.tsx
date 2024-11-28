@@ -10,10 +10,11 @@ import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { useSetEquipmentForm } from "./hooks/useSetEquipmentForm";
 import { EquipmentSearchModal } from "@/app/reservations/modules/form/EquipmentSearchModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { isEmpty } from "lodash";
 import { SetEquipmentItemEditor } from "../modules/SetEquipmentItemEditor";
 import { Margin } from "@/app/components/Margin";
+import { useSetEquipmentItemList } from "./hooks/useSetEquipmentItemList";
 
 const EquipmentCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -27,10 +28,13 @@ const EquipmentCreatePage = () => {
     setDetail,
     memo,
     setMemo,
-    submitEquipmentSetForm,
+    onCreateSetEquipment,
     equipmentList,
     setEquipmentList,
   } = useSetEquipmentForm();
+
+  const { list: occupiedEquipmentList, fetchList: fetchSetEquipmentList } =
+    useSetEquipmentItemList();
 
   return (
     <div>
@@ -130,7 +134,7 @@ const EquipmentCreatePage = () => {
           <Button
             size="Medium"
             style={{ width: "150px" }}
-            onClick={submitEquipmentSetForm}
+            onClick={onCreateSetEquipment}
           >
             등록
           </Button>

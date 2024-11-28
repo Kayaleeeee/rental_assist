@@ -1,11 +1,14 @@
 import {
-  createEquipmentSet,
-  createEquipmentSetItemList,
+  createSetEquipment,
+  createSetEquipmentItemList,
+  deleteSetEquipmentItemList,
+  editSetEquipment,
 } from "@/app/api/equipments/setEquipments";
 import {
   EquipmentListItemType,
   SetEquipmentItemPostPayload,
   SetEquipmentPayload,
+  SetEquipmentType,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty, isNil } from "lodash";
@@ -23,10 +26,10 @@ export const useSetEquipmentForm = () => {
     []
   );
 
-  const getIsValidForm = useCallback(() => {
+  const validateForm = useCallback(() => {
     if (isEmpty(title)) {
       showToast({
-        message: "장비명을 입력해주세요.",
+        message: "세트명을 입력해주세요.",
         type: "error",
       });
       return false;
@@ -37,14 +40,32 @@ export const useSetEquipmentForm = () => {
         message: "렌탈 가격을 입력해주세요.",
         type: "error",
       });
-      return;
+      return false;
+    }
+
+    if (isEmpty(equipmentList)) {
+      showToast({ message: "장비를 추가해주세요.", type: "error" });
+      return false;
     }
 
     return true;
-  }, [title, price]);
+  }, [title, price, equipmentList]);
 
-  const submitEquipmentSetForm = useCallback(async () => {
-    if (!getIsValidForm()) return;
+  const convertEquipmentToPayload = (
+    equipmentList: EquipmentListItemType[],
+    setId: SetEquipmentType["id"]
+  ) => {
+    return equipmentList.map((item) => {
+      return {
+        equipmentId: item.id,
+        quantity: item.quantity,
+        setId,
+      };
+    });
+  };
+
+  const onCreateSetEquipment = useCallback(async () => {
+    if (!validateForm()) return;
 
     const form: SetEquipmentPayload = {
       title,
@@ -53,29 +74,19 @@ export const useSetEquipmentForm = () => {
     };
 
     try {
-      const setCreateResult = await createEquipmentSet(form);
+      const setCreateResult = await createSetEquipment(form);
 
       const convertedSetEquipmentList: SetEquipmentItemPostPayload[] =
-        equipmentList.map((item) => {
-          return {
-            equipmentId: item.id,
-            quantity: item.quantity,
-            setId: setCreateResult.id,
-          };
-        });
+        convertEquipmentToPayload(equipmentList, setCreateResult.id);
 
-      const listCreateResult = await createEquipmentSetItemList(
-        convertedSetEquipmentList
-      );
-
-      console.log(listCreateResult);
+      await createSetEquipmentItemList(convertedSetEquipmentList);
 
       showToast({
-        message: "장비가 등록되었습니다.",
+        message: "풀 세트 장비가 등록되었습니다.",
         type: "success",
       });
 
-      router.push("/equipments");
+      router.push("/equipments/sets");
     } catch (e) {
       console.log("등록 실패", e);
       showToast({
@@ -83,8 +94,50 @@ export const useSetEquipmentForm = () => {
         type: "error",
       });
     }
-  }, [title, price, detail, router, memo, getIsValidForm, equipmentList]);
+  }, [title, price, detail, router, memo, validateForm, equipmentList]);
 
+  const onEditSetEquipment = useCallback(
+    async (
+      setId: SetEquipmentType["id"],
+      originEquipmentList: EquipmentListItemType[]
+    ) => {
+      if (!validateForm()) return;
+
+      const originEquipmentIdList = originEquipmentList.map((item) => item.id);
+
+      try {
+        await editSetEquipment(setId, {
+          title,
+          price,
+          detail,
+          memo,
+        });
+
+        const setEquipmentIdList: SetEquipmentItemPostPayload[] =
+          equipmentList.map((item) => ({
+            equipmentId: item.id,
+            setId,
+            quantity: item.quantity,
+          }));
+
+        await deleteSetEquipmentItemList(originEquipmentIdList.join(","));
+
+        await createSetEquipmentItemList(setEquipmentIdList);
+        showToast({
+          message: "예약이 수정되었습니다.",
+          type: "success",
+        });
+
+        router.replace(`/equipments/sets/${setId}`);
+      } catch {
+        showToast({
+          message: "예약 생성에 오류가 발생했습니다.",
+          type: "error",
+        });
+      }
+    },
+    [router, validateForm, equipmentList]
+  );
   return {
     title,
     setTitle,
@@ -94,7 +147,8 @@ export const useSetEquipmentForm = () => {
     setDetail,
     memo,
     setMemo,
-    submitEquipmentSetForm,
+    onEditSetEquipment,
+    onCreateSetEquipment,
     equipmentList,
     setEquipmentList,
   };

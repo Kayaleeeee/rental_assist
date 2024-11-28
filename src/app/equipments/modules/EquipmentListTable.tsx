@@ -8,6 +8,7 @@ import { formatLocaleString } from "@/app/utils/priceUtils";
 import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import Link from "next/link";
 import styles from "./equipmentListTable.module.scss";
+import { Margin } from "@/app/components/Margin";
 
 const getColumns = (
   isRowClickable: boolean
@@ -58,7 +59,8 @@ type Props = {
   setPageModel: (model: PageModelType) => void;
   pageModel: PageModelType;
   totalElements: number;
-  height?: number;
+  height?: string;
+  margin?: number;
   isRowClickable?: boolean;
 };
 
@@ -77,10 +79,11 @@ export const EquipmentListTable = ({
   totalElements,
   height,
   isRowClickable = true,
+  margin = 10,
 }: Props) => {
   const columns = getColumns(isRowClickable);
   return (
-    <>
+    <div className={styles.wrapper}>
       <div className={styles.searchBarWrapper}>
         <SearchBar
           menuList={searchMenu}
@@ -91,6 +94,8 @@ export const EquipmentListTable = ({
           onSearch={onSearch}
         />
       </div>
+
+      <Margin top={margin} />
 
       <GridTable<EquipmentListItemType>
         height={height}
@@ -122,7 +127,10 @@ export const EquipmentListTable = ({
             limit: model.pageSize,
           });
         }}
+        sx={{
+          marginTop: "-20px",
+        }}
       />
-    </>
+    </div>
   );
 };

@@ -27,8 +27,6 @@ export const SetEquipmentList = () => {
     fetchList,
   } = useSetEquipmentList();
 
-  console.log(selectedEquipmentSetList);
-
   const toggleEquipmentSet = useCallback((equipmentSet: SetEquipmentType) => {
     setSelectedEquipmentSetList((prev) => {
       const selectedSetIndex = prev.findIndex(
@@ -122,6 +120,7 @@ export const SetEquipmentList = () => {
           return (
             <SetEquipmentAccordion
               key={item.id}
+              setId={item.id}
               title={item.title}
               price={item.price}
               equipmentList={item.equipmentList || []}

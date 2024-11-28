@@ -1,22 +1,4 @@
-@import "../styles/mediaQuery.scss";
-
-.relativeWrapper {
-  position: relative;
-}
-
-.fixedFooter {
-  width: calc(100vw - 200px);
-  height: 70px;
-  position: fixed;
-  bottom: 0;
-  left: 200px;
-  background: white;
-  border-top: 1px solid var(--grey-1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 16px;
-}
+@import "../../../styles/mediaQuery.scss";
 
 .buttonWrapper {
   width: 100%;
@@ -29,10 +11,11 @@
 .detailWrapper {
   min-width: 45%;
   border-right: 1px solid var(--grey-1);
-
+  padding-right: 16px;
   @include media-query("lg") {
     width: 100%;
     border-right: none;
+    padding-right: 0;
   }
 }
 

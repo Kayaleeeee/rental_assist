@@ -91,6 +91,7 @@ export const EquipmentSearchModal = ({
       >
         <Label title="카테고리" />
         <Select<EquipmentCategory | string>
+          size="small"
           value={selectedCategory || allString}
           onChange={(event) => {
             const value =
@@ -101,7 +102,8 @@ export const EquipmentSearchModal = ({
             toggleEquipmentCategory(value);
           }}
           sx={{
-            width: "400px",
+            width: "200px",
+            marginBottom: "10px",
           }}
         >
           <MenuItem value={allString}>전체</MenuItem>
@@ -127,11 +129,12 @@ export const EquipmentSearchModal = ({
           setPageModel={setPageModel}
           pageModel={pageModel}
           totalElements={totalElements}
-          height={500}
+          height={"50vh"}
           isRowClickable={false}
+          margin={0}
         />
 
-        <Margin bottom={20} />
+        <Margin bottom={50} />
       </div>
     </Modal>
   );

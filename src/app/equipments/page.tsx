@@ -123,20 +123,22 @@ export default function EquipmentPage() {
       />
 
       {!isFullSetSelected && (
-        <EquipmentListTable
-          list={list}
-          selectedList={selectedEquipmentList}
-          searchMenu={searchMenu}
-          selectedSearchKey={selectedSearchKey}
-          keyword={keyword}
-          onChangeKeyword={onChangeKeyword}
-          onChangeSearchKey={onChangeSearchKey}
-          onSearch={onSearch}
-          onSelectCell={toggleEquipmentList}
-          setPageModel={setPageModel}
-          pageModel={pageModel}
-          totalElements={totalElements}
-        />
+        <Margin top={40}>
+          <EquipmentListTable
+            list={list}
+            selectedList={selectedEquipmentList}
+            searchMenu={searchMenu}
+            selectedSearchKey={selectedSearchKey}
+            keyword={keyword}
+            onChangeKeyword={onChangeKeyword}
+            onChangeSearchKey={onChangeSearchKey}
+            onSearch={onSearch}
+            onSelectCell={toggleEquipmentList}
+            setPageModel={setPageModel}
+            pageModel={pageModel}
+            totalElements={totalElements}
+          />
+        </Margin>
       )}
 
       {isFullSetSelected && <SetEquipmentList />}

@@ -1,6 +1,8 @@
 import {
   EquipmentListParams,
   SetEquipmentItemPostPayload,
+  SetEquipmentListItemType,
+  SetEquipmentListParams,
   SetEquipmentPayload,
   SetEquipmentType,
 } from "@/app/types/equipmentType";
@@ -33,7 +35,7 @@ const applyFilters = (query: any, params?: EquipmentListParams) => {
   return query.order("id", { ascending: false });
 };
 
-export const getEquipmentSetList = async (params?: EquipmentListParams) => {
+export const getSetEquipmentList = async (params?: EquipmentListParams) => {
   const supabase = await createClient();
 
   let query = supabase
@@ -62,7 +64,7 @@ export const getEquipmentSetList = async (params?: EquipmentListParams) => {
   };
 };
 
-export const createEquipmentSet = async (payload: SetEquipmentPayload) => {
+export const createSetEquipment = async (payload: SetEquipmentPayload) => {
   const result = await apiPost<SetEquipmentType[]>(apiUrl, payload, {
     headers: {
       Prefer: "return=representation",
@@ -76,18 +78,22 @@ export const createEquipmentSet = async (payload: SetEquipmentPayload) => {
   }
 };
 
-export const editEquipmentSet = (
+export const getSetEquipmentDetail = async (id: SetEquipmentType["id"]) => {
+  return apiGet<SetEquipmentType[]>("equipment_set_list", { id });
+};
+
+export const editSetEquipment = (
   id: SetEquipmentType["id"],
   payload: SetEquipmentPayload
 ) => {
   return apiPatch(apiUrl, payload, { params: { id } });
 };
 
-export const deleteEquipmentSet = (id: SetEquipmentType["id"]) => {
+export const deleteSetEquipment = (id: SetEquipmentType["id"]) => {
   return apiDelete(apiUrl, { params: { id } });
 };
 
-export const createEquipmentSetItemList = async (
+export const createSetEquipmentItemList = async (
   payload: SetEquipmentItemPostPayload[]
 ) => {
   if (isEmpty(payload)) return;
@@ -95,10 +101,12 @@ export const createEquipmentSetItemList = async (
   await apiPost("equipment_set_items", payload);
 };
 
-export const deleteEquipmentSetItemList = async (idList: string) => {
-  return apiDelete("equipment_set_items", { params: { id: `in.(${idList})` } });
+export const deleteSetEquipmentItemList = async (idList: string) => {
+  return apiDelete("equipment_set_items", {
+    params: { equipmentId: `in.(${idList})` },
+  });
 };
 
-export const getEquipmentDetail = async (id: SetEquipmentType["id"]) => {
-  return apiGet<SetEquipmentType[]>(apiUrl, { params: { id } });
+export const getSetEquipmentItemList = (params?: SetEquipmentListParams) => {
+  return apiGet<SetEquipmentListItemType[]>("equipment_set_items", { params });
 };

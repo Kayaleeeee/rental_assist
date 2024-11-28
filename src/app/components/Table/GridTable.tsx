@@ -6,7 +6,7 @@ import { useMemo } from "react";
 export const GridTable = <T extends GridValidRowModel = any>(
   props: DataGridProps<T> &
     React.RefAttributes<HTMLDivElement> & {
-      height?: number;
+      height?: string;
     }
 ) => {
   const customHeight = useMemo(() => {

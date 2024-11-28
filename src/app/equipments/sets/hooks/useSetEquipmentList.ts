@@ -1,4 +1,4 @@
-import { getEquipmentSetList } from "@/app/api/equipments/setEquipments";
+import { getSetEquipmentList } from "@/app/api/equipments/setEquipments";
 import {
   EquipmentListParams,
   SetEquipmentType,
@@ -22,7 +22,7 @@ export const useSetEquipmentList = () => {
 
   const fetchList = useCallback(async (params?: EquipmentListParams) => {
     try {
-      const result = await getEquipmentSetList(params);
+      const result = await getSetEquipmentList(params);
 
       setList(result.data || []);
       setTotalElements(result.totalElements || 0);

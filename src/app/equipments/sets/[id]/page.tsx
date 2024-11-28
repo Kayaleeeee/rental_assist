@@ -1,75 +1,48 @@
 "use client";
 
-import { FormWrapper } from "@/app/components/Form/FormWrapper";
-import styles from "../page.module.scss";
-
-import { EditableField } from "@/app/components/EditableField";
-import { Label } from "@/app/components/Form/Label";
+import { deleteSetEquipment } from "@/app/api/equipments/setEquipments";
 import { Button } from "@/app/components/Button";
+import { ListButton } from "@/app/components/Button/ListButton";
+import { EditableField } from "@/app/components/EditableField";
+import { FormWrapper } from "@/app/components/Form/FormWrapper";
+import { Label } from "@/app/components/Form/Label";
+import { Margin } from "@/app/components/Margin";
 import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
-import { useEquipmentDetail } from "./hooks/useEquipmentDetail";
-import { useParams, useRouter } from "next/navigation";
-import { EquipmentCategoryList } from "@/app/types/equipmentType";
-import { useCallback, useMemo, useState } from "react";
-import { ListButton } from "@/app/components/Button/ListButton";
-import { Margin } from "@/app/components/Margin";
-import {
-  CalendarEventType,
-  MonthCalendar,
-} from "@/app/components/Calendar/MonthCalendar";
-import { useEquipmentRentalDates } from "../hooks/useEquipmentRentalDates";
-import dayjs from "dayjs";
-import { deleteEquipment } from "@/app/api/equipments";
 import { showToast } from "@/app/utils/toastUtils";
 
-const EquipmentDetailPage = () => {
+import { useParams, useRouter } from "next/navigation";
+import { useCallback } from "react";
+import styles from "./setDetailPage.module.scss";
+import { useSetEquipmentDetail } from "./hooks/useSetEquipmentDetail";
+import { isEmpty } from "lodash";
+import { SetEquipmentItem } from "../modules/SetEquipmentItem";
+
+const SetEquipmentDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const equipmentId = Number(params.id);
-  const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
-  const { rentalInfo } = useEquipmentRentalDates(equipmentId);
-  const [currentDate, setCurrentDate] = useState(dayjs());
 
-  const eventDateList: CalendarEventType[] = useMemo(() => {
-    if (!rentalInfo) return [];
-
-    return rentalInfo.rentedDates.map((item) => ({
-      start: dayjs(item.startDate).toDate(),
-      end: dayjs(item.endDate).toDate(),
-      title: rentalInfo.userName,
-      id: rentalInfo.reservationId,
-    }));
-  }, [rentalInfo]);
-
-  const selectedCategory = useMemo(() => {
-    if (!equipmentDetail) return "";
-
-    return (
-      EquipmentCategoryList.find(
-        (item) => item.key === equipmentDetail.category
-      )?.title || ""
-    );
-  }, [equipmentDetail]);
+  const { detail: setEquipmentDetail } = useSetEquipmentDetail(equipmentId);
 
   const handleDeleteEquipment = useCallback(async () => {
-    if (!equipmentDetail || !equipmentId) return;
+    if (!setEquipmentDetail || !equipmentId) return;
 
     if (!confirm("장비를 삭제하시겠습니까?")) return;
 
     try {
-      await deleteEquipment(equipmentId);
+      await deleteSetEquipment(equipmentId.toString());
 
       showToast({ message: "장비를 삭제했습니다", type: "success" });
       router.push(`/equipments`);
     } catch {
       showToast({ message: "장비를 삭제할 수 없습니다.", type: "error" });
     }
-  }, [equipmentDetail, equipmentId, router]);
+  }, [setEquipmentDetail, equipmentId, router]);
 
-  if (!equipmentDetail) return null;
+  if (!setEquipmentDetail) return null;
 
   return (
     <>
@@ -84,17 +57,11 @@ const EquipmentDetailPage = () => {
         <div className={styles.flexibleInline}>
           <div className={styles.detailWrapper}>
             <div className={styles.sectionWrapper}>
-              <Label title="카테고리" />
-              <EditableField isEditable={false} value={selectedCategory} />
-            </div>
-            <Margin top={20} />
-
-            <div className={styles.sectionWrapper}>
               <Label title="장비명" />
               <EditableField
                 isEditable={false}
                 fullWidth
-                value={equipmentDetail.title}
+                value={setEquipmentDetail.title}
               />
             </div>
             <Margin top={20} />
@@ -105,13 +72,13 @@ const EquipmentDetailPage = () => {
                 <EditableField
                   isEditable={false}
                   fullWidth
-                  value={formatLocaleString(equipmentDetail.price)}
+                  value={formatLocaleString(setEquipmentDetail.price)}
                 />
                 <div
                   className={styles.convertedPrice}
                   style={{ marginLeft: "10px" }}
                 >
-                  ({formatKoreanCurrency(equipmentDetail.price)})
+                  ({formatKoreanCurrency(setEquipmentDetail.price)})
                 </div>
               </div>
             </div>
@@ -123,14 +90,44 @@ const EquipmentDetailPage = () => {
                 isEditable={false}
                 fullWidth
                 multiline
-                value={equipmentDetail.detail}
+                value={setEquipmentDetail.detail}
+              />
+            </div>
+
+            <Margin top={30} />
+            <div className={styles.sectionWrapper}>
+              <Label title="포함 장비 정보" />
+              {!isEmpty(setEquipmentDetail.equipmentList) && (
+                <Margin top={20}>
+                  <div className={styles.equipmentListWrapper}>
+                    {setEquipmentDetail.equipmentList.map((item) => {
+                      return (
+                        <SetEquipmentItem
+                          key={item.id}
+                          item={item}
+                          isSelectable={false}
+                        />
+                      );
+                    })}
+                  </div>
+                </Margin>
+              )}
+            </div>
+
+            <Margin top={30} />
+            <div className={styles.sectionWrapper}>
+              <Label title="메모" />
+
+              <EditableField
+                isEditable={false}
+                value={setEquipmentDetail.memo || ""}
               />
             </div>
             <Margin top={20} />
           </div>
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />
-            <MonthCalendar
+            {/* <MonthCalendar
               size={500}
               currentDate={currentDate}
               setCurrentDate={setCurrentDate}
@@ -138,7 +135,7 @@ const EquipmentDetailPage = () => {
               onClickEvent={(event) => {
                 window.open(`/reservations/${event.id}`, "_blank");
               }}
-            />
+            /> */}
           </div>
         </div>
 
@@ -155,7 +152,9 @@ const EquipmentDetailPage = () => {
           <Button
             size="Small"
             style={{ width: "100px" }}
-            onClick={() => router.push(`/equipments/${equipmentId}/edit`)}
+            onClick={() => {
+              router.push(`/equipments/sets/${equipmentId}/edit`);
+            }}
           >
             수정
           </Button>
@@ -165,4 +164,4 @@ const EquipmentDetailPage = () => {
   );
 };
 
-export default EquipmentDetailPage;
+export default SetEquipmentDetailPage;
