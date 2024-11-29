@@ -1,11 +1,15 @@
 import { useCartStore } from "@/app/store/useCartStore";
 import styles from "./index.module.scss";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import { isEmpty } from "lodash";
 import { Margin } from "../Margin";
+import { useMemo } from "react";
 
 export const CartMenu = () => {
-  const { list, setIsCartOpen } = useCartStore();
+  const { list, setIsCartOpen, equipmentSetList } = useCartStore();
+
+  const cartItemCount = useMemo(() => {
+    return list.length + equipmentSetList.length;
+  }, [list, equipmentSetList]);
 
   return (
     <div className={styles.item} onClick={() => setIsCartOpen(true)}>
@@ -13,9 +17,9 @@ export const CartMenu = () => {
         <AddShoppingCartIcon />
       </div>
       장바구니
-      {!isEmpty(list) && (
+      {cartItemCount > 0 && (
         <Margin left={5}>
-          <div className={styles.cartCountBadge}>{`(${list.length})`}</div>
+          <div className={styles.cartCountBadge}>{`(${cartItemCount})`}</div>
         </Margin>
       )}
     </div>

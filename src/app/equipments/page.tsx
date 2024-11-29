@@ -7,6 +7,7 @@ import {
   EquipmentCategory,
   EquipmentCategoryList,
   EquipmentListItemType,
+  SetEquipmentType,
 } from "../types/equipmentType";
 import { Margin } from "../components/Margin";
 import { CategoryList } from "../components/Category/CategoryList";
@@ -24,9 +25,13 @@ export default function EquipmentPage() {
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     EquipmentListItemType[]
   >([]);
-  const [isFullSetSelected, setIsFullSetSelected] = useState<boolean>(false);
 
-  const { addEquipment } = useCartStore();
+  const [isFullSetSelected, setIsFullSetSelected] = useState<boolean>(false);
+  const [selectedEquipmentSetList, setSelectedEquipmentSetList] = useState<
+    SetEquipmentType[]
+  >([]);
+
+  const { addEquipment, addEquipmentSet } = useCartStore();
 
   const {
     list,
@@ -46,7 +51,8 @@ export default function EquipmentPage() {
   } = useEquipmentList();
 
   const handleAddToCart = useCallback(async () => {
-    if (isEmpty(selectedEquipmentList)) return;
+    if (isEmpty([...selectedEquipmentList, ...selectedEquipmentSetList]))
+      return;
 
     const convertedList: EquipmentListItemState[] = selectedEquipmentList.map(
       (equipment) => ({
@@ -57,13 +63,18 @@ export default function EquipmentPage() {
         totalPrice: equipment.price,
       })
     );
+
     addEquipment(convertedList);
+    addEquipmentSet(selectedEquipmentSetList);
+
     showToast({
       message: "장바구니에 추가되었습니다.",
       type: "info",
     });
+
     setSelectedEquipmentList([]);
-  }, [addEquipment, selectedEquipmentList]);
+    setSelectedEquipmentSetList([]);
+  }, [addEquipment, selectedEquipmentList, selectedEquipmentSetList]);
 
   const toggleEquipmentList = useCallback(
     (itemList: EquipmentListItemType[]) => {
@@ -141,8 +152,13 @@ export default function EquipmentPage() {
         </Margin>
       )}
 
-      {isFullSetSelected && <SetEquipmentList />}
-      {!isEmpty(selectedEquipmentList) && (
+      {isFullSetSelected && (
+        <SetEquipmentList
+          selectedEquipmentSetList={selectedEquipmentSetList}
+          setSelectedEquipmentSetList={setSelectedEquipmentSetList}
+        />
+      )}
+      {!isEmpty([...selectedEquipmentList, ...selectedEquipmentSetList]) && (
         <div className={styles.fixedFooter}>
           <Button
             size="Medium"

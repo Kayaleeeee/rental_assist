@@ -48,6 +48,7 @@ export enum EquipmentCategory {
   lamp = "lamp",
   audio = "audio",
   battery = "battery",
+  others = "others",
 }
 
 export const EquipmentCategoryList: {

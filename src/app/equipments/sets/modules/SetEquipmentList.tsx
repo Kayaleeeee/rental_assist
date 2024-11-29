@@ -6,16 +6,20 @@ import {
   EquipmentListItemType,
 } from "@/app/types/equipmentType";
 
-import { useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import { useSetEquipmentList } from "../hooks/useSetEquipmentList";
 import { SetEquipmentAccordion } from "./SetEquipmentAccordion";
 import { isEqual } from "lodash";
 
-export const SetEquipmentList = () => {
-  const [selectedEquipmentSetList, setSelectedEquipmentSetList] = useState<
-    SetEquipmentType[]
-  >([]);
+type Props = {
+  selectedEquipmentSetList: SetEquipmentType[];
+  setSelectedEquipmentSetList: Dispatch<SetStateAction<SetEquipmentType[]>>;
+};
 
+export const SetEquipmentList = ({
+  selectedEquipmentSetList,
+  setSelectedEquipmentSetList,
+}: Props) => {
   const {
     list = [],
     searchMenu,

@@ -70,7 +70,7 @@ export const QuotationItemEditor = ({
       </div>
 
       <div className={styles.price}>
-        총 {formatLocaleString(quoteState.totalPrice)}원
+        총 {formatLocaleString(quoteState?.totalPrice || 0)}원
       </div>
       <div
         className={styles.deleteButtonWrapper}

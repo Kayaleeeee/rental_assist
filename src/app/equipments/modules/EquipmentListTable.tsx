@@ -116,14 +116,14 @@ export const EquipmentListTable = ({
         getRowId={(cell) => cell.id}
         paginationModel={{
           pageSize: pageModel.limit,
-          page: pageModel.offset,
+          page: pageModel.offset / pageModel.limit,
         }}
         pagination
         paginationMode="server"
         rowCount={totalElements}
         onPaginationModelChange={(model: GridPaginationModel) => {
           setPageModel({
-            offset: model.page,
+            offset: model.page * model.pageSize,
             limit: model.pageSize,
           });
         }}

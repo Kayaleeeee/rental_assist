@@ -124,14 +124,14 @@ export const useSetEquipmentForm = () => {
 
         await createSetEquipmentItemList(setEquipmentIdList);
         showToast({
-          message: "예약이 수정되었습니다.",
+          message: "풀세트 정보가 수정되었습니다.",
           type: "success",
         });
 
         router.replace(`/equipments/sets/${setId}`);
       } catch {
         showToast({
-          message: "예약 생성에 오류가 발생했습니다.",
+          message: "수정에 오류가 발생했습니다.",
           type: "error",
         });
       }

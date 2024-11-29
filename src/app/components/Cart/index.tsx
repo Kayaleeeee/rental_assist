@@ -5,13 +5,26 @@ import styles from "./index.module.scss";
 import { Label } from "../Form/Label";
 import { Margin } from "../Margin";
 import { DateTimeSelector } from "../DateTimeSelector";
-import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
-import { useCallback, useEffect } from "react";
+import {
+  EquipmentAvailabilityType,
+  EquipmentSetAvailabilityType,
+  useEquipmentCart,
+} from "@/app/equipments/hooks/useEquipmentCart";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { QuotationItemEditor } from "@/app/reservations/modules/form/QuotationItemEditor";
+import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
+import { isEmpty } from "lodash";
+import { EquipmentSearchModal } from "@/app/reservations/modules/form/EquipmentSearchModal";
+import { SetEquipmentType } from "@/app/types/equipmentType";
 
 export const Cart = () => {
+  const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
+  const [searchingSetId, setSearchingSetId] = useState<
+    SetEquipmentType["id"] | null
+  >(null);
+
   const router = useRouter();
 
   const {
@@ -20,12 +33,15 @@ export const Cart = () => {
     dateRange,
     checkAvailability,
     availableListState,
+    availableSetListState,
     isChecked,
     removeItem,
     setList,
     rentalDays,
     setIsCartOpen,
     isCartOpen,
+    changeEquipmentSet,
+    removeSet,
   } = useEquipmentCart();
 
   const handleCloseCart = () => {
@@ -70,6 +86,27 @@ export const Cart = () => {
     rentalDays,
   ]);
 
+  const handleDeleteSetEquipment = (
+    setEquipment: EquipmentSetAvailabilityType,
+    equipmentItemId: EquipmentAvailabilityType["equipmentId"]
+  ) => {
+    changeEquipmentSet({
+      ...setEquipment,
+      equipmentList: setEquipment.equipmentList.filter(
+        (item) => item.equipmentId !== equipmentItemId
+      ),
+    });
+  };
+
+  const disabledEquipmentIdList = useMemo(() => {
+    const equipmentIdList = availableListState.map((item) => item.equipmentId);
+    const setItemList = availableSetListState
+      .flatMap((item) => item.equipmentList)
+      .map((item) => item.equipmentId);
+
+    return [...equipmentIdList, ...setItemList];
+  }, [availableListState, availableSetListState]);
+
   if (!isCartOpen) return null;
 
   return (
@@ -102,9 +139,11 @@ export const Cart = () => {
             />
           </div>
 
-          <Label title="장비 리스트" />
-          <div className={styles.equipmentListWrapper}>
-            {/* {availableListState.map((item) => {
+          {!isEmpty(availableListState) && (
+            <Margin bottom={20}>
+              <Label title="단품 장비 리스트" />
+              <div className={styles.equipmentListWrapper}>
+                {/* {availableListState.map((item) => {
               const isAvailable = isChecked && item.isAvailable;
               const unavailable = isChecked && !item.isAvailable;
               const color = !isChecked
@@ -158,29 +197,58 @@ export const Cart = () => {
               );
             })} */}
 
-            {availableListState.map((item) => {
-              return (
-                <QuotationItemEditor
-                  key={item.equipmentId}
-                  quoteState={item}
-                  rentalDays={rentalDays}
-                  onChangeField={() => {}}
-                  onDeleteEquipment={() => removeItem(item.equipmentId)}
-                  availableStatus={
-                    item.isAvailable
-                      ? "available"
-                      : isChecked
-                      ? "unavailable"
-                      : "unknown"
-                  }
-                />
-              );
-            })}
-          </div>
+                {availableListState.map((item) => {
+                  return (
+                    <QuotationItemEditor
+                      key={item.equipmentId}
+                      quoteState={item}
+                      rentalDays={rentalDays}
+                      onChangeField={() => {}}
+                      onDeleteEquipment={() => removeItem(item.equipmentId)}
+                      availableStatus={
+                        item.isAvailable
+                          ? "available"
+                          : isChecked
+                          ? "unavailable"
+                          : "unknown"
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </Margin>
+          )}
+
+          {!isEmpty(availableSetListState) && (
+            <Margin>
+              <Label title="풀세트 리스트" />
+              <div>
+                {availableSetListState.map((item) => {
+                  return (
+                    <SetEquipmentAccordionEditor
+                      key={item.id}
+                      title={item.title}
+                      price={item.price}
+                      equipmentList={item.equipmentList}
+                      changeQuantity={() => {}}
+                      changePrice={() => {}}
+                      addEquipmentItem={() => {
+                        setIsOpenSearchModal(true);
+                        setSearchingSetId(item.id);
+                      }}
+                      deleteEquipmentItem={(equipmentId) =>
+                        handleDeleteSetEquipment(item, equipmentId)
+                      }
+                      deleteSetEquipment={() => removeSet(item.id)}
+                    />
+                  );
+                })}
+              </div>
+            </Margin>
+          )}
         </section>
         <section className={styles.footer}>
           <Button
-            variant="outlined"
             size="Medium"
             onClick={onClickButton}
             style={{
@@ -194,6 +262,27 @@ export const Cart = () => {
           </Button>
         </section>
       </div>
+      {isOpenSearchModal && (
+        <EquipmentSearchModal
+          onCloseModal={() => setIsOpenSearchModal(false)}
+          onConfirm={(newList) => {
+            if (searchingSetId) {
+              const changedSet = availableSetListState.find(
+                (set) => set.id === searchingSetId
+              );
+
+              if (!changedSet) return;
+
+              changeEquipmentSet({
+                ...changedSet,
+                equipmentList: [...changedSet.equipmentList, ...newList],
+              });
+              return;
+            }
+          }}
+          disabledIdList={disabledEquipmentIdList}
+        />
+      )}
     </>
   );
 };

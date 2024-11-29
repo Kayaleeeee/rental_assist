@@ -17,10 +17,18 @@
   width: 100%;
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 8px;
+  gap: 12px;
+  height: 60px;
 }
 
 .price {
   font-weight: 400;
+}
+
+.customAccordion {
+  border: 1px solid var(--grey-1);
+  border-radius: 16px !important;
+  box-shadow: none !important;
 }

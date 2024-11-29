@@ -1,15 +1,36 @@
 import { getEquipmentListWithRentedDates } from "@/app/api/equipments";
 import { EquipmentListItemState, useCartStore } from "@/app/store/useCartStore";
-import { EquipmentListItemType } from "@/app/types/equipmentType";
+import {
+  EquipmentListItemType,
+  SetEquipmentType,
+} from "@/app/types/equipmentType";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-type EquipmentAvailabilityType = EquipmentListItemState & {
+export type EquipmentAvailabilityType = EquipmentListItemState & {
   isAvailable: boolean;
   reservationId?: number;
 };
+
+export type EquipmentSetAvailabilityType = Omit<
+  SetEquipmentType,
+  "equipmentList"
+> & {
+  equipmentList: EquipmentAvailabilityType[];
+};
+
+export const convertEquipmentItemToState = (
+  equipment: EquipmentListItemType
+): EquipmentAvailabilityType => ({
+  equipmentId: equipment.id,
+  title: equipment.title,
+  quantity: equipment.quantity,
+  price: equipment.price,
+  totalPrice: equipment.price,
+  isAvailable: true,
+});
 
 export const useEquipmentCart = () => {
   const {
@@ -20,6 +41,10 @@ export const useEquipmentCart = () => {
     setList,
     isCartOpen,
     setIsCartOpen,
+    equipmentSetList,
+    changeEquipmentSet,
+    removeEquipment,
+    removeEquipmentSet,
   } = useCartStore();
   const [isChecked, setIsChecked] = useState<boolean>(false);
 
@@ -27,18 +52,22 @@ export const useEquipmentCart = () => {
     EquipmentAvailabilityType[]
   >([]);
 
+  const [availableSetListState, setAvailableSetListState] = useState<
+    EquipmentSetAvailabilityType[]
+  >([]);
+
   useEffect(() => {
     setAvailableListState(list.map((item) => ({ ...item, isAvailable: true })));
   }, [list]);
 
-  const removeItem = useCallback(
-    (id: EquipmentAvailabilityType["equipmentId"]) => {
-      setAvailableListState((prev) =>
-        prev.filter((item) => item.equipmentId !== id)
-      );
-    },
-    []
-  );
+  useEffect(() => {
+    setAvailableSetListState(
+      equipmentSetList.map((item) => ({
+        ...item,
+        equipmentList: item.equipmentList.map(convertEquipmentItemToState),
+      }))
+    );
+  }, [equipmentSetList]);
 
   const checkAvailability = useCallback(async () => {
     if (isEmpty(availableListState)) return;
@@ -117,15 +146,18 @@ export const useEquipmentCart = () => {
 
   return {
     hasUnavailableItem,
-    availableListState,
     checkAvailability,
     onChangeDate,
     dateRange,
     resetCart,
     isChecked,
-    removeItem,
+    removeItem: removeEquipment,
+    removeSet: removeEquipmentSet,
+    changeEquipmentSet,
     setList,
     rentalDays,
+    availableListState,
+    availableSetListState,
     isCartOpen,
     setIsCartOpen,
   };
