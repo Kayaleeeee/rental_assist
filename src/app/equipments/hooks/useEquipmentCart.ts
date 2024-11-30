@@ -1,29 +1,18 @@
 import { getEquipmentListWithRentedDates } from "@/app/api/equipments";
-import { EquipmentListItemState, useCartStore } from "@/app/store/useCartStore";
 import {
-  EquipmentListItemType,
-  SetEquipmentType,
-} from "@/app/types/equipmentType";
+  EquipmentListItemState,
+  SetEquipmentStateType,
+  useCartStore,
+} from "@/app/store/useCartStore";
+import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
-export type EquipmentAvailabilityType = EquipmentListItemState & {
-  isAvailable: boolean;
-  reservationId?: number;
-};
-
-export type EquipmentSetAvailabilityType = Omit<
-  SetEquipmentType,
-  "equipmentList"
-> & {
-  equipmentList: EquipmentAvailabilityType[];
-};
+import { useCallback, useMemo } from "react";
 
 export const convertEquipmentItemToState = (
   equipment: EquipmentListItemType
-): EquipmentAvailabilityType => ({
+): EquipmentListItemState => ({
   equipmentId: equipment.id,
   title: equipment.title,
   quantity: equipment.quantity,
@@ -39,39 +28,20 @@ export const useEquipmentCart = () => {
     onChangeDate,
     dateRange,
     setList,
+    setEquipmentSetList,
     isCartOpen,
     setIsCartOpen,
     equipmentSetList,
     changeEquipmentSet,
     removeEquipment,
     removeEquipmentSet,
+    addEquipmentSet,
+    addEquipment,
+    isChecked,
+    setIsChecked,
   } = useCartStore();
-  const [isChecked, setIsChecked] = useState<boolean>(false);
 
-  const [availableListState, setAvailableListState] = useState<
-    EquipmentAvailabilityType[]
-  >([]);
-
-  const [availableSetListState, setAvailableSetListState] = useState<
-    EquipmentSetAvailabilityType[]
-  >([]);
-
-  useEffect(() => {
-    setAvailableListState(list.map((item) => ({ ...item, isAvailable: true })));
-  }, [list]);
-
-  useEffect(() => {
-    setAvailableSetListState(
-      equipmentSetList.map((item) => ({
-        ...item,
-        equipmentList: item.equipmentList.map(convertEquipmentItemToState),
-      }))
-    );
-  }, [equipmentSetList]);
-
-  const checkAvailability = useCallback(async () => {
-    if (isEmpty(availableListState)) return;
-
+  const handleCheckAvailability = useCallback(async () => {
     if (!dateRange.startDate || !dateRange.endDate) {
       showToast({
         message: "날짜를 선택해주세요",
@@ -83,36 +53,63 @@ export const useEquipmentCart = () => {
     setIsChecked(false);
 
     try {
+      const [checkedList, checkedSetList] = await Promise.all([
+        checkListAvailability(list),
+        Promise.all(
+          equipmentSetList.map(async (set) => {
+            const checkedEquipmentList = await checkListAvailability(
+              set.equipmentList
+            );
+            return {
+              ...set,
+              equipmentList: checkedEquipmentList || set.equipmentList,
+            };
+          })
+        ),
+      ]);
+
+      if (checkedList) setList(checkedList);
+      if (checkedSetList) setEquipmentSetList(checkedSetList);
+    } catch {
+      showToast({
+        message: "장비 스케줄 검색에 실패했습니다.",
+        type: "error",
+      });
+    } finally {
+      setIsChecked(true);
+    }
+  }, [equipmentSetList, list, dateRange]);
+
+  const checkListAvailability = useCallback(
+    async (list: EquipmentListItemState[]) => {
+      if (isEmpty(list)) return;
+
       const result = await Promise.all(
-        availableListState.map((item) =>
-          checkAvailabilityById(item.equipmentId, {
+        list.map((item) =>
+          checkAvailabilityById(item.equipmentId, item.quantity, {
             startDate: dateRange.startDate!,
             endDate: dateRange.endDate!,
           })
         )
       );
 
-      const checkedList = availableListState.map((item) => {
-        const target = result.find((r) => r.id === item.equipmentId);
-        if (!target) return item;
+      const checkedList = list.map((item, index) => {
+        const target = result[index];
         return {
           ...item,
           isAvailable: target.isAvailable,
           reservationId: target.reservationId,
         };
       });
-      setAvailableListState(checkedList);
-      setIsChecked(true);
-    } catch {
-      showToast({
-        message: "장비 검색에 실패했습니다.",
-        type: "error",
-      });
-    }
-  }, [availableListState, dateRange]);
+
+      return checkedList;
+    },
+    [dateRange]
+  );
 
   const checkAvailabilityById = async (
     id: EquipmentListItemType["id"],
+    quantity: number,
     dateRange: { startDate: string; endDate: string }
   ) => {
     try {
@@ -127,10 +124,6 @@ export const useEquipmentCart = () => {
 
       return { id, isAvailable: false, reservationId: result[0].reservationId };
     } catch {
-      showToast({
-        message: "장비 검색에 실패했습니다.",
-        type: "error",
-      });
       throw new Error("장비 검색에 에러가 발생했습니다.");
     }
   };
@@ -141,24 +134,80 @@ export const useEquipmentCart = () => {
   }, [dateRange]);
 
   const hasUnavailableItem = useMemo(() => {
-    return availableListState.some((item) => !item.isAvailable);
-  }, [availableListState]);
+    return list.some((item) => !item.isAvailable);
+  }, [list]);
+
+  const handleAddEquipment = useCallback(
+    (itemList: EquipmentListItemState[]) => {
+      addEquipment(itemList);
+      setIsChecked(false);
+    },
+    []
+  );
+
+  const handleAddEquipmentSet = useCallback(
+    (setList: SetEquipmentStateType[]) => {
+      addEquipmentSet(setList);
+      setIsChecked(false);
+    },
+    []
+  );
+
+  const handleDeleteEquipmentItem = useCallback(
+    (itemId: EquipmentListItemState["equipmentId"]) => {
+      removeEquipment(itemId);
+      setIsChecked(false);
+    },
+    []
+  );
+
+  const handleDeleteSetEquipment = useCallback(
+    (setId: SetEquipmentStateType["id"]) => {
+      removeEquipmentSet(setId);
+      setIsChecked(false);
+    },
+    []
+  );
+
+  const handleChangeSetEquipment = (setEquipment: SetEquipmentStateType) => {
+    changeEquipmentSet(setEquipment);
+    setIsChecked(false);
+  };
+
+  const handleDeleteSetEquipmentItem = (
+    setEquipment: SetEquipmentStateType,
+    equipmentItemId: EquipmentListItemState["equipmentId"]
+  ) => {
+    changeEquipmentSet({
+      ...setEquipment,
+      equipmentList: setEquipment.equipmentList.filter(
+        (item) => item.equipmentId !== equipmentItemId
+      ),
+    });
+    setIsChecked(false);
+  };
 
   return {
     hasUnavailableItem,
-    checkAvailability,
+    handleCheckAvailability,
     onChangeDate,
     dateRange,
     resetCart,
+
     isChecked,
-    removeItem: removeEquipment,
-    removeSet: removeEquipmentSet,
-    changeEquipmentSet,
+    setIsChecked,
+
+    handleDeleteEquipmentItem,
+    handleDeleteSetEquipment,
+    handleDeleteSetEquipmentItem,
+    handleChangeSetEquipment,
     setList,
     rentalDays,
-    availableListState,
-    availableSetListState,
     isCartOpen,
     setIsCartOpen,
+    equipmentList: list,
+    equipmentSetList,
+    handleAddEquipment,
+    handleAddEquipmentSet,
   };
 };

@@ -10,11 +10,11 @@ import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { useSetEquipmentForm } from "./hooks/useSetEquipmentForm";
 import { EquipmentSearchModal } from "@/app/reservations/modules/form/EquipmentSearchModal";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { isEmpty } from "lodash";
 import { SetEquipmentItemEditor } from "../modules/SetEquipmentItemEditor";
 import { Margin } from "@/app/components/Margin";
-import { useSetEquipmentItemList } from "./hooks/useSetEquipmentItemList";
+// import { useSetEquipmentItemList } from "./hooks/useSetEquipmentItemList";
 
 const EquipmentCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -33,8 +33,8 @@ const EquipmentCreatePage = () => {
     setEquipmentList,
   } = useSetEquipmentForm();
 
-  const { list: occupiedEquipmentList, fetchList: fetchSetEquipmentList } =
-    useSetEquipmentItemList();
+  // const { list: occupiedEquipmentList, fetchList: fetchSetEquipmentList } =
+  //   useSetEquipmentItemList();
 
   return (
     <div>

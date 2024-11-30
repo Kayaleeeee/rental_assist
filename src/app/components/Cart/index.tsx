@@ -6,8 +6,7 @@ import { Label } from "../Form/Label";
 import { Margin } from "../Margin";
 import { DateTimeSelector } from "../DateTimeSelector";
 import {
-  EquipmentAvailabilityType,
-  EquipmentSetAvailabilityType,
+  convertEquipmentItemToState,
   useEquipmentCart,
 } from "@/app/equipments/hooks/useEquipmentCart";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -18,6 +17,15 @@ import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEq
 import { isEmpty } from "lodash";
 import { EquipmentSearchModal } from "@/app/reservations/modules/form/EquipmentSearchModal";
 import { SetEquipmentType } from "@/app/types/equipmentType";
+
+export const getAvailableStatus = (
+  isChecked: boolean,
+  isAvailable?: boolean
+) => {
+  if (!isChecked) return "unknown";
+  if (isAvailable) return "available";
+  return "unavailable";
+};
 
 export const Cart = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -31,17 +39,18 @@ export const Cart = () => {
     hasUnavailableItem,
     onChangeDate,
     dateRange,
-    checkAvailability,
-    availableListState,
-    availableSetListState,
+    handleCheckAvailability,
     isChecked,
-    removeItem,
     setList,
     rentalDays,
     setIsCartOpen,
     isCartOpen,
-    changeEquipmentSet,
-    removeSet,
+    handleChangeSetEquipment,
+    handleDeleteSetEquipment,
+    handleDeleteEquipmentItem,
+    handleDeleteSetEquipmentItem,
+    equipmentList,
+    equipmentSetList,
   } = useEquipmentCart();
 
   const handleCloseCart = () => {
@@ -64,10 +73,10 @@ export const Cart = () => {
 
   const onClickButton = useCallback(() => {
     if (!isOkToMakeReservation) {
-      checkAvailability();
+      handleCheckAvailability();
     } else {
       setList(
-        availableListState.map((item) => ({
+        equipmentList.map((item) => ({
           equipmentId: item.equipmentId,
           title: item.title,
           price: item.price,
@@ -75,37 +84,27 @@ export const Cart = () => {
           totalPrice: item.price * rentalDays,
         }))
       );
+      handleCloseCart();
       router.push("/reservations/create");
     }
   }, [
     isOkToMakeReservation,
-    availableListState,
-    checkAvailability,
+    equipmentList,
+    handleCheckAvailability,
     setList,
     router,
     rentalDays,
   ]);
 
-  const handleDeleteSetEquipment = (
-    setEquipment: EquipmentSetAvailabilityType,
-    equipmentItemId: EquipmentAvailabilityType["equipmentId"]
-  ) => {
-    changeEquipmentSet({
-      ...setEquipment,
-      equipmentList: setEquipment.equipmentList.filter(
-        (item) => item.equipmentId !== equipmentItemId
-      ),
-    });
-  };
-
   const disabledEquipmentIdList = useMemo(() => {
-    const equipmentIdList = availableListState.map((item) => item.equipmentId);
-    const setItemList = availableSetListState
+    const equipmentIdList = equipmentList.map((item) => item.equipmentId);
+
+    const setItemList = equipmentSetList
       .flatMap((item) => item.equipmentList)
       .map((item) => item.equipmentId);
 
     return [...equipmentIdList, ...setItemList];
-  }, [availableListState, availableSetListState]);
+  }, [equipmentList, equipmentSetList]);
 
   if (!isCartOpen) return null;
 
@@ -139,79 +138,25 @@ export const Cart = () => {
             />
           </div>
 
-          {!isEmpty(availableListState) && (
+          {!isEmpty(equipmentList) && (
             <Margin bottom={20}>
               <Label title="단품 장비 리스트" />
               <div className={styles.equipmentListWrapper}>
-                {/* {availableListState.map((item) => {
-              const isAvailable = isChecked && item.isAvailable;
-              const unavailable = isChecked && !item.isAvailable;
-              const color = !isChecked
-                ? "black"
-                : isAvailable
-                ? "var(--green)"
-                : "var(--error)";
-
-              const className = !isChecked
-                ? styles.equipmentItem
-                : item.isAvailable
-                ? styles.availableItem
-                : styles.unavailableItem;
-
-              return (
-                <div
-                  key={item.equipmentId}
-                  className={className}
-                  onClick={
-                    unavailable
-                      ? () => {
-                          window.open(
-                            `/reservations/${item.reservationId}`,
-                            "_blank"
-                          );
-                        }
-                      : undefined
-                  }
-                >
-                  {isAvailable && <CheckCircleOutlineIcon style={{ color }} />}
-                  {unavailable && <CancelIcon style={{ color }} />}
-                  <div
-                    className={styles.title}
-                    style={{
-                      color,
-                    }}
-                  >
-                    {item.title}
-                  </div>
-                  <div> {formatLocaleString(item.price)}원 / day</div>
-                  <div
-                    className={styles.closeButtonWrapper}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeItem(item.equipmentId);
-                    }}
-                  >
-                    <CloseOutlinedIcon className={styles.closeButton} />
-                  </div>
-                </div>
-              );
-            })} */}
-
-                {availableListState.map((item) => {
+                {equipmentList.map((item) => {
                   return (
                     <QuotationItemEditor
                       key={item.equipmentId}
                       quoteState={item}
                       rentalDays={rentalDays}
                       onChangeField={() => {}}
-                      onDeleteEquipment={() => removeItem(item.equipmentId)}
-                      availableStatus={
-                        item.isAvailable
-                          ? "available"
-                          : isChecked
-                          ? "unavailable"
-                          : "unknown"
+                      quantityOnly
+                      onDeleteEquipment={() =>
+                        handleDeleteEquipmentItem(item.equipmentId)
                       }
+                      availableStatus={getAvailableStatus(
+                        isChecked,
+                        item.isAvailable
+                      )}
                     />
                   );
                 })}
@@ -219,16 +164,16 @@ export const Cart = () => {
             </Margin>
           )}
 
-          {!isEmpty(availableSetListState) && (
+          {!isEmpty(equipmentSetList) && (
             <Margin>
               <Label title="풀세트 리스트" />
               <div>
-                {availableSetListState.map((item) => {
+                {equipmentSetList.map((item) => {
                   return (
                     <SetEquipmentAccordionEditor
                       key={item.id}
                       title={item.title}
-                      price={item.price}
+                      isChecked={isChecked}
                       equipmentList={item.equipmentList}
                       changeQuantity={() => {}}
                       changePrice={() => {}}
@@ -237,9 +182,11 @@ export const Cart = () => {
                         setSearchingSetId(item.id);
                       }}
                       deleteEquipmentItem={(equipmentId) =>
-                        handleDeleteSetEquipment(item, equipmentId)
+                        handleDeleteSetEquipmentItem(item, equipmentId)
                       }
-                      deleteSetEquipment={() => removeSet(item.id)}
+                      deleteSetEquipment={() =>
+                        handleDeleteSetEquipment(item.id)
+                      }
                     />
                   );
                 })}
@@ -267,17 +214,17 @@ export const Cart = () => {
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={(newList) => {
             if (searchingSetId) {
-              const changedSet = availableSetListState.find(
+              const changedSet = equipmentSetList.find(
                 (set) => set.id === searchingSetId
               );
 
               if (!changedSet) return;
+              const convertedList = newList.map(convertEquipmentItemToState);
 
-              changeEquipmentSet({
+              handleChangeSetEquipment({
                 ...changedSet,
-                equipmentList: [...changedSet.equipmentList, ...newList],
+                equipmentList: [...changedSet.equipmentList, ...convertedList],
               });
-              return;
             }
           }}
           disabledIdList={disabledEquipmentIdList}

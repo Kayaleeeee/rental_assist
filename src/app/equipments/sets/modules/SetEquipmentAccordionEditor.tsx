@@ -2,29 +2,27 @@ import { EquipmentCategory } from "@/app/types/equipmentType";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 
 import styles from "./setEquipmentAccordion.module.scss";
-import { formatLocaleString } from "@/app/utils/priceUtils";
 import { Margin } from "@/app/components/Margin";
 import { Button } from "@/app/components/Button";
 import { SetEquipmentItemEditor } from "./SetEquipmentItemEditor";
-import { EquipmentAvailabilityType } from "../../hooks/useEquipmentCart";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { useState } from "react";
-import { EditableField } from "@/app/components/EditableField";
+import { EquipmentListItemState } from "@/app/store/useCartStore";
+import { getAvailableStatus } from "@/app/components/Cart";
 
 type Props = {
   title: string;
-  price: number;
-  equipmentList: EquipmentAvailabilityType[];
+  equipmentList: EquipmentListItemState[];
   addEquipmentItem: () => void;
   deleteSetEquipment: () => void;
-  deleteEquipmentItem: (id: EquipmentAvailabilityType["equipmentId"]) => void;
+  deleteEquipmentItem: (id: EquipmentListItemState["equipmentId"]) => void;
   changeQuantity: (quantity: number) => void;
   changePrice: (price: number) => void;
+  isChecked: boolean;
 };
 
 export const SetEquipmentAccordionEditor = ({
   title,
-  price,
+  isChecked,
   equipmentList = [],
   addEquipmentItem,
   deleteEquipmentItem,
@@ -48,7 +46,7 @@ export const SetEquipmentAccordionEditor = ({
         <div className={styles.equipmentListWrapper}>
           {equipmentList.map((item) => (
             <SetEquipmentItemEditor
-              key={item.equipmentId}
+              key={`item.equipmentId_${item.equipmentId}`}
               item={{
                 id: item.equipmentId,
                 title: item.title,
@@ -58,6 +56,7 @@ export const SetEquipmentAccordionEditor = ({
                 category: EquipmentCategory.others,
                 disabled: false,
               }}
+              availableStatus={getAvailableStatus(isChecked, item.isAvailable)}
               onChangeField={(item) => changeQuantity(item.quantity)}
               onDeleteEquipment={() => {
                 deleteEquipmentItem(item.equipmentId);

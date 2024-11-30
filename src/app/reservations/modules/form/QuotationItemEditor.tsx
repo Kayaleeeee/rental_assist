@@ -2,7 +2,9 @@ import styles from "./quotationItemEditor.module.scss";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 
 type Props = {
   rentalDays: number;
@@ -10,8 +12,8 @@ type Props = {
   onChangeField: (item: EquipmentListItemState) => void;
   onDeleteEquipment: () => void;
   availableStatus: "available" | "unavailable" | "unknown";
-  onClickItem?: () => void;
   reservationId?: number;
+  quantityOnly?: boolean;
 };
 
 export const QuotationItemEditor = ({
@@ -20,14 +22,41 @@ export const QuotationItemEditor = ({
   onChangeField,
   onDeleteEquipment,
   availableStatus,
-  onClickItem,
   reservationId,
+  quantityOnly = false,
 }: Props) => {
+  const styleByStatus = useMemo((): {
+    color: string;
+    className: any;
+    renderIcon?: () => React.ReactElement;
+  } => {
+    switch (availableStatus) {
+      case "available":
+        return {
+          color: "var(--green)",
+          className: styles.availableItem,
+          renderIcon: () => (
+            <CheckCircleOutlineIcon style={{ color: "var(--green)" }} />
+          ),
+        };
+      case "unavailable":
+        return {
+          color: "var(--error)",
+          className: styles.unavailableItem,
+          renderIcon: () => (
+            <CancelOutlinedIcon style={{ color: "var(--error)" }} />
+          ),
+        };
+      case "unknown":
+        return { color: "black", className: styles.equipmentItem };
+    }
+  }, [availableStatus]);
+
   const handleClickItem = useCallback(() => {
     if (availableStatus === "unavailable") {
       window.open(`/reservations/${reservationId}`, "_blank");
     }
-  }, [onClickItem]);
+  }, []);
 
   const onClickPlus = () => {
     const newQuantity = quoteState.quantity + 1;
@@ -52,8 +81,16 @@ export const QuotationItemEditor = ({
   };
 
   return (
-    <div className={styles.wrapper} onClick={handleClickItem}>
-      <div className={styles.title}>{quoteState.title}</div>
+    <div className={styleByStatus.className} onClick={handleClickItem}>
+      {styleByStatus.renderIcon && styleByStatus.renderIcon()}
+      <div
+        className={styles.title}
+        style={{
+          color: styleByStatus.color,
+        }}
+      >
+        {quoteState.title}
+      </div>
       <div className={styles.quantity}>
         <div className={styles.quantityButton} onClick={onClickMinus}>
           -
@@ -63,15 +100,17 @@ export const QuotationItemEditor = ({
           +
         </div>
       </div>
-
-      <div className={styles.days}>{rentalDays}일</div>
-      <div className={styles.supplyPrice}>
-        {formatLocaleString(quoteState.price)}원
-      </div>
-
-      <div className={styles.price}>
-        총 {formatLocaleString(quoteState?.totalPrice || 0)}원
-      </div>
+      {!quantityOnly && (
+        <>
+          <div className={styles.days}>{rentalDays}일</div>
+          <div className={styles.supplyPrice}>
+            {formatLocaleString(quoteState.price)}원
+          </div>
+          <div className={styles.price}>
+            총 {formatLocaleString(quoteState?.totalPrice || 0)}원
+          </div>
+        </>
+      )}
       <div
         className={styles.deleteButtonWrapper}
         onClick={(e) => {

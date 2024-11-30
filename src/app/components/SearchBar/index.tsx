@@ -14,7 +14,7 @@ type Props<T> = {
 export const SearchBar = <T extends string>({
   selectedKey,
   menuList,
-  keyword,
+  // keyword,
   onSearch,
   onChangeSearchKey,
   onChangeKeyword,
@@ -43,9 +43,8 @@ export const SearchBar = <T extends string>({
       </Select>
       <TextField
         fullWidth
-        value={keyword}
         className={styles.textInput}
-        onChange={(e) => onChangeKeyword(e.target.value)}
+        onBlur={(e) => onChangeKeyword(e.target.value)}
         size="small"
         onKeyDown={(e) => {
           if (e.key === "Enter") {

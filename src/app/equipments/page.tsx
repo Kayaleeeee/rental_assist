@@ -13,12 +13,13 @@ import { Margin } from "../components/Margin";
 import { CategoryList } from "../components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
 import { isEmpty } from "lodash";
-import { EquipmentListItemState, useCartStore } from "../store/useCartStore";
+import { EquipmentListItemState } from "../store/useCartStore";
 import { EquipmentListTable } from "./modules/EquipmentListTable";
 import styles from "./page.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { SetEquipmentList } from "./sets/modules/SetEquipmentList";
 import { showToast } from "../utils/toastUtils";
+import { useEquipmentCart } from "./hooks/useEquipmentCart";
 
 export default function EquipmentPage() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function EquipmentPage() {
     SetEquipmentType[]
   >([]);
 
-  const { addEquipment, addEquipmentSet } = useCartStore();
+  const { handleAddEquipment, handleAddEquipmentSet } = useEquipmentCart();
 
   const {
     list,
@@ -51,21 +52,26 @@ export default function EquipmentPage() {
   } = useEquipmentList();
 
   const handleAddToCart = useCallback(async () => {
-    if (isEmpty([...selectedEquipmentList, ...selectedEquipmentSetList]))
+    if (isEmpty(selectedEquipmentList) && isEmpty(selectedEquipmentSetList))
       return;
 
-    const convertedList: EquipmentListItemState[] = selectedEquipmentList.map(
-      (equipment) => ({
-        equipmentId: equipment.id,
-        title: equipment.title,
-        price: equipment.price,
-        quantity: 1,
-        totalPrice: equipment.price,
-      })
-    );
+    const convertItem = (
+      equipment: EquipmentListItemType
+    ): EquipmentListItemState => ({
+      equipmentId: equipment.id,
+      title: equipment.title,
+      price: equipment.price,
+      quantity: equipment.quantity,
+      totalPrice: equipment.price,
+    });
 
-    addEquipment(convertedList);
-    addEquipmentSet(selectedEquipmentSetList);
+    handleAddEquipment(selectedEquipmentList.map(convertItem));
+    handleAddEquipmentSet(
+      selectedEquipmentSetList.map((set) => ({
+        ...set,
+        equipmentList: set.equipmentList.map(convertItem),
+      }))
+    );
 
     showToast({
       message: "장바구니에 추가되었습니다.",
@@ -74,7 +80,7 @@ export default function EquipmentPage() {
 
     setSelectedEquipmentList([]);
     setSelectedEquipmentSetList([]);
-  }, [addEquipment, selectedEquipmentList, selectedEquipmentSetList]);
+  }, [handleAddEquipment, selectedEquipmentList, selectedEquipmentSetList]);
 
   const toggleEquipmentList = useCallback(
     (itemList: EquipmentListItemType[]) => {

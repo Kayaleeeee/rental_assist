@@ -9,6 +9,7 @@ import {
   EquipmentCategoryList,
   EquipmentListItemType,
 } from "@/app/types/equipmentType";
+import { showToast } from "@/app/utils/toastUtils";
 
 import { MenuItem, Select } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
@@ -54,6 +55,11 @@ export const EquipmentSearchModal = ({
   const toggleEquipmentList = useCallback(
     (itemList: EquipmentListItemType[]) => {
       if (itemList.some((item) => disabledIdList.includes(item.id))) {
+        showToast({
+          message: "이미 추가된 장비는 중복으로 추가할 수 없습니다.",
+          type: "error",
+        });
+        return;
       }
 
       setSelectedEquipmentList(itemList);

@@ -91,6 +91,7 @@ export type EquipmentItemWithRentedDates = {
   price: number;
   category: string;
   detail: string;
+  quantity: number;
   rentedDates: { startDate: string; endDate: string }[];
   reservationId: ReservationType["id"];
   userName: UserType["name"];

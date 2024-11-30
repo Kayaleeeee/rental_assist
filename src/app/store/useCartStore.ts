@@ -9,6 +9,12 @@ export type EquipmentListItemState = {
   quantity: number;
   totalPrice?: number;
   id?: QuoteItemType["id"];
+  isAvailable?: boolean;
+  reservationId?: number;
+};
+
+export type SetEquipmentStateType = Omit<SetEquipmentType, "equipmentList"> & {
+  equipmentList: EquipmentListItemState[];
 };
 
 type CartState = {
@@ -18,16 +24,21 @@ type CartState = {
   addEquipment: (equipment: EquipmentListItemState[]) => void;
   removeEquipment: (equipmentId: EquipmentListItemState["equipmentId"]) => void;
 
-  equipmentSetList: SetEquipmentType[];
-  addEquipmentSet: (setEquipment: SetEquipmentType[]) => void;
-  removeEquipmentSet: (setEquipmentId: SetEquipmentType["id"]) => void;
-  changeEquipmentSet: (setEquipment: SetEquipmentType) => void;
+  equipmentSetList: SetEquipmentStateType[];
+  setEquipmentSetList: (list: SetEquipmentStateType[]) => void;
+  addEquipmentSet: (setEquipment: SetEquipmentStateType[]) => void;
+  removeEquipmentSet: (setEquipmentId: SetEquipmentStateType["id"]) => void;
+  changeEquipmentSet: (setEquipment: SetEquipmentStateType) => void;
 
   dateRange: { startDate: string | undefined; endDate: string | undefined };
   onChangeDate: (key: "startDate" | "endDate", date: string) => void;
   setDateRange: (dateRange: { startDate: string; endDate: string }) => void;
+
   isCartOpen: boolean;
   setIsCartOpen: (isOpen: boolean) => void;
+
+  isChecked: boolean;
+  setIsChecked: (isChecked: boolean) => void;
 };
 
 const initialState = {
@@ -40,8 +51,10 @@ export const useCartStore = create<CartState>((set, get) => ({
   setIsCartOpen: (isOpen) => set({ isCartOpen: isOpen }),
   list: [],
   setList: (list) => set({ list }),
-
+  isChecked: false,
+  setIsChecked: (isChecked) => set({ isChecked }),
   equipmentSetList: [],
+  setEquipmentSetList: (list) => set({ equipmentSetList: list }),
   addEquipmentSet: (setEquipment) =>
     set({ equipmentSetList: [...get().equipmentSetList, ...setEquipment] }),
   removeEquipmentSet: (setEquipmentId) =>
