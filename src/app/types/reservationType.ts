@@ -52,7 +52,7 @@ export type ReservationDetailType = ReservationType & {
   discountPrice?: number;
   totalPrice: number;
   paymentMethod?: PaymentMethod;
-  equipmnetList: QuoteItemType[];
+  equipmentList: QuoteItemType[];
   setList: {
     id: SetEquipmentType["id"];
     title: SetEquipmentType["title"];

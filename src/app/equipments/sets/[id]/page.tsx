@@ -18,7 +18,7 @@ import { useCallback } from "react";
 import styles from "./setDetailPage.module.scss";
 import { useSetEquipmentDetail } from "./hooks/useSetEquipmentDetail";
 import { isEmpty } from "lodash";
-import { SetEquipmentItem } from "../modules/SetEquipmentItem";
+import { GroupEquipmentItem } from "../modules/GroupEquipmentItem";
 
 const SetEquipmentDetailPage = () => {
   const router = useRouter();
@@ -102,7 +102,7 @@ const SetEquipmentDetailPage = () => {
                   <div className={styles.equipmentListWrapper}>
                     {setEquipmentDetail.equipmentList.map((item) => {
                       return (
-                        <SetEquipmentItem
+                        <GroupEquipmentItem
                           key={item.id}
                           item={item}
                           isSelectable={false}

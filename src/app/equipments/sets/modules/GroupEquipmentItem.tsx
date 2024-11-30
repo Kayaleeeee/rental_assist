@@ -15,7 +15,7 @@ type Props =
       item: EquipmentListItemType;
     };
 
-export const SetEquipmentItem = ({ item, ...props }: Props) => {
+export const GroupEquipmentItem = ({ item, ...props }: Props) => {
   const handleClickItem = useCallback(
     (item: EquipmentListItemType) => {
       if (props.isSelectable) {

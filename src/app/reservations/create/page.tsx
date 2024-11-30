@@ -23,10 +23,7 @@ import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../hooks/useReservationForm";
-import {
-  convertEquipmentItemToState,
-  useEquipmentCart,
-} from "@/app/equipments/hooks/useEquipmentCart";
+import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { getAvailableStatus } from "@/app/components/Cart";
 import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
 import { GroupEquipmentSearchModal } from "../modules/form/GroupEquipmentSearchModal";
@@ -37,6 +34,7 @@ import {
 import { isNil } from "lodash";
 import { onCreateReservation } from "../actions/createReservation";
 import { useRouter } from "next/navigation";
+import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 
 const ReservationCreatePage = () => {
   const router = useRouter();

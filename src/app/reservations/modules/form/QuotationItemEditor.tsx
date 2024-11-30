@@ -143,11 +143,11 @@ export const QuotationItemEditor = ({
                 <div className={styles.diffPrice}>조정 가격: {priceDiff}원</div>
               )}
             </div>
-            <div className={styles.totalPrice}>
-              총 {formatLocaleString(quoteState?.totalPrice || 0)}원
-            </div>
           </div>
         )}
+        <div className={styles.totalPrice}>
+          총 {formatLocaleString(quoteState?.totalPrice || 0)}원
+        </div>
       </div>
     </div>
   );

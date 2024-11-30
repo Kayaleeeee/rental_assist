@@ -24,12 +24,9 @@ import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../../hooks/useReservationForm";
 import { useParams } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
-import { isEmpty, isNil } from "lodash";
+import { isNil } from "lodash";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
-import {
-  convertEquipmentItemToState,
-  useEquipmentCart,
-} from "@/app/equipments/hooks/useEquipmentCart";
+import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { onUpdateReservation } from "../../actions/updateReservation";
 import { QuoteItemType } from "@/app/types/quoteType";
 import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
@@ -38,6 +35,7 @@ import {
   ReservationDetailType,
   ReservationType,
 } from "@/app/types/reservationType";
+import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 
 const convertQuoteItemToEquipmentState = (
   item: QuoteItemType
@@ -99,7 +97,7 @@ const ReservationEditPage = () => {
 
     setDiscountPriceState(detail.discountPrice ?? 0);
     setIsDiscounted(!isNil(detail.discountPrice) && detail.discountPrice > 0);
-    const quoteItemList = detail.equipmnetList.map(
+    const quoteItemList = detail.equipmentList.map(
       convertQuoteItemToEquipmentState
     );
     setEquipmentItemList(quoteItemList);

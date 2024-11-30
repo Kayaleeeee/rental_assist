@@ -33,6 +33,10 @@ import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined
 import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
 import { QuotationItem } from "../modules/form/QuotationItem";
 import { isEmpty } from "lodash";
+import { SetEquipmentAccordion } from "@/app/equipments/sets/modules/SetEquipmentAccordion";
+import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
+import { convertQuoteItemToEquipmentItem } from "@/app/types/mapper/converQuoteItemToEquipmentItem";
+import { GroupEquipment } from "@/app/equipments/sets/modules/GroupEquipment";
 
 const defaultString = "-";
 
@@ -121,6 +125,8 @@ const ReservationDetailPage = () => {
     [reservationDetail]
   );
 
+  console.log(reservationDetail);
+
   if (!reservationDetail) return null;
 
   return (
@@ -159,7 +165,7 @@ const ReservationDetailPage = () => {
           />
         </div>
 
-        <div className={styles.inlineWrapper}>
+        <div className={styles.inlineFlexStartWrapper}>
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <div
               className={styles.clickableLabelWrapper}
@@ -211,7 +217,7 @@ const ReservationDetailPage = () => {
         </div>
 
         <Label title="고객 정보" />
-        <div className={styles.inlineWrapper}>
+        <div className={styles.inlineFlexStartWrapper}>
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <Label title="이름" />
             <EditableField
@@ -233,25 +239,45 @@ const ReservationDetailPage = () => {
         <div className={formStyles.sectionWrapper}>
           <Margin top={20} />
 
-          {rentalDays > 0 && (
-            <div className={formStyles.sectionWrapper}>
-              <Label title="대여 장비 목록" />
+          <div className={formStyles.sectionWrapper}>
+            <Label title="대여 장비 목록" />
 
-              <div className={styles.equipmentListWrapper}>
-                {reservationDetail.equipmnetList.map((quote) => {
+            <div className={styles.equipmentListWrapper}>
+              {reservationDetail.equipmentList.map((quote) => {
+                return (
+                  <QuotationItem
+                    key={quote.id}
+                    quoteItem={quote}
+                    rentalDays={rentalDays}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          {!isEmpty(reservationDetail.setList) && (
+            <Margin>
+              <Label title="풀세트 리스트" />
+              <div>
+                {reservationDetail.setList.map((item) => {
+                  const convertedList = item.equipmentList.map(
+                    convertQuoteItemToEquipmentItem
+                  );
                   return (
-                    <QuotationItem
-                      key={quote.id}
-                      quoteItem={quote}
-                      rentalDays={rentalDays}
+                    <GroupEquipment
+                      key={item.id}
+                      title={item.title}
+                      price={item.price}
+                      totalPrice={item.totalPrice}
+                      equipmentList={convertedList}
                     />
                   );
                 })}
               </div>
-            </div>
+            </Margin>
           )}
 
-          {!isEmpty(reservationDetail.equipmnetList.length) && (
+          {!isEmpty(reservationDetail.equipmentList.length) && (
             <div className={styles.priceSection}>
               <div className={styles.discountPriceWrapper}>
                 <Label title="정가" />

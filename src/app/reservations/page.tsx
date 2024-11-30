@@ -79,7 +79,8 @@ export default function ReservationListPage() {
   } = useReservationList();
 
   useEffect(() => {
-    fetchReservationList();
+    const params = getSearchParams();
+    fetchReservationList(params);
   }, []);
 
   const onSearch = () => {

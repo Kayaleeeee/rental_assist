@@ -5,10 +5,7 @@ import styles from "./index.module.scss";
 import { Label } from "../Form/Label";
 import { Margin } from "../Margin";
 import { DateTimeSelector } from "../DateTimeSelector";
-import {
-  convertEquipmentItemToState,
-  useEquipmentCart,
-} from "@/app/equipments/hooks/useEquipmentCart";
+import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -17,6 +14,7 @@ import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEq
 import { isEmpty } from "lodash";
 import { EquipmentSearchModal } from "@/app/reservations/modules/form/EquipmentSearchModal";
 import { SetEquipmentType } from "@/app/types/equipmentType";
+import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 
 export const getAvailableStatus = (
   isChecked: boolean,

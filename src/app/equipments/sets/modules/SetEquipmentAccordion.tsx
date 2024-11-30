@@ -9,7 +9,7 @@ import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { Margin } from "@/app/components/Margin";
 import { Button } from "@/app/components/Button";
-import { SetEquipmentItem } from "./SetEquipmentItem";
+import { GroupEquipmentItem } from "./GroupEquipmentItem";
 import Link from "next/link";
 
 type Props = {
@@ -52,11 +52,11 @@ export const SetEquipmentAccordion = ({
       <AccordionDetails>
         <div className={styles.equipmentListWrapper}>
           {equipmentList.map((item) => (
-            <SetEquipmentItem
+            <GroupEquipmentItem
               key={item.id}
               item={item}
               isSelectable
-              toggleItem={() => toggleEquipmentItem(item)}
+              toggleItem={() => toggleEquipmentItem?.(item)}
               isSelected={selectedEquipmentList.some(
                 (selectedItem) => selectedItem.id === item.id
               )}

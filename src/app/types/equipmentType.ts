@@ -7,8 +7,8 @@ export type EquipmentListItemType = {
   title: string;
   price: number;
   category: string;
-  detail: string;
-  disabled: boolean;
+  detail?: string;
+  disabled?: boolean;
   quantity: number;
 };
 

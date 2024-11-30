@@ -10,17 +10,6 @@ import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
 import { useCallback, useMemo } from "react";
 
-export const convertEquipmentItemToState = (
-  equipment: EquipmentListItemType
-): EquipmentListItemState => ({
-  equipmentId: equipment.id,
-  title: equipment.title,
-  quantity: equipment.quantity,
-  price: equipment.price,
-  totalPrice: equipment.price,
-  isAvailable: true,
-});
-
 export const useEquipmentCart = () => {
   const {
     resetCart,
@@ -156,10 +145,15 @@ export const useEquipmentCart = () => {
 
   const handleAddEquipmentGroup = useCallback(
     (equipmentList: SetEquipmentStateType[]) => {
-      addEquipmentGroup(equipmentList);
+      addEquipmentGroup(
+        equipmentList.map((set) => ({
+          ...set,
+          totalPrice: set.price * rentalDays,
+        }))
+      );
       setIsChecked(false);
     },
-    []
+    [rentalDays]
   );
 
   const handleDeleteEquipmentItem = useCallback(
