@@ -13,22 +13,27 @@ export type EquipmentListItemState = {
   reservationId?: number;
 };
 
-export type SetEquipmentStateType = Omit<SetEquipmentType, "equipmentList"> & {
+export type SetEquipmentStateType = Omit<
+  SetEquipmentType,
+  "equipmentList" | "detail" | "memo"
+> & {
   equipmentList: EquipmentListItemState[];
 };
 
 type CartState = {
-  list: EquipmentListItemState[];
-  setList: (list: EquipmentListItemState[]) => void;
+  equipmentItemList: EquipmentListItemState[];
+  setEquipmentItemList: (list: EquipmentListItemState[]) => void;
+
   resetCart: () => void;
   addEquipment: (equipment: EquipmentListItemState[]) => void;
   removeEquipment: (equipmentId: EquipmentListItemState["equipmentId"]) => void;
+  changeEquipmentItem: (equipment: EquipmentListItemState) => void;
 
-  equipmentSetList: SetEquipmentStateType[];
-  setEquipmentSetList: (list: SetEquipmentStateType[]) => void;
-  addEquipmentSet: (setEquipment: SetEquipmentStateType[]) => void;
-  removeEquipmentSet: (setEquipmentId: SetEquipmentStateType["id"]) => void;
-  changeEquipmentSet: (setEquipment: SetEquipmentStateType) => void;
+  equipmentGroupList: SetEquipmentStateType[];
+  setEquipmentGroupList: (list: SetEquipmentStateType[]) => void;
+  addEquipmentGroup: (setEquipment: SetEquipmentStateType[]) => void;
+  removeEquipmentGroup: (setEquipmentId: SetEquipmentStateType["id"]) => void;
+  changeEquipmentGroup: (setEquipment: SetEquipmentStateType) => void;
 
   dateRange: { startDate: string | undefined; endDate: string | undefined };
   onChangeDate: (key: "startDate" | "endDate", date: string) => void;
@@ -42,35 +47,53 @@ type CartState = {
 };
 
 const initialState = {
-  list: [],
+  isCartOpen: false,
+  isChecked: false,
+  equipmentItemList: [],
+  equipmentGroupList: [],
   dateRange: { startDate: undefined, endDate: undefined },
 };
 
 export const useCartStore = create<CartState>((set, get) => ({
-  isCartOpen: false,
+  ...initialState,
   setIsCartOpen: (isOpen) => set({ isCartOpen: isOpen }),
-  list: [],
-  setList: (list) => set({ list }),
-  isChecked: false,
-  setIsChecked: (isChecked) => set({ isChecked }),
-  equipmentSetList: [],
-  setEquipmentSetList: (list) => set({ equipmentSetList: list }),
-  addEquipmentSet: (setEquipment) =>
-    set({ equipmentSetList: [...get().equipmentSetList, ...setEquipment] }),
-  removeEquipmentSet: (setEquipmentId) =>
+  setEquipmentItemList: (list) => set({ equipmentItemList: list }),
+  changeEquipmentItem: (item) => {
     set({
-      equipmentSetList: get().equipmentSetList.filter(
+      equipmentItemList: get().equipmentItemList.map((prevItem) =>
+        prevItem.equipmentId === item.equipmentId ? item : prevItem
+      ),
+    });
+  },
+  addEquipment: (equipment) =>
+    set({ equipmentItemList: [...get().equipmentItemList, ...equipment] }),
+  removeEquipment: (equipmentId) =>
+    set({
+      equipmentItemList: get().equipmentItemList.filter(
+        (equipment) => equipment.equipmentId !== equipmentId
+      ),
+    }),
+
+  setIsChecked: (isChecked) => set({ isChecked }),
+
+  setEquipmentGroupList: (list) => set({ equipmentGroupList: list }),
+  addEquipmentGroup: (setEquipment) =>
+    set({
+      equipmentGroupList: [...get().equipmentGroupList, ...setEquipment],
+    }),
+  removeEquipmentGroup: (setEquipmentId) =>
+    set({
+      equipmentGroupList: get().equipmentGroupList.filter(
         (setEquipment) => setEquipment.id !== setEquipmentId
       ),
     }),
-  changeEquipmentSet: (changedSet) => {
+  changeEquipmentGroup: (changedSet) => {
     set({
-      equipmentSetList: get().equipmentSetList.map((setEquipmentItem) =>
+      equipmentGroupList: get().equipmentGroupList.map((setEquipmentItem) =>
         setEquipmentItem.id === changedSet.id ? changedSet : setEquipmentItem
       ),
     });
   },
-  dateRange: { startDate: undefined, endDate: undefined },
   onChangeDate: (key, date) => {
     set({ dateRange: { ...get().dateRange, [key]: date } });
   },
@@ -80,11 +103,4 @@ export const useCartStore = create<CartState>((set, get) => ({
   resetCart: () => {
     set(initialState);
   },
-  addEquipment: (equipment) => set({ list: [...get().list, ...equipment] }),
-  removeEquipment: (equipmentId) =>
-    set({
-      list: get().list.filter(
-        (equipment) => equipment.equipmentId !== equipmentId
-      ),
-    }),
 }));

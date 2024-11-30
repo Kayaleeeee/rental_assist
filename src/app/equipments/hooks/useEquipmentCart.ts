@@ -23,20 +23,25 @@ export const convertEquipmentItemToState = (
 
 export const useEquipmentCart = () => {
   const {
-    list,
     resetCart,
-    onChangeDate,
     dateRange,
-    setList,
-    setEquipmentSetList,
+    onChangeDate,
+    setDateRange,
     isCartOpen,
     setIsCartOpen,
-    equipmentSetList,
-    changeEquipmentSet,
-    removeEquipment,
-    removeEquipmentSet,
-    addEquipmentSet,
+
+    equipmentItemList,
+    setEquipmentItemList,
     addEquipment,
+    removeEquipment,
+    changeEquipmentItem,
+
+    equipmentGroupList,
+    setEquipmentGroupList,
+    changeEquipmentGroup,
+    removeEquipmentGroup,
+    addEquipmentGroup,
+
     isChecked,
     setIsChecked,
   } = useCartStore();
@@ -54,9 +59,9 @@ export const useEquipmentCart = () => {
 
     try {
       const [checkedList, checkedSetList] = await Promise.all([
-        checkListAvailability(list),
+        checkListAvailability(equipmentItemList),
         Promise.all(
-          equipmentSetList.map(async (set) => {
+          equipmentGroupList.map(async (set) => {
             const checkedEquipmentList = await checkListAvailability(
               set.equipmentList
             );
@@ -68,8 +73,8 @@ export const useEquipmentCart = () => {
         ),
       ]);
 
-      if (checkedList) setList(checkedList);
-      if (checkedSetList) setEquipmentSetList(checkedSetList);
+      if (checkedList) setEquipmentItemList(checkedList);
+      if (checkedSetList) setEquipmentGroupList(checkedSetList);
     } catch {
       showToast({
         message: "장비 스케줄 검색에 실패했습니다.",
@@ -78,14 +83,14 @@ export const useEquipmentCart = () => {
     } finally {
       setIsChecked(true);
     }
-  }, [equipmentSetList, list, dateRange]);
+  }, [equipmentGroupList, equipmentItemList, dateRange]);
 
   const checkListAvailability = useCallback(
-    async (list: EquipmentListItemState[]) => {
-      if (isEmpty(list)) return;
+    async (equipmentItemList: EquipmentListItemState[]) => {
+      if (isEmpty(equipmentItemList)) return;
 
       const result = await Promise.all(
-        list.map((item) =>
+        equipmentItemList.map((item) =>
           checkAvailabilityById(item.equipmentId, item.quantity, {
             startDate: dateRange.startDate!,
             endDate: dateRange.endDate!,
@@ -93,7 +98,7 @@ export const useEquipmentCart = () => {
         )
       );
 
-      const checkedList = list.map((item, index) => {
+      const checkedList = equipmentItemList.map((item, index) => {
         const target = result[index];
         return {
           ...item,
@@ -119,7 +124,11 @@ export const useEquipmentCart = () => {
         endDate: dateRange.endDate,
       });
 
-      if (isEmpty(result))
+      const sumOfQuantity = result.reduce((prev, acc) => {
+        return (prev += acc.quantity);
+      }, 0);
+
+      if (isEmpty(result) || quantity - sumOfQuantity < 0)
         return { id, isAvailable: true, reservationId: undefined };
 
       return { id, isAvailable: false, reservationId: result[0].reservationId };
@@ -134,8 +143,8 @@ export const useEquipmentCart = () => {
   }, [dateRange]);
 
   const hasUnavailableItem = useMemo(() => {
-    return list.some((item) => !item.isAvailable);
-  }, [list]);
+    return equipmentItemList.some((item) => !item.isAvailable);
+  }, [equipmentItemList]);
 
   const handleAddEquipment = useCallback(
     (itemList: EquipmentListItemState[]) => {
@@ -146,8 +155,8 @@ export const useEquipmentCart = () => {
   );
 
   const handleAddEquipmentSet = useCallback(
-    (setList: SetEquipmentStateType[]) => {
-      addEquipmentSet(setList);
+    (setEquipmentItemList: SetEquipmentStateType[]) => {
+      addEquipmentGroup(setEquipmentItemList);
       setIsChecked(false);
     },
     []
@@ -163,14 +172,19 @@ export const useEquipmentCart = () => {
 
   const handleDeleteSetEquipment = useCallback(
     (setId: SetEquipmentStateType["id"]) => {
-      removeEquipmentSet(setId);
+      removeEquipmentGroup(setId);
       setIsChecked(false);
     },
     []
   );
 
   const handleChangeSetEquipment = (setEquipment: SetEquipmentStateType) => {
-    changeEquipmentSet(setEquipment);
+    changeEquipmentGroup(setEquipment);
+    setIsChecked(false);
+  };
+
+  const handleChangeEquipmentItem = (equipemtItem: EquipmentListItemState) => {
+    changeEquipmentItem(equipemtItem);
     setIsChecked(false);
   };
 
@@ -178,7 +192,7 @@ export const useEquipmentCart = () => {
     setEquipment: SetEquipmentStateType,
     equipmentItemId: EquipmentListItemState["equipmentId"]
   ) => {
-    changeEquipmentSet({
+    changeEquipmentGroup({
       ...setEquipment,
       equipmentList: setEquipment.equipmentList.filter(
         (item) => item.equipmentId !== equipmentItemId
@@ -192,22 +206,29 @@ export const useEquipmentCart = () => {
     handleCheckAvailability,
     onChangeDate,
     dateRange,
+    setDateRange,
     resetCart,
+    rentalDays,
 
+    //flag 변수
+    isCartOpen,
+    setIsCartOpen,
     isChecked,
     setIsChecked,
 
-    handleDeleteEquipmentItem,
+    //세트 아이템
+    equipmentGroupList,
     handleDeleteSetEquipment,
     handleDeleteSetEquipmentItem,
     handleChangeSetEquipment,
-    setList,
-    rentalDays,
-    isCartOpen,
-    setIsCartOpen,
-    equipmentList: list,
-    equipmentSetList,
-    handleAddEquipment,
     handleAddEquipmentSet,
+    setEquipmentGroupList,
+
+    //단품 아이템
+    equipmentItemList,
+    handleAddEquipment,
+    handleDeleteEquipmentItem,
+    handleChangeEquipmentItem,
+    setEquipmentItemList,
   };
 };

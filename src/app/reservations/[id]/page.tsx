@@ -32,6 +32,7 @@ import { PaymentStatusChangeModal } from "../modules/list/PaymentStatusChangeMod
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
 import { QuotationItem } from "../modules/form/QuotationItem";
+import { isEmpty } from "lodash";
 
 const defaultString = "-";
 
@@ -237,7 +238,7 @@ const ReservationDetailPage = () => {
               <Label title="대여 장비 목록" />
 
               <div className={styles.equipmentListWrapper}>
-                {reservationDetail.quoteItems.map((quote) => {
+                {reservationDetail.equipmnetList.map((quote) => {
                   return (
                     <QuotationItem
                       key={quote.id}
@@ -250,7 +251,7 @@ const ReservationDetailPage = () => {
             </div>
           )}
 
-          {reservationDetail.quoteItems.length > 0 && (
+          {!isEmpty(reservationDetail.equipmnetList.length) && (
             <div className={styles.priceSection}>
               <div className={styles.discountPriceWrapper}>
                 <Label title="정가" />

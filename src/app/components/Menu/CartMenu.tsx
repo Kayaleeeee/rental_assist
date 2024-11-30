@@ -5,11 +5,12 @@ import { Margin } from "../Margin";
 import { useMemo } from "react";
 
 export const CartMenu = () => {
-  const { list, setIsCartOpen, equipmentSetList } = useCartStore();
+  const { equipmentItemList, setIsCartOpen, equipmentGroupList } =
+    useCartStore();
 
   const cartItemCount = useMemo(() => {
-    return list.length + equipmentSetList.length;
-  }, [list, equipmentSetList]);
+    return equipmentItemList.length + equipmentGroupList.length;
+  }, [equipmentItemList, equipmentGroupList]);
 
   return (
     <div className={styles.item} onClick={() => setIsCartOpen(true)}>

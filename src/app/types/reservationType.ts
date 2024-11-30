@@ -1,3 +1,4 @@
+import { SetEquipmentType } from "./equipmentType";
 import { ListParamsType } from "./listType";
 import { QuoteItemType } from "./quoteType";
 import { UserType } from "./userType";
@@ -5,9 +6,9 @@ import { UserType } from "./userType";
 export type ReservationType = {
   id: number;
   createdAt: string;
+  updatedAt?: string;
   quoteId: QuoteItemType["id"];
   userId: number;
-  updatedAt?: string;
   status: ReservationStatus;
   paymentStatus: PaymentStatus;
   totalPrice: number;
@@ -42,7 +43,6 @@ export type ReservationPostPayload = {
 };
 
 export type ReservationDetailType = ReservationType & {
-  quoteItems: QuoteItemType[];
   quoteId: QuoteItemType["id"];
   quoteTitle: string;
   createdBy: string;
@@ -50,7 +50,17 @@ export type ReservationDetailType = ReservationType & {
   phoneNumber: UserType["phoneNumber"];
   supplyPrice: number;
   discountPrice?: number;
+  totalPrice: number;
   paymentMethod?: PaymentMethod;
+  equipmnetList: QuoteItemType[];
+  setList: {
+    id: SetEquipmentType["id"];
+    title: SetEquipmentType["title"];
+    price: SetEquipmentType["price"];
+    discountedPrice: number;
+    totalPrice: number;
+    equipmentList: QuoteItemType[];
+  }[];
 };
 
 export type ReservationSearchParams = ListParamsType<{

@@ -164,6 +164,8 @@ export default function EquipmentPage() {
           setSelectedEquipmentSetList={setSelectedEquipmentSetList}
         />
       )}
+      <Margin top={120} />
+
       {!isEmpty([...selectedEquipmentList, ...selectedEquipmentSetList]) && (
         <div className={styles.fixedFooter}>
           <Button

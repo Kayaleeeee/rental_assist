@@ -41,7 +41,7 @@ export const Cart = () => {
     dateRange,
     handleCheckAvailability,
     isChecked,
-    setList,
+    setEquipmentItemList,
     rentalDays,
     setIsCartOpen,
     isCartOpen,
@@ -49,8 +49,8 @@ export const Cart = () => {
     handleDeleteSetEquipment,
     handleDeleteEquipmentItem,
     handleDeleteSetEquipmentItem,
-    equipmentList,
-    equipmentSetList,
+    equipmentItemList,
+    equipmentGroupList,
   } = useEquipmentCart();
 
   const handleCloseCart = () => {
@@ -75,8 +75,8 @@ export const Cart = () => {
     if (!isOkToMakeReservation) {
       handleCheckAvailability();
     } else {
-      setList(
-        equipmentList.map((item) => ({
+      setEquipmentItemList(
+        equipmentItemList.map((item) => ({
           equipmentId: item.equipmentId,
           title: item.title,
           price: item.price,
@@ -89,22 +89,22 @@ export const Cart = () => {
     }
   }, [
     isOkToMakeReservation,
-    equipmentList,
+    equipmentItemList,
     handleCheckAvailability,
-    setList,
+    setEquipmentItemList,
     router,
     rentalDays,
   ]);
 
   const disabledEquipmentIdList = useMemo(() => {
-    const equipmentIdList = equipmentList.map((item) => item.equipmentId);
+    const equipmentIdList = equipmentItemList.map((item) => item.equipmentId);
 
-    const setItemList = equipmentSetList
+    const setItemList = equipmentGroupList
       .flatMap((item) => item.equipmentList)
       .map((item) => item.equipmentId);
 
     return [...equipmentIdList, ...setItemList];
-  }, [equipmentList, equipmentSetList]);
+  }, [equipmentItemList, equipmentGroupList]);
 
   if (!isCartOpen) return null;
 
@@ -138,11 +138,11 @@ export const Cart = () => {
             />
           </div>
 
-          {!isEmpty(equipmentList) && (
+          {!isEmpty(equipmentItemList) && (
             <Margin bottom={20}>
               <Label title="단품 장비 리스트" />
               <div className={styles.equipmentListWrapper}>
-                {equipmentList.map((item) => {
+                {equipmentItemList.map((item) => {
                   return (
                     <QuotationItemEditor
                       key={item.equipmentId}
@@ -164,11 +164,11 @@ export const Cart = () => {
             </Margin>
           )}
 
-          {!isEmpty(equipmentSetList) && (
+          {!isEmpty(equipmentGroupList) && (
             <Margin>
               <Label title="풀세트 리스트" />
               <div>
-                {equipmentSetList.map((item) => {
+                {equipmentGroupList.map((item) => {
                   return (
                     <SetEquipmentAccordionEditor
                       key={item.id}
@@ -214,7 +214,7 @@ export const Cart = () => {
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={(newList) => {
             if (searchingSetId) {
-              const changedSet = equipmentSetList.find(
+              const changedSet = equipmentGroupList.find(
                 (set) => set.id === searchingSetId
               );
 

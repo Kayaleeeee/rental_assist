@@ -11,22 +11,36 @@ import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EquipmentSearchModal } from "../../modules/form/EquipmentSearchModal";
 import { QuotationItemEditor } from "../../modules/form/QuotationItemEditor";
-import {
-  formatKoreanCurrency,
-  formatLocaleString,
-} from "@/app/utils/priceUtils";
+// import {
+//   formatKoreanCurrency,
+//   formatLocaleString,
+// } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
-// import { useEquipmentListWithRentedDates } from "@/app/equipments/hooks/useEquipmentListWithRentedDates";
 import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../../hooks/useReservationForm";
 import { useParams } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
 import { isNil } from "lodash";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
+import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
+import { onUpdateReservation } from "../../actions/updateReservation";
+import { QuoteItemType } from "@/app/types/quoteType";
+
+const convertQuoteItemToEquipmentState = (
+  item: QuoteItemType
+): EquipmentListItemState => {
+  return {
+    equipmentId: item.equipmentId,
+    title: item.equipmentName,
+    quantity: item.quantity,
+    price: item.price,
+    totalPrice: item.totalPrice,
+  };
+};
 
 const ReservationEditPage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -38,37 +52,30 @@ const ReservationEditPage = () => {
   const isFirstRender = useRef(true);
   const quoteItemListStateRef = useRef<EquipmentListItemState[]>([]);
 
-  const {
-    form,
-    setForm,
-    onChangeForm,
-    quoteItemListState,
-    setDateRange,
-    setQuoteItemListState,
-    onChangeQuoteItem,
-    onDeleteQuoteItem,
-    onAddQuoteItemList,
-    rentalDays,
-    totalPrice,
-    totalSupplyPrice,
-    onChangeDate,
-    onEditQuote,
-    dateRange,
-  } = useReservationForm();
-
+  const { form, setForm, onChangeForm } = useReservationForm();
   const { detail } = useReservationDetail(reservationId);
 
-  // const { list: rentedEquipmentList, fetchList: fetchEquipmentRentedDateList } =
-  //   useEquipmentListWithRentedDates({
-  //     startDate: dateRange.startDate,
-  //     endDate: dateRange.endDate,
-  //   });
+  const {
+    // hasUnavailableItem,
+    onChangeDate,
+    setDateRange,
+    dateRange,
+    // handleCheckAvailability,
+    // isChecked,
+    rentalDays,
 
-  // useEffect(() => {
-  //   if (isOpenSearchModal) {
-  //     fetchEquipmentRentedDateList();
-  //   }
-  // }, [isOpenSearchModal]);
+    // resetCart,
+    // handleChangeSetEquipment,
+    // handleDeleteSetEquipment,
+    handleDeleteEquipmentItem,
+    // handleDeleteSetEquipmentItem,
+    handleChangeEquipmentItem,
+    equipmentItemList,
+    setEquipmentItemList,
+
+    equipmentGroupList,
+    setEquipmentGroupList,
+  } = useEquipmentCart();
 
   useEffect(() => {
     if (!reservationId || !detail) return;
@@ -83,15 +90,16 @@ const ReservationEditPage = () => {
 
     setDiscountPriceState(detail.discountPrice ?? 0);
     setIsDiscounted(!isNil(detail.discountPrice) && detail.discountPrice > 0);
-    const quoteItemList = detail.quoteItems.map((item) => ({
-      equipmentId: item.equipmentId,
-      price: item.price,
-      quantity: item.quantity,
-      totalPrice: item.price * item.quantity * rentalDays,
-      title: item.equipmentName,
-      id: item.id,
-    }));
-    setQuoteItemListState(quoteItemList);
+    const quoteItemList = detail.equipmnetList.map(
+      convertQuoteItemToEquipmentState
+    );
+    setEquipmentItemList(quoteItemList);
+    setEquipmentGroupList(
+      detail.setList.map((set) => ({
+        ...set,
+        equipmentList: set.equipmentList.map(convertQuoteItemToEquipmentState),
+      }))
+    );
     quoteItemListStateRef.current = quoteItemList;
   }, [detail, reservationId, rentalDays]);
 
@@ -123,14 +131,25 @@ const ReservationEditPage = () => {
   const handleSaveForm = useCallback(() => {
     if (!detail?.quoteId) return;
 
-    onEditQuote(detail.quoteId, reservationId, [
-      ...quoteItemListStateRef.current,
-    ]);
-  }, [detail?.quoteId, reservationId, onEditQuote]);
+    onUpdateReservation({
+      quoteId: detail.quoteId,
+      reservationId,
+      form,
+      dateRange,
+      originQuoteItemList: [...quoteItemListStateRef.current],
+      equipmentItemList,
+      groupEquipmentList: equipmentGroupList,
+    });
+  }, [detail?.quoteId, reservationId, setEquipmentItemList]);
 
   const existIdList = useMemo(() => {
-    return quoteItemListState.map((item) => item.equipmentId);
-  }, [quoteItemListState]);
+    const equipmentIdList = equipmentItemList.map((item) => item.equipmentId);
+    const groupEquipmentItemIdList = equipmentGroupList
+      .flatMap((item) => item.equipmentList)
+      .map((item) => item.equipmentId);
+
+    return [...equipmentIdList, ...groupEquipmentItemIdList];
+  }, [equipmentItemList, equipmentGroupList]);
 
   return (
     <div>
@@ -202,18 +221,16 @@ const ReservationEditPage = () => {
               </Margin>
 
               <div className={styles.equipmentListWrapper}>
-                {quoteItemListState.map((quote) => {
+                {equipmentItemList.map((quote) => {
                   return (
                     <QuotationItemEditor
                       key={quote.equipmentId}
                       rentalDays={rentalDays}
                       quoteState={quote}
                       availableStatus="unknown"
-                      onChangeField={(state) =>
-                        onChangeQuoteItem(quote.equipmentId, state)
-                      }
+                      onChangeField={handleChangeEquipmentItem}
                       onDeleteEquipment={() =>
-                        onDeleteQuoteItem(quote.equipmentId)
+                        handleDeleteEquipmentItem(quote.equipmentId)
                       }
                     />
                   );
@@ -221,11 +238,11 @@ const ReservationEditPage = () => {
               </div>
             </div>
           )}
-          {quoteItemListState.length > 0 && (
+          {equipmentItemList.length > 0 && (
             <div className={styles.priceSection}>
               <div className={styles.discountPriceWrapper}>
                 <Label title="정가" />
-                <div>{formatLocaleString(totalSupplyPrice)}원</div>
+                {/* <div>{formatLocaleString(totalSupplyPrice)}원</div> */}
               </div>
               {isDiscounted ? (
                 <div className={styles.discountPriceWrapper}>
@@ -263,9 +280,9 @@ const ReservationEditPage = () => {
 
               <div className={styles.totalPriceWrapper}>
                 <div className={styles.totalPrice}>
-                  총 {formatLocaleString(totalPrice)}원 (
+                  {/* 총 {formatLocaleString(totalPrice)}원 ( */}
                 </div>
-                <div> {formatKoreanCurrency(totalPrice)})</div>
+                {/* <div> {formatKoreanCurrency(totalPrice)})</div> */}
               </div>
             </div>
           )}
@@ -285,7 +302,7 @@ const ReservationEditPage = () => {
         <EquipmentSearchModal
           disabledIdList={existIdList}
           onCloseModal={() => setIsOpenSearchModal(false)}
-          onConfirm={onAddQuoteItemList}
+          onConfirm={() => {}}
         />
       )}
       {isOpenUserModal && (

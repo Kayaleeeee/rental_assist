@@ -9,6 +9,8 @@ export type QuoteItemType = {
   equipmentName: EquipmentDetailType["title"];
   quantity: number;
   price: number;
+  discountPrice?: number;
+  totalPrice: number;
 };
 
 export type QuoteType = {
