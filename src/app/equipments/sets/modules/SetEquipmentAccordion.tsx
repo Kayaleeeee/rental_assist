@@ -21,11 +21,13 @@ type Props = {
   isAllSelected: boolean;
   toggleSelectAll: () => void;
   toggleEquipmentItem: (item: EquipmentListItemType) => void;
+  hideDetailButton?: boolean;
 };
 
 export const SetEquipmentAccordion = ({
   title,
   price,
+  hideDetailButton = false,
   equipmentList = [],
   isAllSelected = false,
   selectedEquipmentList,
@@ -64,11 +66,13 @@ export const SetEquipmentAccordion = ({
         <Margin top={16} />
         <div className={styles.accordionFooter}>
           <div className={styles.price}>{formatLocaleString(price)}원</div>
-          <Link href={`/equipments/sets/${setId}`}>
-            <Button variant="outlined" size="Small">
-              상세보기
-            </Button>
-          </Link>
+          {!hideDetailButton && (
+            <Link href={`/equipments/sets/${setId}`}>
+              <Button variant="outlined" size="Small">
+                상세보기
+              </Button>
+            </Link>
+          )}
         </div>
       </AccordionDetails>
     </Accordion>

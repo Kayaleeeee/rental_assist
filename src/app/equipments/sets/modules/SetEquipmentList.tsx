@@ -124,6 +124,7 @@ export const SetEquipmentList = ({
           return (
             <SetEquipmentAccordion
               key={item.id}
+              hideDetailButton
               setId={item.id}
               title={item.title}
               price={item.price}

@@ -32,7 +32,8 @@ export default function EquipmentPage() {
     SetEquipmentType[]
   >([]);
 
-  const { handleAddEquipment, handleAddEquipmentSet } = useEquipmentCart();
+  const { handleAddEquipmentList, handleAddEquipmentGroup } =
+    useEquipmentCart();
 
   const {
     list,
@@ -65,8 +66,8 @@ export default function EquipmentPage() {
       totalPrice: equipment.price,
     });
 
-    handleAddEquipment(selectedEquipmentList.map(convertItem));
-    handleAddEquipmentSet(
+    handleAddEquipmentList(selectedEquipmentList.map(convertItem));
+    handleAddEquipmentGroup(
       selectedEquipmentSetList.map((set) => ({
         ...set,
         equipmentList: set.equipmentList.map(convertItem),
@@ -80,7 +81,7 @@ export default function EquipmentPage() {
 
     setSelectedEquipmentList([]);
     setSelectedEquipmentSetList([]);
-  }, [handleAddEquipment, selectedEquipmentList, selectedEquipmentSetList]);
+  }, [handleAddEquipmentList, selectedEquipmentList, selectedEquipmentSetList]);
 
   const toggleEquipmentList = useCallback(
     (itemList: EquipmentListItemType[]) => {

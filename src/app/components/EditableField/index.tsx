@@ -3,7 +3,7 @@ import styles from "./index.module.scss";
 
 type Props = {
   isEditable?: boolean;
-  value: string | number;
+  value?: string | number;
   fontSize?: string;
 } & Omit<TextFieldProps, "variant" | "value">;
 

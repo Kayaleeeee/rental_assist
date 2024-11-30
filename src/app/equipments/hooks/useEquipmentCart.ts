@@ -146,7 +146,7 @@ export const useEquipmentCart = () => {
     return equipmentItemList.some((item) => !item.isAvailable);
   }, [equipmentItemList]);
 
-  const handleAddEquipment = useCallback(
+  const handleAddEquipmentList = useCallback(
     (itemList: EquipmentListItemState[]) => {
       addEquipment(itemList);
       setIsChecked(false);
@@ -154,9 +154,9 @@ export const useEquipmentCart = () => {
     []
   );
 
-  const handleAddEquipmentSet = useCallback(
-    (setEquipmentItemList: SetEquipmentStateType[]) => {
-      addEquipmentGroup(setEquipmentItemList);
+  const handleAddEquipmentGroup = useCallback(
+    (equipmentList: SetEquipmentStateType[]) => {
+      addEquipmentGroup(equipmentList);
       setIsChecked(false);
     },
     []
@@ -170,7 +170,7 @@ export const useEquipmentCart = () => {
     []
   );
 
-  const handleDeleteSetEquipment = useCallback(
+  const handleDeleteGroupEquipment = useCallback(
     (setId: SetEquipmentStateType["id"]) => {
       removeEquipmentGroup(setId);
       setIsChecked(false);
@@ -178,7 +178,7 @@ export const useEquipmentCart = () => {
     []
   );
 
-  const handleChangeSetEquipment = (setEquipment: SetEquipmentStateType) => {
+  const handleChangeGroupEquipment = (setEquipment: SetEquipmentStateType) => {
     changeEquipmentGroup(setEquipment);
     setIsChecked(false);
   };
@@ -188,7 +188,7 @@ export const useEquipmentCart = () => {
     setIsChecked(false);
   };
 
-  const handleDeleteSetEquipmentItem = (
+  const handleDeleteGroupEquipmentItem = (
     setEquipment: SetEquipmentStateType,
     equipmentItemId: EquipmentListItemState["equipmentId"]
   ) => {
@@ -218,15 +218,15 @@ export const useEquipmentCart = () => {
 
     //세트 아이템
     equipmentGroupList,
-    handleDeleteSetEquipment,
-    handleDeleteSetEquipmentItem,
-    handleChangeSetEquipment,
-    handleAddEquipmentSet,
+    handleDeleteGroupEquipment,
+    handleDeleteGroupEquipmentItem,
+    handleChangeGroupEquipment,
+    handleAddEquipmentGroup,
     setEquipmentGroupList,
 
     //단품 아이템
     equipmentItemList,
-    handleAddEquipment,
+    handleAddEquipmentList,
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
     setEquipmentItemList,

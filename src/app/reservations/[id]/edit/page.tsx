@@ -24,11 +24,20 @@ import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../../hooks/useReservationForm";
 import { useParams } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
-import { isNil } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
-import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
+import {
+  convertEquipmentItemToState,
+  useEquipmentCart,
+} from "@/app/equipments/hooks/useEquipmentCart";
 import { onUpdateReservation } from "../../actions/updateReservation";
 import { QuoteItemType } from "@/app/types/quoteType";
+import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
+import { getAvailableStatus } from "@/app/components/Cart";
+import {
+  ReservationDetailType,
+  ReservationType,
+} from "@/app/types/reservationType";
 
 const convertQuoteItemToEquipmentState = (
   item: QuoteItemType
@@ -61,15 +70,17 @@ const ReservationEditPage = () => {
     setDateRange,
     dateRange,
     // handleCheckAvailability,
-    // isChecked,
+    isChecked,
     rentalDays,
 
     // resetCart,
-    // handleChangeSetEquipment,
-    // handleDeleteSetEquipment,
+    // handleChangeGroupEquipment,
+    handleDeleteGroupEquipment,
     handleDeleteEquipmentItem,
-    // handleDeleteSetEquipmentItem,
+    handleDeleteGroupEquipmentItem,
     handleChangeEquipmentItem,
+    handleAddEquipmentList,
+
     equipmentItemList,
     setEquipmentItemList,
 
@@ -77,9 +88,7 @@ const ReservationEditPage = () => {
     setEquipmentGroupList,
   } = useEquipmentCart();
 
-  useEffect(() => {
-    if (!reservationId || !detail) return;
-
+  const initializeForm = useCallback((detail: ReservationDetailType) => {
     setForm({
       userId: detail.userId,
       guestName: detail.userName,
@@ -100,8 +109,15 @@ const ReservationEditPage = () => {
         equipmentList: set.equipmentList.map(convertQuoteItemToEquipmentState),
       }))
     );
+
     quoteItemListStateRef.current = quoteItemList;
-  }, [detail, reservationId, rentalDays]);
+  }, []);
+
+  useEffect(() => {
+    if (!reservationId || !detail) return;
+
+    initializeForm(detail);
+  }, [detail, reservationId]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -207,35 +223,73 @@ const ReservationEditPage = () => {
             <div className={formStyles.sectionWrapper}>
               <Label title="대여 장비 목록" />
 
-              <Margin top={10} bottom={20}>
-                <Button
-                  size="Small"
-                  variant="outlined"
-                  onClick={onClickEquipmentModal}
-                  style={{
-                    width: "200px",
-                  }}
-                >
-                  장비 추가
-                </Button>
+              <Margin top={10} />
+
+              <Margin bottom={20}>
+                <Label title="단품 장비 리스트" />
+                <div className={styles.equipmentListWrapper}>
+                  {equipmentItemList.map((item) => {
+                    return (
+                      <QuotationItemEditor
+                        key={item.equipmentId}
+                        quoteState={item}
+                        rentalDays={rentalDays}
+                        onChangeField={() => {}}
+                        quantityOnly
+                        onDeleteEquipment={() =>
+                          handleDeleteEquipmentItem(item.equipmentId)
+                        }
+                        availableStatus={getAvailableStatus(
+                          isChecked,
+                          item.isAvailable
+                        )}
+                      />
+                    );
+                  })}
+                  <Button
+                    size="Small"
+                    variant="outlined"
+                    onClick={onClickEquipmentModal}
+                  >
+                    단품 장비 추가
+                  </Button>
+                </div>
               </Margin>
 
-              <div className={styles.equipmentListWrapper}>
-                {equipmentItemList.map((quote) => {
-                  return (
-                    <QuotationItemEditor
-                      key={quote.equipmentId}
-                      rentalDays={rentalDays}
-                      quoteState={quote}
-                      availableStatus="unknown"
-                      onChangeField={handleChangeEquipmentItem}
-                      onDeleteEquipment={() =>
-                        handleDeleteEquipmentItem(quote.equipmentId)
-                      }
-                    />
-                  );
-                })}
-              </div>
+              <Margin>
+                <Label title="풀세트 리스트" />
+                <div className={styles.equipmentListWrapper}>
+                  {equipmentGroupList.map((item) => {
+                    return (
+                      <SetEquipmentAccordionEditor
+                        key={item.id}
+                        title={item.title}
+                        isChecked={isChecked}
+                        equipmentList={item.equipmentList}
+                        changeQuantity={() => {}}
+                        changePrice={() => {}}
+                        addEquipmentItem={() => {
+                          setIsOpenSearchModal(true);
+                          // setSearchingSetId(item.id);
+                        }}
+                        deleteEquipmentItem={(equipmentId) =>
+                          handleDeleteGroupEquipmentItem(item, equipmentId)
+                        }
+                        deleteSetEquipment={() =>
+                          handleDeleteGroupEquipment(item.id)
+                        }
+                      />
+                    );
+                  })}
+                  <Button
+                    size="Small"
+                    variant="outlined"
+                    onClick={onClickEquipmentModal}
+                  >
+                    풀세트 추가
+                  </Button>
+                </div>
+              </Margin>
             </div>
           )}
           {equipmentItemList.length > 0 && (
@@ -300,9 +354,11 @@ const ReservationEditPage = () => {
       </FormWrapper>
       {isOpenSearchModal && dateRange.startDate && dateRange.endDate && (
         <EquipmentSearchModal
-          disabledIdList={existIdList}
           onCloseModal={() => setIsOpenSearchModal(false)}
-          onConfirm={() => {}}
+          onConfirm={(list) =>
+            handleAddEquipmentList(list.map(convertEquipmentItemToState))
+          }
+          disabledIdList={existIdList}
         />
       )}
       {isOpenUserModal && (

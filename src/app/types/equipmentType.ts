@@ -109,6 +109,7 @@ export type SetEquipmentType = {
   title: string;
   detail: string;
   price: number;
+  totalPrice: number;
   equipmentList: EquipmentListItemType[];
   memo?: string;
 };

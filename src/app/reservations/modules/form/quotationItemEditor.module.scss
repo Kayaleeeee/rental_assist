@@ -1,13 +1,21 @@
 .wrapper {
-  display: inline-flex;
+  // display: inline-flex;
+  display: flex;
+  flex-direction: column;
+
   align-items: center;
   border: 1px solid var(--grey-1);
   border-radius: 12px;
   font-size: 14px;
   width: 100%;
-  height: 65px;
-  padding: 16px;
-  gap: 12px;
+  // height: 65px;
+  padding: 4px 16px;
+}
+
+.inlineWrapper {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
 }
 
 .equipmentItem {
@@ -31,26 +39,34 @@
 .title {
   @include cell();
   font-weight: 700;
-  flex: 3;
-}
-
-.equipmentTitle {
-  @include cell();
-  font-weight: 700;
-  flex: 3;
-  font-size: 15px;
+  flex: 1;
+  min-width: 200px;
 }
 
 .days {
   @include cell();
+  width: 50px;
 }
 
-.price {
+.totalPrice {
   @include cell();
+  width: 200px;
+
+  display: flex;
+  font-weight: 700;
+  justify-content: flex-end;
 }
 
 .supplyPrice {
   @include cell();
+  width: 100px;
+}
+
+.diffPrice {
+  @include cell();
+  width: 200px;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .deleteButtonWrapper {
@@ -61,27 +77,25 @@
   cursor: pointer;
 }
 
-.closeButtonWrapper {
+.iconButton {
+  color: var(--grey);
+}
+
+.moreIconWrapper {
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 24px;
   height: 24px;
-
-  &:hover {
-    border: 1px solid var(--primary);
-    border-radius: 50%;
-  }
-}
-
-.closeButton {
-  color: var(--grey);
+  position: relative;
 }
 
 .quantity {
   @include cell();
   display: inline-flex;
   align-items: center;
+  width: 80px;
 }
 
 .quantityNumber {

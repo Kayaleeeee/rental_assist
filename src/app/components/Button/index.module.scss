@@ -44,3 +44,8 @@
   color: var(--button-color, var(--primary));
   border: 1px solid var(--button-color, var(--primary));
 }
+
+.textButton {
+  @include wrapper();
+  background: #fff;
+}

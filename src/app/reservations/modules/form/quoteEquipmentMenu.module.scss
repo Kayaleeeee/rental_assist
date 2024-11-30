@@ -1,0 +1,43 @@
+.wrapper {
+  top: -10px;
+  left: 20px;
+  width: 120px;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 0;
+  box-shadow: var(--shadow);
+  flex: 1;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  padding: 8px 16px;
+
+  &:hover {
+    font-weight: 800;
+  }
+}
+
+.priceModalTitle {
+  display: flex;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.priceModalWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.priceButtonWrapper {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin-top: 10px;
+  justify-content: flex-end;
+}

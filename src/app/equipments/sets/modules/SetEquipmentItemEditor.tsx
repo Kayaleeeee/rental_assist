@@ -72,7 +72,7 @@ export const SetEquipmentItemEditor = ({
           onChange={(e) => {
             const qty = Number(e.target.value);
 
-            if (isNaN(qty) || qty >= 100) return;
+            if (isNaN(qty) || qty >= 100 || qty < 0) return;
             onChangeField({ ...item, quantity: qty });
           }}
           size="small"

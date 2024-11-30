@@ -1,4 +1,4 @@
-import { EquipmentDetailType } from "./equipmentType";
+import { EquipmentDetailType, SetEquipmentItemType } from "./equipmentType";
 import { ReservationType } from "./reservationType";
 import { UserType } from "./userType";
 
@@ -55,6 +55,7 @@ export type QuoteItemPostPayload = {
   equipmentId: number;
   quantity: number;
   price: number;
+  setId?: SetEquipmentItemType["id"] | null;
 }[];
 
 export type QuoteItemPutPayload = {

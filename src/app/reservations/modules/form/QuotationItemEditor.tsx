@@ -1,10 +1,12 @@
 import styles from "./quotationItemEditor.module.scss";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
+import { EditableField } from "@/app/components/EditableField";
+import { QuoteEquipmentMoreMenu } from "./QuoteEquipmentMenu";
 
 type Props = {
   rentalDays: number;
@@ -25,6 +27,18 @@ export const QuotationItemEditor = ({
   reservationId,
   quantityOnly = false,
 }: Props) => {
+  const [quantityState, setQuantityState] = useState<number>(
+    quoteState.quantity
+  );
+  const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
+
+  const priceDiff = useMemo(() => {
+    const diff = (quoteState.totalPrice || 0) - quoteState.price * rentalDays;
+
+    if (diff === 0) return undefined;
+    return `${diff > 0 && "+"}${formatLocaleString(diff)}`;
+  }, [rentalDays, quoteState.totalPrice, quoteState.price]);
+
   const styleByStatus = useMemo((): {
     color: string;
     className: any;
@@ -58,67 +72,82 @@ export const QuotationItemEditor = ({
     }
   }, []);
 
-  const onClickPlus = () => {
-    const newQuantity = quoteState.quantity + 1;
-
-    onChangeField({
-      ...quoteState,
-      quantity: newQuantity,
-      totalPrice: quoteState.price * newQuantity * rentalDays,
-    });
-  };
-
-  const onClickMinus = () => {
-    if (quoteState.quantity === 1) return;
-
-    const newQuantity = quoteState.quantity - 1;
-
-    onChangeField({
-      ...quoteState,
-      quantity: newQuantity,
-      totalPrice: quoteState.price * newQuantity * rentalDays,
-    });
-  };
-
   return (
     <div className={styleByStatus.className} onClick={handleClickItem}>
-      {styleByStatus.renderIcon && styleByStatus.renderIcon()}
-      <div
-        className={styles.title}
-        style={{
-          color: styleByStatus.color,
-        }}
-      >
-        {quoteState.title}
-      </div>
-      <div className={styles.quantity}>
-        <div className={styles.quantityButton} onClick={onClickMinus}>
-          -
+      <div className={styles.inlineWrapper}>
+        {styleByStatus.renderIcon && styleByStatus.renderIcon()}
+        <div
+          className={styles.title}
+          style={{
+            color: styleByStatus.color,
+          }}
+        >
+          {quoteState.title}
         </div>
-        <div className={styles.quantityNumber}>{quoteState.quantity}</div>
-        <div className={styles.quantityButton} onClick={onClickPlus}>
-          +
+        <div className={styles.moreIconWrapper}>
+          <MoreVertOutlinedIcon
+            onClick={() => setIsOpenMenu(true)}
+            className={styles.iconButton}
+          />
+
+          <QuoteEquipmentMoreMenu
+            menuOpen={isOpenMenu}
+            closeMenu={() => setIsOpenMenu(false)}
+            totalPrice={quoteState.totalPrice || 0}
+            onChangeTotalPrice={(changedPrice) =>
+              onChangeField({ ...quoteState, totalPrice: changedPrice })
+            }
+            onConfirm={(menu) => {
+              if (!menu) return;
+
+              if (menu.key === "delete") {
+                onDeleteEquipment();
+                return;
+              }
+            }}
+          />
         </div>
       </div>
-      {!quantityOnly && (
-        <>
-          <div className={styles.days}>{rentalDays}일</div>
-          <div className={styles.supplyPrice}>
-            {formatLocaleString(quoteState.price)}원
+      <div className={styles.inlineWrapper}>
+        <div className={styles.quantity}>
+          <EditableField
+            value={quantityState}
+            type="phone"
+            onChange={(e) => {
+              const qty = Number(e.target.value);
+
+              if (isNaN(qty) || qty >= 100 || qty < 0) return;
+              setQuantityState(qty);
+            }}
+            onBlur={() => {
+              onChangeField({ ...quoteState, quantity: quantityState });
+            }}
+            size="small"
+            sx={{
+              width: "45px",
+              marginRight: "10px",
+              textAlign: "right",
+            }}
+            fontSize="14px"
+          />
+          개
+        </div>
+        {!quantityOnly && (
+          <div className={styles.inlineWrapper}>
+            <div className={styles.inlineWrapper}>
+              <div className={styles.days}>{rentalDays}일</div>
+              <div className={styles.supplyPrice}>
+                단가: {formatLocaleString(quoteState.price)}원
+              </div>
+              {priceDiff && (
+                <div className={styles.diffPrice}>조정 가격: {priceDiff}원</div>
+              )}
+            </div>
+            <div className={styles.totalPrice}>
+              총 {formatLocaleString(quoteState?.totalPrice || 0)}원
+            </div>
           </div>
-          <div className={styles.price}>
-            총 {formatLocaleString(quoteState?.totalPrice || 0)}원
-          </div>
-        </>
-      )}
-      <div
-        className={styles.deleteButtonWrapper}
-        onClick={(e) => {
-          e.stopPropagation();
-          onDeleteEquipment();
-        }}
-      >
-        <CloseOutlinedIcon className={styles.closeButton} />
+        )}
       </div>
     </div>
   );

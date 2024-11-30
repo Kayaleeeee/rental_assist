@@ -45,16 +45,18 @@ export const Cart = () => {
     rentalDays,
     setIsCartOpen,
     isCartOpen,
-    handleChangeSetEquipment,
-    handleDeleteSetEquipment,
+    setIsChecked,
+    handleChangeGroupEquipment,
+    handleDeleteGroupEquipment,
     handleDeleteEquipmentItem,
-    handleDeleteSetEquipmentItem,
+    handleDeleteGroupEquipmentItem,
     equipmentItemList,
     equipmentGroupList,
   } = useEquipmentCart();
 
   const handleCloseCart = () => {
     setIsCartOpen(false);
+    setIsChecked(false);
   };
 
   useEffect(() => {
@@ -182,10 +184,10 @@ export const Cart = () => {
                         setSearchingSetId(item.id);
                       }}
                       deleteEquipmentItem={(equipmentId) =>
-                        handleDeleteSetEquipmentItem(item, equipmentId)
+                        handleDeleteGroupEquipmentItem(item, equipmentId)
                       }
                       deleteSetEquipment={() =>
-                        handleDeleteSetEquipment(item.id)
+                        handleDeleteGroupEquipment(item.id)
                       }
                     />
                   );
@@ -221,7 +223,7 @@ export const Cart = () => {
               if (!changedSet) return;
               const convertedList = newList.map(convertEquipmentItemToState);
 
-              handleChangeSetEquipment({
+              handleChangeGroupEquipment({
                 ...changedSet,
                 equipmentList: [...changedSet.equipmentList, ...convertedList],
               });

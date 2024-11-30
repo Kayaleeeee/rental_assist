@@ -34,13 +34,6 @@
   flex: 3;
 }
 
-.equipmentTitle {
-  @include cell();
-  font-weight: 700;
-  flex: 3;
-  font-size: 15px;
-}
-
 .days {
   @include cell();
 }
