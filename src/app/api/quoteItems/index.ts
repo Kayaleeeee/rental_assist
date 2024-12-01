@@ -25,7 +25,7 @@ export const updateQuoteItem = (
 };
 
 export const deleteQuoteItemList = (idList: string) => {
-  return apiDelete(apiUrl, { params: { id: `in.(${idList})` } });
+  return apiDelete(apiUrl, { params: { equipment_id: `in.(${idList})` } });
 };
 
 export const createQuoteSet = (payload: QuoteSetPayload) => {
@@ -39,6 +39,6 @@ export const updateQuoteSet = (
   return apiPatch("quote_sets", payload, { params: id });
 };
 
-export const deleteQuoteSet = (id: QuoteSetType["id"]) => {
-  return apiDelete("quote_sets", { params: id });
+export const deleteQuoteSetList = (idList: string) => {
+  return apiDelete("quote_sets", { params: { id: `in.(${idList})` } });
 };

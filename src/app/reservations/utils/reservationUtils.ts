@@ -52,7 +52,7 @@ export const getValidReservationForm = ({
     return null;
   }
 
-  if (isEmpty(equipmentItemList)) {
+  if (isEmpty(equipmentItemList) && isEmpty(groupEquipmentList)) {
     showToast({
       message: "장비를 선택해주세요.",
       type: "error",
@@ -60,14 +60,22 @@ export const getValidReservationForm = ({
     return null;
   }
 
+  const totalPrice = getSumOfPrice(
+    "totalPrice",
+    equipmentItemList,
+    groupEquipmentList
+  );
+  const supplyPrice = getSumOfPrice(
+    "price",
+    equipmentItemList,
+    groupEquipmentList
+  );
+
   return {
     ...form,
-    supplyPrice: getSumOfPrice("price", equipmentItemList, groupEquipmentList),
-    totalPrice: getSumOfPrice(
-      "totalPrice",
-      equipmentItemList,
-      groupEquipmentList
-    ),
+    supplyPrice,
+    totalPrice,
+    discountPrice: supplyPrice - totalPrice,
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
   };

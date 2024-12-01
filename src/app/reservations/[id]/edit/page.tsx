@@ -18,10 +18,13 @@ import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../../hooks/useReservationForm";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
 import { isEmpty, isNil } from "lodash";
-import { EquipmentListItemState } from "@/app/store/useCartStore";
+import {
+  EquipmentListItemState,
+  SetEquipmentStateType,
+} from "@/app/store/useCartStore";
 import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { onUpdateReservation } from "../../actions/updateReservation";
 import { QuoteItemType } from "@/app/types/quoteType";
@@ -52,6 +55,7 @@ const convertQuoteItemToEquipmentState = (
 };
 
 const ReservationEditPage = () => {
+  const router = useRouter();
   const [isOpenUserModal, setIsOpenUserModal] = useState(false);
   const [isDiscounted, setIsDiscounted] = useState<boolean>(false);
   const [discountPriceState, setDiscountPriceState] = useState<number>(0);
@@ -59,6 +63,7 @@ const ReservationEditPage = () => {
   const reservationId = Number(id);
   const isFirstRender = useRef(true);
   const quoteItemListStateRef = useRef<EquipmentListItemState[]>([]);
+  const setListStateRef = useRef<SetEquipmentStateType[]>([]);
 
   const { form, setForm, onChangeForm } = useReservationForm();
   const { detail, isLoading } = useReservationDetail(reservationId);
@@ -73,7 +78,7 @@ const ReservationEditPage = () => {
     dateRange,
     setEquipmentItemList,
     setEquipmentGroupList,
-    // handleCheckAvailability,
+    handleCheckAvailability,
     isChecked,
     rentalDays,
     setDateRange,
@@ -103,14 +108,14 @@ const ReservationEditPage = () => {
       convertQuoteItemToEquipmentState
     );
     setEquipmentItemList(quoteItemList);
-    setEquipmentGroupList(
-      detail.setList.map((set) => ({
-        ...set,
-        equipmentList: set.equipmentList.map(convertQuoteItemToEquipmentState),
-      }))
-    );
 
+    const setList = detail.setList.map((set) => ({
+      ...set,
+      equipmentList: set.equipmentList.map(convertQuoteItemToEquipmentState),
+    }));
+    setEquipmentGroupList(setList);
     quoteItemListStateRef.current = quoteItemList;
+    setListStateRef.current = setList;
   }, []);
 
   useEffect(() => {
@@ -135,19 +140,42 @@ const ReservationEditPage = () => {
     }));
   };
 
-  const handleSaveForm = useCallback(() => {
+  const handleSaveForm = useCallback(async () => {
     if (!detail?.quoteId) return;
 
-    onUpdateReservation({
-      quoteId: detail.quoteId,
-      reservationId,
-      form,
-      dateRange,
-      originQuoteItemList: [...quoteItemListStateRef.current],
-      equipmentItemList,
-      groupEquipmentList: equipmentGroupList,
-    });
-  }, [detail?.quoteId, reservationId, setEquipmentItemList]);
+    try {
+      await onUpdateReservation({
+        quoteId: detail.quoteId,
+        reservationId,
+        form,
+        dateRange,
+        originQuoteItemList: quoteItemListStateRef.current,
+        originSetList: setListStateRef.current,
+        equipmentItemList,
+        groupEquipmentList: equipmentGroupList,
+      });
+
+      showToast({
+        message: "예약이 수정되었습니다.",
+        type: "success",
+      });
+      router.push(`/reservations/${reservationId}`);
+    } catch {
+      showToast({
+        message: "예약 변경에 실패했습니다.",
+        type: "error",
+      });
+    }
+  }, [
+    detail?.quoteId,
+    form,
+    dateRange,
+    equipmentItemList,
+    equipmentGroupList,
+    reservationId,
+    setEquipmentItemList,
+    router,
+  ]);
 
   const handleOpenEquipmentModal = (
     status:

@@ -14,7 +14,6 @@ import { useState } from "react";
 import { isEmpty } from "lodash";
 import { SetEquipmentItemEditor } from "../modules/SetEquipmentItemEditor";
 import { Margin } from "@/app/components/Margin";
-// import { useSetEquipmentItemList } from "./hooks/useSetEquipmentItemList";
 
 const EquipmentCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
@@ -32,9 +31,6 @@ const EquipmentCreatePage = () => {
     equipmentList,
     setEquipmentList,
   } = useSetEquipmentForm();
-
-  // const { list: occupiedEquipmentList, fetchList: fetchSetEquipmentList } =
-  //   useSetEquipmentItemList();
 
   return (
     <div>
