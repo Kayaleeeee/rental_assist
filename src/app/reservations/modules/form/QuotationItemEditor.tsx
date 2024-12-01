@@ -7,6 +7,7 @@ import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import { EditableField } from "@/app/components/EditableField";
 import { QuoteEquipmentMoreMenu } from "./QuoteEquipmentMenu";
+import { Margin } from "@/app/components/Margin";
 
 type Props = {
   rentalDays: number;
@@ -134,15 +135,14 @@ export const QuotationItemEditor = ({
         </div>
         {!quantityOnly && (
           <div className={styles.inlineWrapper}>
-            <div className={styles.inlineWrapper}>
-              <div className={styles.days}>{rentalDays}일</div>
-              <div className={styles.supplyPrice}>
-                단가: {formatLocaleString(quoteState.price)}원
-              </div>
-              {priceDiff && (
-                <div className={styles.diffPrice}>조정 가격: {priceDiff}원</div>
-              )}
+            <Margin right={8} />
+            <div className={styles.days}>{rentalDays}일</div>
+            <div className={styles.supplyPrice}>
+              단가: {formatLocaleString(quoteState.price)}원
             </div>
+            {priceDiff && (
+              <div className={styles.diffPrice}>조정 가격: {priceDiff}원</div>
+            )}
           </div>
         )}
         <div className={styles.totalPrice}>

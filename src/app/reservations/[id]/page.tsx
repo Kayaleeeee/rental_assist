@@ -33,9 +33,7 @@ import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined
 import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
 import { QuotationItem } from "../modules/form/QuotationItem";
 import { isEmpty } from "lodash";
-import { SetEquipmentAccordion } from "@/app/equipments/sets/modules/SetEquipmentAccordion";
-import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
-import { convertQuoteItemToEquipmentItem } from "@/app/types/mapper/converQuoteItemToEquipmentItem";
+import { convertQuoteItemToEquipmentItem } from "@/app/types/mapper/convertQuoteItemToEquipmentItem";
 import { GroupEquipment } from "@/app/equipments/sets/modules/GroupEquipment";
 
 const defaultString = "-";
@@ -124,8 +122,6 @@ const ReservationDetailPage = () => {
     },
     [reservationDetail]
   );
-
-  console.log(reservationDetail);
 
   if (!reservationDetail) return null;
 
@@ -276,38 +272,35 @@ const ReservationDetailPage = () => {
               </div>
             </Margin>
           )}
+          <Margin top={40} />
 
-          {!isEmpty(reservationDetail.equipmentList.length) && (
-            <div className={styles.priceSection}>
-              <div className={styles.discountPriceWrapper}>
-                <Label title="정가" />
-                <div>{formatLocaleString(reservationDetail.supplyPrice)}원</div>
-              </div>
+          <div className={styles.priceSection}>
+            <Margin top={20} />
 
-              {!!reservationDetail.discountPrice &&
-                reservationDetail.discountPrice > 0 && (
-                  <div className={styles.discountPriceWrapper}>
-                    <Label title="할인 금액" />
-                    <EditableField
-                      isEditable={false}
-                      value={`-${formatLocaleString(
-                        reservationDetail.discountPrice
-                      )}원`}
-                    />
-                  </div>
-                )}
-              <div className={styles.totalPriceWrapper}>
-                <div className={styles.totalPrice}>
-                  총 {formatLocaleString(reservationDetail.totalPrice)}원 (
-                </div>
-                <div>
-                  {" "}
-                  {formatKoreanCurrency(reservationDetail.totalPrice)})
-                </div>
-              </div>
+            <div className={styles.discountPriceWrapper}>
+              <Label title="정가" />
+              <div>{formatLocaleString(reservationDetail.supplyPrice)}원</div>
             </div>
-          )}
-          <Margin top={20} />
+
+            {!!reservationDetail.discountPrice &&
+              reservationDetail.discountPrice > 0 && (
+                <div className={styles.discountPriceWrapper}>
+                  <Label title="할인 금액" />
+                  <EditableField
+                    isEditable={false}
+                    value={`-${formatLocaleString(
+                      reservationDetail.discountPrice || 0
+                    )}원`}
+                  />
+                </div>
+              )}
+            <div className={styles.totalPriceWrapper}>
+              <div className={styles.totalPrice}>
+                총 {formatLocaleString(reservationDetail.totalPrice)}원 (
+              </div>
+              <div> {formatKoreanCurrency(reservationDetail.totalPrice)})</div>
+            </div>
+          </div>
         </div>
       </FormWrapper>
       {isOpenStatusModal && reservationDetail && (

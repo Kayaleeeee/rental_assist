@@ -30,7 +30,7 @@ export const onCreateReservation = async ({
       groupEquipmentList,
     });
 
-    if (!validForm) return;
+    if (!validForm) throw new Error("form validation 실패");
 
     // quote 생성
     const quoteResult = await createQuote(validForm);
@@ -64,7 +64,7 @@ export const onCreateReservation = async ({
     return { reservationId: reservationResult.id };
   } catch (error) {
     console.error("예약 생성 중 오류:", error);
-    throw error; // 호출하는 곳에서 추가 처리 가능
+    throw error;
   }
 };
 
@@ -84,6 +84,7 @@ const prepareQuoteData = (
         equipmentId: item.equipmentId,
         quantity: item.quantity,
         price: item.price,
+        totalPrice: item.totalPrice,
         quoteId,
         setId: null,
       });
@@ -106,6 +107,7 @@ const prepareQuoteData = (
           quantity: equipment.quantity,
           price: 0,
           quoteId,
+          totalPrice: item.totalPrice,
           setId: item.id,
         });
       });

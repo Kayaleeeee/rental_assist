@@ -3,14 +3,18 @@ import { ReservationDetailType } from "@/app/types/reservationType";
 import { useEffect, useState } from "react";
 
 export const useReservationDetail = (id?: number) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [detail, setDetail] = useState<ReservationDetailType>();
 
   const fetchDetail = async (id: number) => {
     try {
+      setIsLoading(true);
       const result = await getReservationDetail(id);
       setDetail(result);
     } catch {
       setDetail(undefined);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -20,5 +24,5 @@ export const useReservationDetail = (id?: number) => {
     fetchDetail(id);
   }, [id]);
 
-  return { detail, setDetail };
+  return { detail, setDetail, isLoading };
 };

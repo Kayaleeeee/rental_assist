@@ -1,12 +1,8 @@
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
 import { SetEquipmentList } from "@/app/equipments/sets/modules/SetEquipmentList";
-import {
-  EquipmentListItemType,
-  SetEquipmentType,
-} from "@/app/types/equipmentType";
-import { showToast } from "@/app/utils/toastUtils";
-import { useCallback, useState } from "react";
+import { SetEquipmentType } from "@/app/types/equipmentType";
+import { useState } from "react";
 
 type Props = {
   onCloseModal: () => void;
@@ -17,8 +13,8 @@ type Props = {
 export const GroupEquipmentSearchModal = ({
   onCloseModal,
   onConfirm,
-  disabledIdList,
-}: Props) => {
+}: // disabledIdList,
+Props) => {
   const [selectedGroupList, setSelectedGroupList] = useState<
     SetEquipmentType[]
   >([]);

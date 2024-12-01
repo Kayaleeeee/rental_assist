@@ -59,6 +59,8 @@ export type QuoteItemPostPayload = {
   equipmentId: number;
   quantity: number;
   price: number;
+  totalPrice: number;
+  discountPrice?: number;
   setId?: SetEquipmentItemType["id"] | null;
 }[];
 

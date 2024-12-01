@@ -31,7 +31,7 @@ import {
   EquipmentListItemType,
   SetEquipmentType,
 } from "@/app/types/equipmentType";
-import { isNil } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { onCreateReservation } from "../actions/createReservation";
 import { useRouter } from "next/navigation";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
@@ -61,7 +61,6 @@ const ReservationCreatePage = () => {
 
     equipmentGroupList,
     handleDeleteGroupEquipment,
-    handleDeleteGroupEquipmentItem,
     handleAddEquipmentGroup,
     handleChangeGroupEquipment,
   } = useEquipmentCart();
@@ -291,25 +290,15 @@ const ReservationCreatePage = () => {
                     return (
                       <SetEquipmentAccordionEditor
                         key={item.id}
-                        title={item.title}
                         isChecked={isChecked}
-                        equipmentList={item.equipmentList}
-                        changeQuantity={() => {}}
-                        changePrice={(price) => {
-                          handleChangeGroupEquipment({
-                            ...item,
-                            totalPrice: price,
-                          });
-                        }}
-                        price={item.totalPrice}
-                        addEquipmentItem={() =>
+                        equipmentSet={item}
+                        changeSetEquipment={handleChangeGroupEquipment}
+                        showPrice
+                        onClickAddEquipment={() =>
                           handleOpenEquipmentModal({
                             mode: "group",
                             groupId: item.id,
                           })
-                        }
-                        deleteEquipmentItem={(equipmentId) =>
-                          handleDeleteGroupEquipmentItem(item, equipmentId)
                         }
                         deleteSetEquipment={() =>
                           handleDeleteGroupEquipment(item.id)
@@ -328,7 +317,7 @@ const ReservationCreatePage = () => {
               </Margin>
             </div>
           )}
-          {equipmentItemList.length > 0 && (
+          {!isEmpty(equipmentItemList) && (
             <div className={styles.priceSection}>
               <div className={styles.discountPriceWrapper}>
                 <Label title="정가" />

@@ -48,6 +48,8 @@ export const onUpdateReservation = async ({
         quantity: item.quantity,
         price: item.price,
         quoteId: quoteResult.id,
+        totalPrice: item.totalPrice,
+        discountPrice: item.discountPrice,
       })
     );
 

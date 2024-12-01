@@ -18,7 +18,6 @@ import { useSetEquipmentForm } from "../../create/hooks/useSetEquipmentForm";
 import { SetEquipmentItemEditor } from "../../modules/SetEquipmentItemEditor";
 import { useSetEquipmentDetail } from "../hooks/useSetEquipmentDetail";
 import { useParams } from "next/navigation";
-import { Loader } from "@/app/components/Loader";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 
 const EquipmentEditPage = () => {
@@ -57,114 +56,97 @@ const EquipmentEditPage = () => {
 
   return (
     <div>
-      <FormWrapper title="풀세트 등록">
-        {isLoading ? (
-          <div
-            className={styles.loaderWrapper}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-              height: "60vh",
+      <FormWrapper title="풀세트 등록" isLoading={isLoading}>
+        <div className={formStyles.sectionWrapper}>
+          <Label title="세트명" />
+          <EditableField
+            fullWidth
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div className={formStyles.sectionWrapper}>
+          <Label title="렌탈 가격" />
+          <TextField
+            fullWidth
+            value={price}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+
+              if (isNaN(value)) return;
+              if (value < 0) return;
+
+              setPrice(value);
             }}
-          >
-            <Loader mode="dark" />
+          />
+          <div style={{ marginTop: "10px" }} />
+          <div className={styles.convertedPrice}>
+            {formatKoreanCurrency(price)}
           </div>
-        ) : (
-          <>
-            <div className={formStyles.sectionWrapper}>
-              <Label title="세트명" />
-              <EditableField
-                fullWidth
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
-            <div className={formStyles.sectionWrapper}>
-              <Label title="렌탈 가격" />
-              <TextField
-                fullWidth
-                value={price}
-                onChange={(e) => {
-                  const value = Number(e.target.value);
+        </div>
 
-                  if (isNaN(value)) return;
-                  if (value < 0) return;
+        <div className={formStyles.sectionWrapper}>
+          <Label title="상세 정보" />
+          <TextField
+            fullWidth
+            multiline
+            value={detail}
+            placeholder="상세 정보를 입력해주세요."
+            onChange={(e) => setDetail(e.target.value)}
+          />
+        </div>
 
-                  setPrice(value);
-                }}
-              />
-              <div style={{ marginTop: "10px" }} />
-              <div className={styles.convertedPrice}>
-                {formatKoreanCurrency(price)}
+        <div className={formStyles.sectionWrapper}>
+          <Label title="포함 장비" />
+          <Button
+            variant="outlined"
+            size="Small"
+            style={{
+              width: "200px",
+            }}
+            onClick={() => setIsOpenSearchModal(true)}
+          >
+            장비 추가하기
+          </Button>
+
+          {!isEmpty(equipmentList) && (
+            <Margin top={20}>
+              <div className={styles.equipmentListWrapper}>
+                {equipmentList.map((item) => {
+                  return (
+                    <SetEquipmentItemEditor
+                      key={item.id}
+                      item={item}
+                      onChangeField={(state) =>
+                        setEquipmentList((prev) =>
+                          prev.map((item) =>
+                            item.id === state.id ? state : item
+                          )
+                        )
+                      }
+                      onDeleteEquipment={() =>
+                        setEquipmentList((prev) =>
+                          prev.filter((prevItem) => prevItem.id !== item.id)
+                        )
+                      }
+                    />
+                  );
+                })}
               </div>
-            </div>
+            </Margin>
+          )}
+        </div>
 
-            <div className={formStyles.sectionWrapper}>
-              <Label title="상세 정보" />
-              <TextField
-                fullWidth
-                multiline
-                value={detail}
-                placeholder="상세 정보를 입력해주세요."
-                onChange={(e) => setDetail(e.target.value)}
-              />
-            </div>
-
-            <div className={formStyles.sectionWrapper}>
-              <Label title="포함 장비" />
-              <Button
-                variant="outlined"
-                size="Small"
-                style={{
-                  width: "200px",
-                }}
-                onClick={() => setIsOpenSearchModal(true)}
-              >
-                장비 추가하기
-              </Button>
-
-              {!isEmpty(equipmentList) && (
-                <Margin top={20}>
-                  <div className={styles.equipmentListWrapper}>
-                    {equipmentList.map((item) => {
-                      return (
-                        <SetEquipmentItemEditor
-                          key={item.id}
-                          item={item}
-                          onChangeField={(state) =>
-                            setEquipmentList((prev) =>
-                              prev.map((item) =>
-                                item.id === state.id ? state : item
-                              )
-                            )
-                          }
-                          onDeleteEquipment={() =>
-                            setEquipmentList((prev) =>
-                              prev.filter((prevItem) => prevItem.id !== item.id)
-                            )
-                          }
-                        />
-                      );
-                    })}
-                  </div>
-                </Margin>
-              )}
-            </div>
-
-            <div className={formStyles.sectionWrapper}>
-              <Label title="메모" />
-              <TextField
-                fullWidth
-                multiline
-                value={memo}
-                placeholder="메모를 입력해주세요."
-                onChange={(e) => setMemo(e.target.value)}
-              />
-            </div>
-          </>
-        )}
+        <div className={formStyles.sectionWrapper}>
+          <Label title="메모" />
+          <TextField
+            fullWidth
+            multiline
+            value={memo}
+            placeholder="메모를 입력해주세요."
+            onChange={(e) => setMemo(e.target.value)}
+          />
+        </div>
         <div className={styles.buttonWrapper}>
           <Button
             size="Medium"

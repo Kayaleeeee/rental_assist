@@ -47,7 +47,6 @@ export const Cart = () => {
     handleChangeGroupEquipment,
     handleDeleteGroupEquipment,
     handleDeleteEquipmentItem,
-    handleDeleteGroupEquipmentItem,
     equipmentItemList,
     equipmentGroupList,
   } = useEquipmentCart();
@@ -172,18 +171,14 @@ export const Cart = () => {
                   return (
                     <SetEquipmentAccordionEditor
                       key={item.id}
-                      title={item.title}
+                      equipmentSet={item}
                       isChecked={isChecked}
-                      equipmentList={item.equipmentList}
-                      changeQuantity={() => {}}
-                      changePrice={() => {}}
-                      addEquipmentItem={() => {
+                      showPrice={false}
+                      changeSetEquipment={handleChangeGroupEquipment}
+                      onClickAddEquipment={() => {
                         setIsOpenSearchModal(true);
                         setSearchingSetId(item.id);
                       }}
-                      deleteEquipmentItem={(equipmentId) =>
-                        handleDeleteGroupEquipmentItem(item, equipmentId)
-                      }
                       deleteSetEquipment={() =>
                         handleDeleteGroupEquipment(item.id)
                       }

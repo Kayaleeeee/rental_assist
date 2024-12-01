@@ -7,17 +7,18 @@ import {
   SetEquipmentStateType,
 } from "@/app/store/useCartStore";
 
-const getTotalPrice = (
+const getSumOfPrice = (
+  field: "price" | "totalPrice",
   equipmentItemList: EquipmentListItemState[],
   groupEquipmentList: SetEquipmentStateType[]
 ): number => {
   const equipmentPrice = equipmentItemList.reduce(
-    (prev, acc) => (prev += acc.price),
+    (prev, acc) => (prev += acc[field]),
     0
   );
 
   const groupEquipmentPrice = groupEquipmentList.reduce(
-    (prev, acc) => (prev += acc.price),
+    (prev, acc) => (prev += acc[field]),
     0
   );
 
@@ -61,8 +62,12 @@ export const getValidReservationForm = ({
 
   return {
     ...form,
-    supplyPrice: getTotalPrice(equipmentItemList, groupEquipmentList),
-    totalPrice: getTotalPrice(equipmentItemList, groupEquipmentList),
+    supplyPrice: getSumOfPrice("price", equipmentItemList, groupEquipmentList),
+    totalPrice: getSumOfPrice(
+      "totalPrice",
+      equipmentItemList,
+      groupEquipmentList
+    ),
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
   };

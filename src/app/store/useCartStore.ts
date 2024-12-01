@@ -1,13 +1,15 @@
 import { create } from "zustand";
 import { QuoteItemType } from "../types/quoteType";
-import { SetEquipmentType } from "../types/equipmentType";
+import { EquipmentCategory, SetEquipmentType } from "../types/equipmentType";
 
 export type EquipmentListItemState = {
   equipmentId: number;
   title: string;
   price: number;
   quantity: number;
-  totalPrice?: number;
+  totalPrice: number;
+  category?: EquipmentCategory;
+  discountPrice?: number;
   id?: QuoteItemType["id"];
   isAvailable?: boolean;
   reservationId?: number;

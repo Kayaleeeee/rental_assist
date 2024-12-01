@@ -8,7 +8,7 @@ import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 export const useEquipmentCart = () => {
   const {
@@ -146,9 +146,9 @@ export const useEquipmentCart = () => {
   const handleAddEquipmentGroup = useCallback(
     (equipmentList: SetEquipmentStateType[]) => {
       addEquipmentGroup(
-        equipmentList.map((set) => ({
-          ...set,
-          totalPrice: set.price * rentalDays,
+        equipmentList.map((group) => ({
+          ...group,
+          totalPrice: group.price * rentalDays - (group.discountPrice || 0),
         }))
       );
       setIsChecked(false);
@@ -177,8 +177,8 @@ export const useEquipmentCart = () => {
     setIsChecked(false);
   };
 
-  const handleChangeEquipmentItem = (equipemtItem: EquipmentListItemState) => {
-    changeEquipmentItem(equipemtItem);
+  const handleChangeEquipmentItem = (equipmentItem: EquipmentListItemState) => {
+    changeEquipmentItem(equipmentItem);
     setIsChecked(false);
   };
 
@@ -194,6 +194,23 @@ export const useEquipmentCart = () => {
     });
     setIsChecked(false);
   };
+
+  useEffect(() => {
+    setEquipmentItemList(
+      equipmentItemList.map((item) => ({
+        ...item,
+        totalPrice:
+          item.price * rentalDays * item.quantity - (item.discountPrice || 0),
+      }))
+    );
+
+    setEquipmentGroupList(
+      equipmentGroupList.map((item) => ({
+        ...item,
+        totalPrice: item.price * rentalDays - (item.discountPrice || 0),
+      }))
+    );
+  }, [rentalDays]);
 
   return {
     hasUnavailableItem,

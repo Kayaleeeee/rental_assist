@@ -11,10 +11,6 @@ import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EquipmentSearchModal } from "../../modules/form/EquipmentSearchModal";
 import { QuotationItemEditor } from "../../modules/form/QuotationItemEditor";
-// import {
-//   formatKoreanCurrency,
-//   formatLocaleString,
-// } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../../users/modules/UserSearchModal";
@@ -24,18 +20,24 @@ import { useUnmount } from "usehooks-ts";
 import { useReservationForm } from "../../hooks/useReservationForm";
 import { useParams } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
-import { isNil } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
 import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { onUpdateReservation } from "../../actions/updateReservation";
 import { QuoteItemType } from "@/app/types/quoteType";
 import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
 import { getAvailableStatus } from "@/app/components/Cart";
-import {
-  ReservationDetailType,
-  ReservationType,
-} from "@/app/types/reservationType";
+import { ReservationDetailType } from "@/app/types/reservationType";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
+import {
+  formatKoreanCurrency,
+  formatLocaleString,
+} from "@/app/utils/priceUtils";
+import {
+  EquipmentListItemType,
+  SetEquipmentType,
+} from "@/app/types/equipmentType";
+import { GroupEquipmentSearchModal } from "../../modules/form/GroupEquipmentSearchModal";
 
 const convertQuoteItemToEquipmentState = (
   item: QuoteItemType
@@ -50,7 +52,6 @@ const convertQuoteItemToEquipmentState = (
 };
 
 const ReservationEditPage = () => {
-  const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const [isOpenUserModal, setIsOpenUserModal] = useState(false);
   const [isDiscounted, setIsDiscounted] = useState<boolean>(false);
   const [discountPriceState, setDiscountPriceState] = useState<number>(0);
@@ -60,30 +61,31 @@ const ReservationEditPage = () => {
   const quoteItemListStateRef = useRef<EquipmentListItemState[]>([]);
 
   const { form, setForm, onChangeForm } = useReservationForm();
-  const { detail } = useReservationDetail(reservationId);
+  const { detail, isLoading } = useReservationDetail(reservationId);
+  const [changingStatus, setChangingStatus] = useState<
+    { mode: "item" } | { mode: "group"; groupId: SetEquipmentType["id"] } | null
+  >(null);
+  const [isOpenGroupSearchModal, setIsOpenGroupSearchModal] = useState(false);
 
   const {
     // hasUnavailableItem,
     onChangeDate,
-    setDateRange,
     dateRange,
+    setEquipmentItemList,
+    setEquipmentGroupList,
     // handleCheckAvailability,
     isChecked,
     rentalDays,
-
-    // resetCart,
-    // handleChangeGroupEquipment,
-    handleDeleteGroupEquipment,
-    handleDeleteEquipmentItem,
-    handleDeleteGroupEquipmentItem,
-    handleChangeEquipmentItem,
-    handleAddEquipmentList,
-
+    setDateRange,
     equipmentItemList,
-    setEquipmentItemList,
+    handleAddEquipmentList,
+    handleDeleteEquipmentItem,
+    handleChangeEquipmentItem,
 
     equipmentGroupList,
-    setEquipmentGroupList,
+    handleDeleteGroupEquipment,
+    handleAddEquipmentGroup,
+    handleChangeGroupEquipment,
   } = useEquipmentCart();
 
   const initializeForm = useCallback((detail: ReservationDetailType) => {
@@ -124,15 +126,6 @@ const ReservationEditPage = () => {
     }
   });
 
-  const onClickEquipmentModal = () => {
-    if (rentalDays === 0) {
-      showToast({ message: "기간을 설정해주세요.", type: "error" });
-      return;
-    }
-
-    setIsOpenSearchModal(true);
-  };
-
   const handleSelectUser = (user: UserType) => {
     setForm((prev) => ({
       ...prev,
@@ -156,6 +149,86 @@ const ReservationEditPage = () => {
     });
   }, [detail?.quoteId, reservationId, setEquipmentItemList]);
 
+  const handleOpenEquipmentModal = (
+    status:
+      | { mode: "item" }
+      | { mode: "group"; groupId: SetEquipmentType["id"] }
+  ) => {
+    if (rentalDays === 0) {
+      showToast({ message: "기간을 설정해주세요.", type: "error" });
+      return;
+    }
+
+    setChangingStatus(status);
+  };
+
+  const handleConfirmEquipmentModal = useCallback(
+    (list: EquipmentListItemType[]) => {
+      if (!changingStatus) return;
+
+      const convertedList = list.map(convertEquipmentItemToState);
+
+      if (changingStatus.mode === "item") {
+        handleAddEquipmentList(convertedList);
+        return;
+      }
+
+      if (changingStatus.mode === "group") {
+        const targetSet = equipmentGroupList.find(
+          (set) => set.id === changingStatus.groupId
+        );
+
+        if (targetSet) {
+          handleChangeGroupEquipment({
+            ...targetSet,
+            equipmentList: targetSet.equipmentList.concat(convertedList),
+          });
+        }
+      }
+    },
+    [changingStatus, equipmentGroupList]
+  );
+
+  const onClickGroupEquipmentModal = () => {
+    if (rentalDays === 0) {
+      showToast({ message: "기간을 설정해주세요.", type: "error" });
+      return;
+    }
+
+    setIsOpenGroupSearchModal(true);
+  };
+
+  const { supplyPrice: totalSupplyPrice, totalPrice: finalTotalPrice } =
+    useMemo(() => {
+      const [itemSupply, itemTotal] = equipmentItemList.reduce(
+        (prev, item) => {
+          let [supply, total] = prev;
+          const supplyPrice = (supply +=
+            item.quantity * item.price * rentalDays);
+          const totalPrice = (total += item.totalPrice || 0);
+
+          return [supplyPrice, totalPrice];
+        },
+        [0, 0]
+      );
+
+      const [groupSupply, groupTotal] = equipmentGroupList.reduce(
+        (prev, item) => {
+          let [supply, total] = prev;
+          const supplyPrice = (supply += item.price * rentalDays);
+          const totalPrice = (total += item.totalPrice || 0);
+
+          return [supplyPrice, totalPrice];
+        },
+        [0, 0]
+      );
+
+      return {
+        supplyPrice: itemSupply + groupSupply,
+        totalPrice: itemTotal + groupTotal,
+      };
+    }, [equipmentGroupList, equipmentItemList, rentalDays]);
+
   const existIdList = useMemo(() => {
     const equipmentIdList = equipmentItemList.map((item) => item.equipmentId);
     const groupEquipmentItemIdList = equipmentGroupList
@@ -167,7 +240,7 @@ const ReservationEditPage = () => {
 
   return (
     <div>
-      <FormWrapper title="예약 수정">
+      <FormWrapper title="예약 수정" isLoading={isLoading}>
         <div className={formStyles.sectionWrapper}>
           <Label title="고객 정보" />
 
@@ -232,7 +305,7 @@ const ReservationEditPage = () => {
                         key={item.equipmentId}
                         quoteState={item}
                         rentalDays={rentalDays}
-                        onChangeField={() => {}}
+                        onChangeField={handleChangeEquipmentItem}
                         quantityOnly
                         onDeleteEquipment={() =>
                           handleDeleteEquipmentItem(item.equipmentId)
@@ -247,7 +320,7 @@ const ReservationEditPage = () => {
                   <Button
                     size="Small"
                     variant="outlined"
-                    onClick={onClickEquipmentModal}
+                    onClick={() => handleOpenEquipmentModal({ mode: "item" })}
                   >
                     단품 장비 추가
                   </Button>
@@ -261,17 +334,15 @@ const ReservationEditPage = () => {
                     return (
                       <SetEquipmentAccordionEditor
                         key={item.id}
-                        title={item.title}
                         isChecked={isChecked}
-                        equipmentList={item.equipmentList}
-                        changeQuantity={() => {}}
-                        changePrice={() => {}}
-                        addEquipmentItem={() => {
-                          setIsOpenSearchModal(true);
-                          // setSearchingSetId(item.id);
-                        }}
-                        deleteEquipmentItem={(equipmentId) =>
-                          handleDeleteGroupEquipmentItem(item, equipmentId)
+                        equipmentSet={item}
+                        changeSetEquipment={handleChangeGroupEquipment}
+                        showPrice
+                        onClickAddEquipment={() =>
+                          handleOpenEquipmentModal({
+                            mode: "group",
+                            groupId: item.id,
+                          })
                         }
                         deleteSetEquipment={() =>
                           handleDeleteGroupEquipment(item.id)
@@ -282,7 +353,7 @@ const ReservationEditPage = () => {
                   <Button
                     size="Small"
                     variant="outlined"
-                    onClick={onClickEquipmentModal}
+                    onClick={onClickGroupEquipmentModal}
                   >
                     풀세트 추가
                   </Button>
@@ -290,11 +361,11 @@ const ReservationEditPage = () => {
               </Margin>
             </div>
           )}
-          {equipmentItemList.length > 0 && (
+          {!isEmpty(equipmentItemList) && (
             <div className={styles.priceSection}>
               <div className={styles.discountPriceWrapper}>
                 <Label title="정가" />
-                {/* <div>{formatLocaleString(totalSupplyPrice)}원</div> */}
+                <div>{formatLocaleString(totalSupplyPrice)}원</div>
               </div>
               {isDiscounted ? (
                 <div className={styles.discountPriceWrapper}>
@@ -332,9 +403,9 @@ const ReservationEditPage = () => {
 
               <div className={styles.totalPriceWrapper}>
                 <div className={styles.totalPrice}>
-                  {/* 총 {formatLocaleString(totalPrice)}원 ( */}
+                  총 {formatLocaleString(finalTotalPrice)}원 (
                 </div>
-                {/* <div> {formatKoreanCurrency(totalPrice)})</div> */}
+                <div> {formatKoreanCurrency(finalTotalPrice)})</div>
               </div>
             </div>
           )}
@@ -350,11 +421,25 @@ const ReservationEditPage = () => {
           </Button>
         </div>
       </FormWrapper>
-      {isOpenSearchModal && dateRange.startDate && dateRange.endDate && (
+      {!isNil(changingStatus) && dateRange.startDate && dateRange.endDate && (
         <EquipmentSearchModal
-          onCloseModal={() => setIsOpenSearchModal(false)}
+          onCloseModal={() => setChangingStatus(null)}
+          onConfirm={handleConfirmEquipmentModal}
+          disabledIdList={existIdList}
+        />
+      )}
+      {isOpenGroupSearchModal && dateRange.startDate && dateRange.endDate && (
+        <GroupEquipmentSearchModal
+          onCloseModal={() => setIsOpenGroupSearchModal(false)}
           onConfirm={(list) =>
-            handleAddEquipmentList(list.map(convertEquipmentItemToState))
+            handleAddEquipmentGroup(
+              list.map((set) => ({
+                ...set,
+                equipmentList: set.equipmentList.map(
+                  convertEquipmentItemToState
+                ),
+              }))
+            )
           }
           disabledIdList={existIdList}
         />
