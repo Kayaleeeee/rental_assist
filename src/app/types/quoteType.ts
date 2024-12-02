@@ -63,6 +63,7 @@ export type QuoteItemPostPayload = {
   totalPrice: number;
   discountPrice?: number;
   setId?: SetEquipmentItemType["id"] | null;
+  quoteSetId?: QuoteSetType["id"] | null;
 }[];
 
 export type QuoteItemPutPayload = {
@@ -72,6 +73,8 @@ export type QuoteItemPutPayload = {
   price: number;
   totalPrice: number;
   discountPrice?: number;
+  setId?: SetEquipmentItemType["id"] | null;
+  quoteSetId?: QuoteSetType["id"] | null;
 };
 
 export type QuoteSetType = {
@@ -83,4 +86,4 @@ export type QuoteSetType = {
   discountPrice?: number;
 };
 
-export type QuoteSetPayload = Omit<QuoteSetType, "id">[];
+export type QuoteSetPayload = Omit<QuoteSetType, "id">;

@@ -162,17 +162,17 @@ export const Cart = () => {
                 {equipmentGroupList.map((item) => {
                   return (
                     <SetEquipmentAccordionEditor
-                      key={item.id}
+                      key={item.setId}
                       equipmentSet={item}
                       isChecked={isChecked}
                       showPrice={false}
                       changeSetEquipment={handleChangeGroupEquipment}
                       onClickAddEquipment={() => {
                         setIsOpenSearchModal(true);
-                        setSearchingSetId(item.id);
+                        setSearchingSetId(item.setId);
                       }}
                       deleteSetEquipment={() =>
-                        handleDeleteGroupEquipment(item.id)
+                        handleDeleteGroupEquipment(item.setId)
                       }
                     />
                   );
@@ -202,7 +202,7 @@ export const Cart = () => {
           onConfirm={(newList) => {
             if (searchingSetId) {
               const changedSet = equipmentGroupList.find(
-                (set) => set.id === searchingSetId
+                (set) => set.setId === searchingSetId
               );
 
               if (!changedSet) return;

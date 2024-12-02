@@ -47,6 +47,8 @@ import {
   getAllEquipmentSupplyPrice,
   getAllEquipmentTotalPrice,
 } from "../../utils/reservationUtils";
+import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGropEquipmentToState";
+import { convertReservationGroupEquipmentToState } from "@/app/types/mapper/convertReservationResponseToState";
 
 const ReservationEditPage = () => {
   const router = useRouter();
@@ -75,41 +77,39 @@ const ReservationEditPage = () => {
     handleAddEquipmentList,
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
+    handleSetEquipmentList,
 
     equipmentGroupList,
     handleDeleteGroupEquipment,
     handleAddEquipmentGroup,
     handleChangeGroupEquipment,
+    handleSetEquipmentGroup,
   } = useEquipmentCart();
 
-  const initializeForm = useCallback(
-    (detail: ReservationDetailType) => {
-      setForm({
-        userId: detail.userId,
-        guestName: detail.userName,
-        guestPhoneNumber: detail.phoneNumber || "",
-        discountPrice: detail.discountPrice ?? 0,
-      });
-      handleChangeDate({
-        startDate: detail.startDate,
-        endDate: detail.endDate,
-      });
+  const initializeForm = useCallback((detail: ReservationDetailType) => {
+    setForm({
+      userId: detail.userId,
+      guestName: detail.userName,
+      guestPhoneNumber: detail.phoneNumber || "",
+      discountPrice: detail.discountPrice ?? 0,
+    });
+    handleChangeDate({
+      startDate: detail.startDate,
+      endDate: detail.endDate,
+    });
 
-      const quoteItemList = detail.equipmentList.map(
-        convertQuoteItemToEquipmentState
-      );
-      handleAddEquipmentList(quoteItemList);
+    const quoteItemList = detail.equipmentList.map(
+      convertQuoteItemToEquipmentState
+    );
+    handleSetEquipmentList(quoteItemList);
 
-      const setList = detail.setList.map((set) => ({
-        ...set,
-        equipmentList: set.equipmentList.map(convertQuoteItemToEquipmentState),
-      }));
-      handleAddEquipmentGroup(setList);
-      quoteItemListStateRef.current = quoteItemList;
-      setListStateRef.current = setList;
-    },
-    [handleAddEquipmentList]
-  );
+    const setList = detail.setList.map(convertReservationGroupEquipmentToState);
+    handleSetEquipmentGroup(setList);
+    quoteItemListStateRef.current = quoteItemList;
+    setListStateRef.current = setList;
+  }, []);
+
+  console.log(equipmentGroupList);
 
   useEffect(() => {
     if (!reservationId || !detail) return;
@@ -191,13 +191,13 @@ const ReservationEditPage = () => {
       const convertedList = list.map(convertEquipmentItemToState);
 
       if (changingStatus.mode === "item") {
-        handleAddEquipmentList([...equipmentItemList, ...convertedList]);
+        handleAddEquipmentList(convertedList);
         return;
       }
 
       if (changingStatus.mode === "group") {
         const targetSet = equipmentGroupList.find(
-          (set) => set.id === changingStatus.groupId
+          (set) => set.setId === changingStatus.groupId
         );
 
         if (targetSet) {
@@ -350,7 +350,7 @@ const ReservationEditPage = () => {
                     return (
                       <SetEquipmentAccordionEditor
                         showPrice
-                        key={item.id}
+                        key={item.setId}
                         isChecked={isChecked}
                         equipmentSet={item}
                         rentalDays={rentalDays}
@@ -358,11 +358,11 @@ const ReservationEditPage = () => {
                         onClickAddEquipment={() =>
                           handleOpenEquipmentModal({
                             mode: "group",
-                            groupId: item.id,
+                            groupId: item.setId,
                           })
                         }
                         deleteSetEquipment={() =>
-                          handleDeleteGroupEquipment(item.id)
+                          handleDeleteGroupEquipment(item.setId)
                         }
                       />
                     );
@@ -417,14 +417,7 @@ const ReservationEditPage = () => {
         <GroupEquipmentSearchModal
           onCloseModal={() => setIsOpenGroupSearchModal(false)}
           onConfirm={(list) =>
-            handleAddEquipmentGroup(
-              list.map((set) => ({
-                ...set,
-                equipmentList: set.equipmentList.map(
-                  convertEquipmentItemToState
-                ),
-              }))
-            )
+            handleAddEquipmentGroup(list.map(convertGroupEquipmentToState))
           }
           disabledIdList={existIdList}
         />

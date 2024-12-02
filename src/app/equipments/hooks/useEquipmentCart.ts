@@ -22,6 +22,7 @@ export const useEquipmentCart = () => {
     setEquipmentItemList,
     removeEquipment,
     changeEquipmentItem,
+    addEquipment,
 
     equipmentGroupList,
     setEquipmentGroupList,
@@ -146,21 +147,31 @@ export const useEquipmentCart = () => {
       addEquipmentGroup(equipmentList);
       setIsChecked(false);
     },
-    [rentalDays]
+    []
   );
 
   const handleAddEquipmentList = useCallback(
     (equipmentList: EquipmentListItemState[]) => {
-      setEquipmentItemList(
-        equipmentList.map((item) => ({
-          ...item,
-          totalPrice:
-            item.price * rentalDays * item.quantity - (item.discountPrice || 0),
-        }))
-      );
+      addEquipment(equipmentList);
       setIsChecked(false);
     },
-    [rentalDays]
+    []
+  );
+
+  const handleSetEquipmentGroup = useCallback(
+    (equipmentList: SetEquipmentStateType[]) => {
+      setEquipmentGroupList(equipmentList);
+      setIsChecked(false);
+    },
+    []
+  );
+
+  const handleSetEquipmentList = useCallback(
+    (equipmentList: EquipmentListItemState[]) => {
+      setEquipmentItemList(equipmentList);
+      setIsChecked(false);
+    },
+    []
   );
 
   const handleDeleteEquipmentItem = useCallback(
@@ -172,7 +183,7 @@ export const useEquipmentCart = () => {
   );
 
   const handleDeleteGroupEquipment = useCallback(
-    (setId: SetEquipmentStateType["id"]) => {
+    (setId: SetEquipmentStateType["setId"]) => {
       removeEquipmentGroup(setId);
       setIsChecked(false);
     },
@@ -222,11 +233,13 @@ export const useEquipmentCart = () => {
     handleDeleteGroupEquipmentItem,
     handleChangeGroupEquipment,
     handleAddEquipmentGroup,
+    handleSetEquipmentGroup,
 
     //단품 아이템
     equipmentItemList,
     handleAddEquipmentList,
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
+    handleSetEquipmentList,
   };
 };

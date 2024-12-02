@@ -7,7 +7,7 @@ import {
   ReservationType,
 } from "@/app/types/reservationType";
 import { apiGet, apiPatch, apiPost } from "..";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
 
 const apiUrl = "/reservations";
 const listUrl = "/reservation_list";
@@ -31,7 +31,16 @@ export const getReservationDetail = async (id: number) => {
   const result = await apiGet<ReservationDetailType[]>(detailUrl, { id });
 
   if (isEmpty(result)) throw new Error("No data found");
-  return result[0];
+
+  const detail = result[0];
+
+  return {
+    ...detail,
+    setList: detail.setList.map((item) => ({
+      ...item,
+      equipmentList: isNil(item.equipmentList) ? [] : item.equipmentList,
+    })),
+  };
 };
 
 export const getReservationStatusCount = async () => {

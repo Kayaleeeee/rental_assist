@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { QuoteItemType } from "../types/quoteType";
+import { QuoteItemType, QuoteSetType } from "../types/quoteType";
 import { EquipmentCategory, SetEquipmentType } from "../types/equipmentType";
 
 export type EquipmentListItemState = {
@@ -14,10 +14,13 @@ export type EquipmentListItemState = {
   reservationId?: number;
 };
 
-export type SetEquipmentStateType = Omit<
-  SetEquipmentType,
-  "equipmentList" | "detail" | "memo"
-> & {
+export type SetEquipmentStateType = {
+  title: string;
+  price: number;
+  totalPrice: number;
+  discountPrice?: number;
+  setId: SetEquipmentType["id"];
+  quoteSetId?: QuoteSetType["id"];
   equipmentList: EquipmentListItemState[];
 };
 
@@ -33,7 +36,9 @@ type CartState = {
   equipmentGroupList: SetEquipmentStateType[];
   setEquipmentGroupList: (list: SetEquipmentStateType[]) => void;
   addEquipmentGroup: (setEquipment: SetEquipmentStateType[]) => void;
-  removeEquipmentGroup: (setEquipmentId: SetEquipmentStateType["id"]) => void;
+  removeEquipmentGroup: (
+    setEquipmentId: SetEquipmentStateType["setId"]
+  ) => void;
   changeEquipmentGroup: (setEquipment: SetEquipmentStateType) => void;
 
   dateRange: { startDate?: string; endDate?: string };
@@ -84,13 +89,15 @@ export const useCartStore = create<CartState>((set, get) => ({
   removeEquipmentGroup: (setEquipmentId) =>
     set({
       equipmentGroupList: get().equipmentGroupList.filter(
-        (setEquipment) => setEquipment.id !== setEquipmentId
+        (setEquipment) => setEquipment.setId !== setEquipmentId
       ),
     }),
   changeEquipmentGroup: (changedSet) => {
     set({
       equipmentGroupList: get().equipmentGroupList.map((setEquipmentItem) =>
-        setEquipmentItem.id === changedSet.id ? changedSet : setEquipmentItem
+        setEquipmentItem.setId === changedSet.setId
+          ? changedSet
+          : setEquipmentItem
       ),
     });
   },

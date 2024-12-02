@@ -1,4 +1,5 @@
 import { ListParamsType } from "./listType";
+import { QuoteSetType } from "./quoteType";
 import { ReservationType } from "./reservationType";
 import { UserType } from "./userType";
 
@@ -132,6 +133,7 @@ export type SetEquipmentPayload = {
 export type SetEquipmentItemType = {
   id: string;
   setId: SetEquipmentType["id"];
+  quoteSetId?: QuoteSetType["id"];
   equipmentId: EquipmentListItemType["id"];
   quantity: number;
 };

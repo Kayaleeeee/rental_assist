@@ -1,6 +1,9 @@
 import { createQuote, updateQuote } from "@/app/api/quote";
 import { QuoteItemPostPayload, QuoteSetPayload } from "@/app/types/quoteType";
-import { getValidReservationForm } from "../utils/reservationUtils";
+import {
+  getEquipmentTotalPrice,
+  getValidReservationForm,
+} from "../utils/reservationUtils";
 import { ReservationFormState } from "../hooks/useReservationForm";
 import {
   EquipmentListItemState,
@@ -15,11 +18,13 @@ export const onCreateReservation = async ({
   dateRange,
   equipmentItemList,
   groupEquipmentList,
+  rentalDays,
 }: {
   form: ReservationFormState;
   dateRange: { startDate?: string; endDate?: string };
   equipmentItemList: EquipmentListItemState[];
   groupEquipmentList: SetEquipmentStateType[];
+  rentalDays: number;
 }) => {
   try {
     // 유효한 예약 데이터 확인
@@ -28,6 +33,7 @@ export const onCreateReservation = async ({
       dateRange,
       equipmentItemList,
       groupEquipmentList,
+      rentalDays,
     });
 
     if (!validForm) throw new Error("form validation 실패");
@@ -39,7 +45,8 @@ export const onCreateReservation = async ({
     const { quoteItemList, quoteGroupList } = prepareQuoteData(
       equipmentItemList,
       groupEquipmentList,
-      quoteResult.id
+      quoteResult.id,
+      rentalDays
     );
 
     // 병렬로 데이터 생성
@@ -72,10 +79,11 @@ export const onCreateReservation = async ({
 const prepareQuoteData = (
   equipmentItemList: EquipmentListItemState[],
   groupEquipmentList: SetEquipmentStateType[],
-  quoteId: number
+  quoteId: number,
+  rentalDays: number
 ) => {
   const quoteItemList: QuoteItemPostPayload = [];
-  const quoteGroupList: QuoteSetPayload = [];
+  const quoteGroupList: QuoteSetPayload[] = [];
 
   // 개별 장비 처리
   if (!isEmpty(equipmentItemList)) {
@@ -84,7 +92,7 @@ const prepareQuoteData = (
         equipmentId: item.equipmentId,
         quantity: item.quantity,
         price: item.price,
-        totalPrice: item.totalPrice,
+        totalPrice: getEquipmentTotalPrice(item, rentalDays),
         quoteId,
         setId: null,
       });
@@ -95,7 +103,7 @@ const prepareQuoteData = (
   if (!isEmpty(groupEquipmentList)) {
     groupEquipmentList.forEach((item) => {
       quoteGroupList.push({
-        setId: item.id,
+        setId: item.setId,
         quoteId,
         price: item.price,
         totalPrice: item.totalPrice,
@@ -108,7 +116,7 @@ const prepareQuoteData = (
           price: 0,
           quoteId,
           totalPrice: item.totalPrice,
-          setId: item.id,
+          setId: item.setId,
         });
       });
     });

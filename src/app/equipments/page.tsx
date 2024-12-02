@@ -20,6 +20,7 @@ import { SetEquipmentList } from "./sets/modules/SetEquipmentList";
 import { showToast } from "../utils/toastUtils";
 import { useEquipmentCart } from "./hooks/useEquipmentCart";
 import { convertEquipmentItemToState } from "../types/mapper/convertEquipmentItemToState";
+import { convertGroupEquipmentToState } from "../types/mapper/convertGropEquipmentToState";
 
 export default function EquipmentPage() {
   const router = useRouter();
@@ -60,10 +61,7 @@ export default function EquipmentPage() {
       selectedEquipmentList.map(convertEquipmentItemToState)
     );
     handleAddEquipmentGroup(
-      selectedEquipmentSetList.map((set) => ({
-        ...set,
-        equipmentList: set.equipmentList.map(convertEquipmentItemToState),
-      }))
+      selectedEquipmentSetList.map(convertGroupEquipmentToState)
     );
 
     showToast({

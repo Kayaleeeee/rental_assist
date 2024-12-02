@@ -5,6 +5,7 @@ export const convertQuoteItemToEquipmentState = (
   item: QuoteItemType
 ): EquipmentListItemState => {
   return {
+    ...item,
     equipmentId: item.equipmentId,
     title: item.equipmentName,
     quantity: item.quantity,

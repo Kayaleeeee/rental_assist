@@ -1,6 +1,6 @@
 import { SetEquipmentType } from "./equipmentType";
 import { ListParamsType } from "./listType";
-import { QuoteItemType } from "./quoteType";
+import { QuoteItemType, QuoteSetType } from "./quoteType";
 import { UserType } from "./userType";
 
 export type ReservationType = {
@@ -54,12 +54,13 @@ export type ReservationDetailType = ReservationType & {
   paymentMethod?: PaymentMethod;
   equipmentList: QuoteItemType[];
   setList: {
-    id: SetEquipmentType["id"];
+    id: QuoteSetType["id"];
     title: SetEquipmentType["title"];
     price: SetEquipmentType["price"];
     discountedPrice: number;
     totalPrice: number;
     equipmentList: QuoteItemType[];
+    setId: SetEquipmentType["id"];
   }[];
 };
 
