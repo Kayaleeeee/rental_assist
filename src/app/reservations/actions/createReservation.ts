@@ -1,6 +1,7 @@
 import { createQuote, updateQuote } from "@/app/api/quote";
-import { QuoteItemPostPayload, QuoteSetPayload } from "@/app/types/quoteType";
+import { QuoteItemPostPayload } from "@/app/types/quoteType";
 import {
+  getEquipmentGroupTotalPrice,
   getEquipmentTotalPrice,
   getValidReservationForm,
 } from "../utils/reservationUtils";
@@ -42,18 +43,47 @@ export const onCreateReservation = async ({
     const quoteResult = await createQuote(validForm);
     if (!quoteResult) throw new Error("견적 생성 실패");
 
-    const { quoteItemList, quoteGroupList } = prepareQuoteData(
-      equipmentItemList,
-      groupEquipmentList,
-      quoteResult.id,
-      rentalDays
-    );
+    if (!isEmpty(equipmentItemList)) {
+      const payload: QuoteItemPostPayload = equipmentItemList.map((item) => ({
+        equipmentId: item.equipmentId,
+        quantity: item.quantity,
+        price: item.price,
+        totalPrice: getEquipmentTotalPrice(item, rentalDays),
+        quoteId: quoteResult.id,
+        quoteSetId: null,
+        setId: null,
+      }));
 
-    // 병렬로 데이터 생성
-    await Promise.all([
-      !isEmpty(quoteGroupList) && createQuoteSet(quoteGroupList),
-      createQuoteItemList(quoteItemList),
-    ]);
+      await createQuoteItemList(payload);
+    }
+
+    if (!isEmpty(groupEquipmentList)) {
+      groupEquipmentList.forEach(async (set) => {
+        const result = await createQuoteSet([
+          {
+            setId: set.setId,
+            quoteId: quoteResult.id,
+            price: set.price,
+            totalPrice: getEquipmentGroupTotalPrice(set, rentalDays),
+            discountPrice: set.discountPrice || 0,
+          },
+        ]);
+
+        if (isEmpty(result)) throw new Error("quote set 생성 실패");
+
+        const quoteItemPayload = set.equipmentList.map((item) => ({
+          equipmentId: item.equipmentId,
+          quantity: item.quantity,
+          price: 0,
+          totalPrice: 0,
+          quoteId: quoteResult.id,
+          quoteSetId: result[0].id,
+          setId: set.setId,
+        }));
+
+        await createQuoteItemList(quoteItemPayload);
+      });
+    }
 
     // 예약 생성
     const reservationResult = await postReservation({
@@ -73,54 +103,4 @@ export const onCreateReservation = async ({
     console.error("예약 생성 중 오류:", error);
     throw error;
   }
-};
-
-// Helper 함수로 데이터 준비 로직 분리
-const prepareQuoteData = (
-  equipmentItemList: EquipmentListItemState[],
-  groupEquipmentList: SetEquipmentStateType[],
-  quoteId: number,
-  rentalDays: number
-) => {
-  const quoteItemList: QuoteItemPostPayload = [];
-  const quoteGroupList: QuoteSetPayload[] = [];
-
-  // 개별 장비 처리
-  if (!isEmpty(equipmentItemList)) {
-    equipmentItemList.forEach((item) => {
-      quoteItemList.push({
-        equipmentId: item.equipmentId,
-        quantity: item.quantity,
-        price: item.price,
-        totalPrice: getEquipmentTotalPrice(item, rentalDays),
-        quoteId,
-        setId: null,
-      });
-    });
-  }
-
-  // 그룹 장비 처리
-  if (!isEmpty(groupEquipmentList)) {
-    groupEquipmentList.forEach((item) => {
-      quoteGroupList.push({
-        setId: item.setId,
-        quoteId,
-        price: item.price,
-        totalPrice: item.totalPrice,
-      });
-
-      item.equipmentList.forEach((equipment) => {
-        quoteItemList.push({
-          equipmentId: equipment.equipmentId,
-          quantity: equipment.quantity,
-          price: 0,
-          quoteId,
-          totalPrice: item.totalPrice,
-          setId: item.setId,
-        });
-      });
-    });
-  }
-
-  return { quoteItemList, quoteGroupList };
 };

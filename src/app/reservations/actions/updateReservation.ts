@@ -136,7 +136,6 @@ export const onUpdateReservation = async ({
 
     // (4): 각 Set의 `equipmentList` 변경 사항 확인
     const equipmentChangesBySet = updatedSets.map((updatedSet) => {
-      console.log("updateSet", updatedSet);
       const originSet = originSetList.find(
         (set) => set.quoteSetId === updatedSet.quoteSetId
       );
