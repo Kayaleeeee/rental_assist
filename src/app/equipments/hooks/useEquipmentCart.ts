@@ -8,20 +8,18 @@ import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 export const useEquipmentCart = () => {
   const {
     resetCart,
     dateRange,
-    onChangeDate,
     setDateRange,
     isCartOpen,
     setIsCartOpen,
 
     equipmentItemList,
     setEquipmentItemList,
-    addEquipment,
     removeEquipment,
     changeEquipmentItem,
 
@@ -135,9 +133,9 @@ export const useEquipmentCart = () => {
     return equipmentItemList.some((item) => !item.isAvailable);
   }, [equipmentItemList]);
 
-  const handleAddEquipmentList = useCallback(
-    (itemList: EquipmentListItemState[]) => {
-      addEquipment(itemList);
+  const handleChangeDate = useCallback(
+    (dateRange: { startDate?: string; endDate?: string }) => {
+      setDateRange(dateRange);
       setIsChecked(false);
     },
     []
@@ -145,10 +143,19 @@ export const useEquipmentCart = () => {
 
   const handleAddEquipmentGroup = useCallback(
     (equipmentList: SetEquipmentStateType[]) => {
-      addEquipmentGroup(
-        equipmentList.map((group) => ({
-          ...group,
-          totalPrice: group.price * rentalDays - (group.discountPrice || 0),
+      addEquipmentGroup(equipmentList);
+      setIsChecked(false);
+    },
+    [rentalDays]
+  );
+
+  const handleAddEquipmentList = useCallback(
+    (equipmentList: EquipmentListItemState[]) => {
+      setEquipmentItemList(
+        equipmentList.map((item) => ({
+          ...item,
+          totalPrice:
+            item.price * rentalDays * item.quantity - (item.discountPrice || 0),
         }))
       );
       setIsChecked(false);
@@ -195,29 +202,11 @@ export const useEquipmentCart = () => {
     setIsChecked(false);
   };
 
-  useEffect(() => {
-    setEquipmentItemList(
-      equipmentItemList.map((item) => ({
-        ...item,
-        totalPrice:
-          item.price * rentalDays * item.quantity - (item.discountPrice || 0),
-      }))
-    );
-
-    setEquipmentGroupList(
-      equipmentGroupList.map((item) => ({
-        ...item,
-        totalPrice: item.price * rentalDays - (item.discountPrice || 0),
-      }))
-    );
-  }, [rentalDays]);
-
   return {
     hasUnavailableItem,
     handleCheckAvailability,
-    onChangeDate,
     dateRange,
-    setDateRange,
+    handleChangeDate,
     resetCart,
     rentalDays,
 
@@ -233,13 +222,11 @@ export const useEquipmentCart = () => {
     handleDeleteGroupEquipmentItem,
     handleChangeGroupEquipment,
     handleAddEquipmentGroup,
-    setEquipmentGroupList,
 
     //단품 아이템
     equipmentItemList,
     handleAddEquipmentList,
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
-    setEquipmentItemList,
   };
 };

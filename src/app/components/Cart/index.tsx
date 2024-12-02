@@ -35,11 +35,10 @@ export const Cart = () => {
 
   const {
     hasUnavailableItem,
-    onChangeDate,
+    handleChangeDate,
     dateRange,
     handleCheckAvailability,
     isChecked,
-    setEquipmentItemList,
     rentalDays,
     setIsCartOpen,
     isCartOpen,
@@ -47,6 +46,7 @@ export const Cart = () => {
     handleChangeGroupEquipment,
     handleDeleteGroupEquipment,
     handleDeleteEquipmentItem,
+    handleAddEquipmentList,
     equipmentItemList,
     equipmentGroupList,
   } = useEquipmentCart();
@@ -74,15 +74,7 @@ export const Cart = () => {
     if (!isOkToMakeReservation) {
       handleCheckAvailability();
     } else {
-      setEquipmentItemList(
-        equipmentItemList.map((item) => ({
-          equipmentId: item.equipmentId,
-          title: item.title,
-          price: item.price,
-          quantity: 1,
-          totalPrice: item.price * rentalDays,
-        }))
-      );
+      handleAddEquipmentList(equipmentItemList);
       handleCloseCart();
       router.push("/reservations/create");
     }
@@ -90,7 +82,7 @@ export const Cart = () => {
     isOkToMakeReservation,
     equipmentItemList,
     handleCheckAvailability,
-    setEquipmentItemList,
+    handleAddEquipmentList,
     router,
     rentalDays,
   ]);
@@ -120,7 +112,7 @@ export const Cart = () => {
               value={dateRange.startDate}
               onChange={(value) => {
                 if (!value) return;
-                onChangeDate("startDate", value);
+                handleChangeDate({ ...dateRange, startDate: value });
               }}
             />
             <Margin bottom={10} />
@@ -132,7 +124,7 @@ export const Cart = () => {
               value={dateRange.endDate}
               onChange={(value) => {
                 if (!value) return;
-                onChangeDate("endDate", value);
+                handleChangeDate({ ...dateRange, endDate: value });
               }}
             />
           </div>

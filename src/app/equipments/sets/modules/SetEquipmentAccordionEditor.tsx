@@ -8,11 +8,12 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import { SetEquipmentStateType } from "@/app/store/useCartStore";
 import { getAvailableStatus } from "@/app/components/Cart";
 import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { QuoteEquipmentMoreMenu } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { convertStateToEquipmentItem } from "@/app/types/mapper/convertStateToEquipmentItem";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
+import { getEquipmentGroupTotalPrice } from "@/app/reservations/utils/reservationUtils";
 
 type Props = {
   equipmentSet: SetEquipmentStateType;
@@ -31,9 +32,14 @@ export const SetEquipmentAccordionEditor = ({
   deleteSetEquipment,
   changeSetEquipment,
   showPrice,
-  rentalDays,
+  rentalDays = 0,
 }: Props) => {
   const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
+
+  const currentTotalPrice = useMemo(() => {
+    return getEquipmentGroupTotalPrice(equipmentSet, rentalDays);
+  }, [equipmentSet, rentalDays]);
+
   return (
     <Accordion expanded className={styles.customAccordion}>
       <AccordionSummary>
@@ -49,9 +55,12 @@ export const SetEquipmentAccordionEditor = ({
           <QuoteEquipmentMoreMenu
             menuOpen={isOpenMenu}
             closeMenu={() => setIsOpenMenu(false)}
-            totalPrice={equipmentSet.totalPrice || 0}
+            currentPrice={currentTotalPrice}
             onChangeTotalPrice={(changedPrice) =>
-              changeSetEquipment({ ...equipmentSet, totalPrice: changedPrice })
+              changeSetEquipment({
+                ...equipmentSet,
+                discountPrice: changedPrice,
+              })
             }
             onConfirm={(menu) => {
               if (!menu) return;
@@ -111,9 +120,29 @@ export const SetEquipmentAccordionEditor = ({
         {showPrice && (
           <Margin top={20}>
             <div className={styles.inlineWrapper}>
-              {rentalDays && <div className={styles.days}>{rentalDays}일</div>}
-              <div className={styles.priceWrapper}>
-                총 {formatLocaleString(equipmentSet.totalPrice)}원
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <div className={styles.priceWrapper}>
+                  단가: {formatLocaleString(equipmentSet.price)}원
+                </div>
+                <div className={styles.priceWrapper}>* 1 개</div>
+
+                {rentalDays > 0 && (
+                  <div className={styles.days}> * {rentalDays}일</div>
+                )}
+              </div>
+              <div
+                className={styles.priceWrapper}
+                style={{
+                  fontWeight: "bold",
+                }}
+              >
+                총 {formatLocaleString(currentTotalPrice)}원
               </div>
             </div>
           </Margin>

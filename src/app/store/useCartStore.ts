@@ -7,7 +7,6 @@ export type EquipmentListItemState = {
   title: string;
   price: number;
   quantity: number;
-  totalPrice: number;
   category?: EquipmentCategory;
   discountPrice?: number;
   id?: QuoteItemType["id"];
@@ -37,9 +36,8 @@ type CartState = {
   removeEquipmentGroup: (setEquipmentId: SetEquipmentStateType["id"]) => void;
   changeEquipmentGroup: (setEquipment: SetEquipmentStateType) => void;
 
-  dateRange: { startDate: string | undefined; endDate: string | undefined };
-  onChangeDate: (key: "startDate" | "endDate", date: string) => void;
-  setDateRange: (dateRange: { startDate: string; endDate: string }) => void;
+  dateRange: { startDate?: string; endDate?: string };
+  setDateRange: (dateRange: { startDate?: string; endDate?: string }) => void;
 
   isCartOpen: boolean;
   setIsCartOpen: (isOpen: boolean) => void;
@@ -95,9 +93,6 @@ export const useCartStore = create<CartState>((set, get) => ({
         setEquipmentItem.id === changedSet.id ? changedSet : setEquipmentItem
       ),
     });
-  },
-  onChangeDate: (key, date) => {
-    set({ dateRange: { ...get().dateRange, [key]: date } });
   },
   setDateRange: (dateRange) => {
     set({ dateRange });

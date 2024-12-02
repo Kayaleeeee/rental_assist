@@ -3,6 +3,8 @@ import styles from "./quoteEquipmentMenu.module.scss";
 import { Modal } from "@/app/components/Modal";
 import { Margin } from "@/app/components/Margin";
 import { EditableField } from "@/app/components/EditableField";
+import { formatLocaleString } from "@/app/utils/priceUtils";
+// import { Button } from "@/app/components/Button";
 
 const menu = [
   { key: "delete", title: "제거" },
@@ -10,7 +12,7 @@ const menu = [
 ];
 
 type Props = {
-  totalPrice: number;
+  currentPrice: number;
   onChangeTotalPrice: (price: number) => void;
   onConfirm: (menu?: { key: string; title: string }) => void;
   menuOpen: boolean;
@@ -18,7 +20,7 @@ type Props = {
 };
 
 export const QuoteEquipmentMoreMenu = ({
-  totalPrice,
+  currentPrice,
   onChangeTotalPrice,
   onConfirm,
   closeMenu,
@@ -57,7 +59,7 @@ export const QuoteEquipmentMoreMenu = ({
     <>
       {mode === "price" && (
         <PriceChangingModal
-          currentPrice={totalPrice}
+          currentPrice={currentPrice}
           onClose={() => {
             handleConfirm(undefined);
           }}
@@ -118,11 +120,17 @@ const PriceChangingModal = ({
       <div>
         <div className={styles.priceModalTitle}>가격 변경</div>
         <Margin top={10} bottom={10}>
-          총 가격
+          현재 총 가격: {formatLocaleString(currentPrice)}원
         </Margin>
+
+        <Margin top={10} bottom={10}>
+          변경할 가격
+        </Margin>
+
         <EditableField
           fullWidth
           value={price}
+          size="small"
           onChange={(e) => {
             const value = Number(e.target.value);
 

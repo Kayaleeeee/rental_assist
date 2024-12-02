@@ -8,7 +8,6 @@ export const convertEquipmentItemToState = (
   title: equipment.title,
   quantity: equipment.quantity,
   price: equipment.price,
-  totalPrice: equipment.price * equipment.quantity,
   discountPrice: 0,
   isAvailable: true,
 });

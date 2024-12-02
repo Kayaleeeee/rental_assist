@@ -7,22 +7,76 @@ import {
   SetEquipmentStateType,
 } from "@/app/store/useCartStore";
 
-const getSumOfPrice = (
-  field: "price" | "totalPrice",
-  equipmentItemList: EquipmentListItemState[],
-  groupEquipmentList: SetEquipmentStateType[]
-): number => {
-  const equipmentPrice = equipmentItemList.reduce(
-    (prev, acc) => (prev += acc[field]),
-    0
-  );
+//equipment list 총 가격
+export const getAllEquipmentTotalPrice = (
+  list: EquipmentListItemState[],
+  rentalDays: number
+) => {
+  return list.reduce((prev, item) => {
+    return (prev += getEquipmentTotalPrice(item, rentalDays));
+  }, 0);
+};
 
-  const groupEquipmentPrice = groupEquipmentList.reduce(
-    (prev, acc) => (prev += acc[field]),
-    0
-  );
+//equipment 단품 최종 가격
+export const getEquipmentTotalPrice = (
+  item: EquipmentListItemState,
+  rentalDays: number
+) => {
+  return item.price * item.quantity * rentalDays - (item.discountPrice || 0);
+};
 
-  return Number(equipmentPrice + groupEquipmentPrice);
+// 세트 구성 하나당 총 가격
+export const getEquipmentGroupTotalPrice = (
+  list: SetEquipmentStateType,
+  rentalDays: number
+) => {
+  return list.price * rentalDays - (list.discountPrice || 0);
+};
+
+// 세트 리스트 최종 합산 가격
+export const getAllEquipmentGroupTotalPrice = (
+  list: SetEquipmentStateType[],
+  rentalDays: number
+) => {
+  return list.reduce((prev, item) => {
+    return (prev += getEquipmentGroupTotalPrice(item, rentalDays));
+  }, 0);
+};
+
+//equipment list 정가 합산 가격
+export const getAllEquipmentSupplyPrice = (
+  list: EquipmentListItemState[],
+  rentalDays: number
+) => {
+  return list.reduce((prev, item) => {
+    return (prev += getEquipmentSupplyPrice(item, rentalDays));
+  }, 0);
+};
+
+//equipment 단품 정가
+export const getEquipmentSupplyPrice = (
+  item: EquipmentListItemState,
+  rentalDays: number
+) => {
+  return item.price * item.quantity * rentalDays;
+};
+
+// 세트 구성 하나당 공급 가격
+export const getEquipmentGroupSupplyPrice = (
+  list: SetEquipmentStateType,
+  rentalDays: number
+) => {
+  return list.price * rentalDays;
+};
+
+// 세트 리스트 정가 합산 가격
+export const getAllEquipmentGroupSupplyPrice = (
+  list: SetEquipmentStateType[],
+  rentalDays: number
+) => {
+  return list.reduce((prev, item) => {
+    return (prev += getEquipmentGroupSupplyPrice(item, rentalDays));
+  }, 0);
 };
 
 export const getValidReservationForm = ({
@@ -30,11 +84,13 @@ export const getValidReservationForm = ({
   dateRange,
   equipmentItemList,
   groupEquipmentList,
+  rentalDays,
 }: {
   form: ReservationFormState;
   dateRange: { startDate?: string; endDate?: string };
   equipmentItemList: EquipmentListItemState[];
   groupEquipmentList: SetEquipmentStateType[];
+  rentalDays: number;
 }): QuotePostPayload | null => {
   if (!form.userId) {
     showToast({
@@ -60,16 +116,13 @@ export const getValidReservationForm = ({
     return null;
   }
 
-  const totalPrice = getSumOfPrice(
-    "totalPrice",
-    equipmentItemList,
-    groupEquipmentList
-  );
-  const supplyPrice = getSumOfPrice(
-    "price",
-    equipmentItemList,
-    groupEquipmentList
-  );
+  const totalPrice =
+    getAllEquipmentTotalPrice(equipmentItemList, rentalDays) +
+    getAllEquipmentGroupTotalPrice(groupEquipmentList, rentalDays);
+
+  const supplyPrice =
+    getAllEquipmentSupplyPrice(equipmentItemList, rentalDays) +
+    getAllEquipmentGroupSupplyPrice(groupEquipmentList, rentalDays);
 
   return {
     ...form,

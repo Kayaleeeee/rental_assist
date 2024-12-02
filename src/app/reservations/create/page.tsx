@@ -11,11 +11,6 @@ import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EquipmentSearchModal } from "../modules/form/EquipmentSearchModal";
 import { QuotationItemEditor } from "../modules/form/QuotationItemEditor";
-import {
-  formatKoreanCurrency,
-  formatLocaleString,
-} from "@/app/utils/priceUtils";
-
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../users/modules/UserSearchModal";
@@ -35,6 +30,16 @@ import { isEmpty, isNil } from "lodash";
 import { onCreateReservation } from "../actions/createReservation";
 import { useRouter } from "next/navigation";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
+import {
+  getAllEquipmentGroupSupplyPrice,
+  getAllEquipmentGroupTotalPrice,
+  getAllEquipmentSupplyPrice,
+  getAllEquipmentTotalPrice,
+} from "../utils/reservationUtils";
+import {
+  formatKoreanCurrency,
+  formatLocaleString,
+} from "@/app/utils/priceUtils";
 
 const ReservationCreatePage = () => {
   const router = useRouter();
@@ -48,7 +53,7 @@ const ReservationCreatePage = () => {
 
   const {
     // hasUnavailableItem,
-    onChangeDate,
+    handleChangeDate,
     dateRange,
     // handleCheckAvailability,
     isChecked,
@@ -120,7 +125,7 @@ const ReservationCreatePage = () => {
       const convertedList = list.map(convertEquipmentItemToState);
 
       if (changingStatus.mode === "item") {
-        handleAddEquipmentList(convertedList);
+        handleAddEquipmentList([...equipmentItemList, ...convertedList]);
         return;
       }
 
@@ -137,37 +142,32 @@ const ReservationCreatePage = () => {
         }
       }
     },
-    [changingStatus, equipmentGroupList]
+    [changingStatus, equipmentGroupList, equipmentItemList]
   );
 
-  const { supplyPrice: totalSupplyPrice, totalPrice: finalTotalPrice } =
+  const { total: reservationTotalPrice, supply: reservationSupplyPrice } =
     useMemo(() => {
-      const [itemSupply, itemTotal] = equipmentItemList.reduce(
-        (prev, item) => {
-          let [supply, total] = prev;
-          const supplyPrice = (supply +=
-            item.quantity * item.price * rentalDays);
-          const totalPrice = (total += item.totalPrice || 0);
-
-          return [supplyPrice, totalPrice];
-        },
-        [0, 0]
+      const listTotalPrice = getAllEquipmentTotalPrice(
+        equipmentItemList,
+        rentalDays
+      );
+      const groupTotalPrice = getAllEquipmentGroupTotalPrice(
+        equipmentGroupList,
+        rentalDays
       );
 
-      const [groupSupply, groupTotal] = equipmentGroupList.reduce(
-        (prev, item) => {
-          let [supply, total] = prev;
-          const supplyPrice = (supply += item.price * rentalDays);
-          const totalPrice = (total += item.totalPrice || 0);
-
-          return [supplyPrice, totalPrice];
-        },
-        [0, 0]
+      const listSupply = getAllEquipmentSupplyPrice(
+        equipmentItemList,
+        rentalDays
+      );
+      const groupSupply = getAllEquipmentGroupSupplyPrice(
+        equipmentGroupList,
+        rentalDays
       );
 
       return {
-        supplyPrice: itemSupply + groupSupply,
-        totalPrice: itemTotal + groupTotal,
+        total: listTotalPrice + groupTotalPrice,
+        supply: listSupply + groupSupply,
       };
     }, [equipmentGroupList, equipmentItemList, rentalDays]);
 
@@ -230,7 +230,7 @@ const ReservationCreatePage = () => {
               value={dateRange.startDate}
               onChange={(value) => {
                 if (!value) return;
-                onChangeDate("startDate", value);
+                handleChangeDate({ ...dateRange, startDate: value });
               }}
             />
             <div className={styles.separator}>~</div>
@@ -241,7 +241,7 @@ const ReservationCreatePage = () => {
               minDateTime={dayjs(dateRange.startDate)}
               onChange={(value) => {
                 if (!value) return;
-                onChangeDate("endDate", value);
+                handleChangeDate({ ...dateRange, endDate: value });
               }}
             />
           </div>
@@ -321,7 +321,7 @@ const ReservationCreatePage = () => {
             <div className={styles.priceSection}>
               <div className={styles.discountPriceWrapper}>
                 <Label title="정가" />
-                <div>{formatLocaleString(totalSupplyPrice)}원</div>
+                <div>{formatLocaleString(reservationSupplyPrice)}원</div>
               </div>
               {isDiscounted ? (
                 <div className={styles.discountPriceWrapper}>
@@ -359,9 +359,9 @@ const ReservationCreatePage = () => {
 
               <div className={styles.totalPriceWrapper}>
                 <div className={styles.totalPrice}>
-                  총 {formatLocaleString(finalTotalPrice)}원 (
+                  총 {formatLocaleString(reservationTotalPrice)}원 (
                 </div>
-                <div> {formatKoreanCurrency(finalTotalPrice)})</div>
+                <div> {formatKoreanCurrency(reservationTotalPrice)})</div>
               </div>
             </div>
           )}

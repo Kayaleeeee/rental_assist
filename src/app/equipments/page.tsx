@@ -13,13 +13,13 @@ import { Margin } from "../components/Margin";
 import { CategoryList } from "../components/Category/CategoryList";
 import { useCallback, useEffect, useState } from "react";
 import { isEmpty } from "lodash";
-import { EquipmentListItemState } from "../store/useCartStore";
 import { EquipmentListTable } from "./modules/EquipmentListTable";
 import styles from "./page.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { SetEquipmentList } from "./sets/modules/SetEquipmentList";
 import { showToast } from "../utils/toastUtils";
 import { useEquipmentCart } from "./hooks/useEquipmentCart";
+import { convertEquipmentItemToState } from "../types/mapper/convertEquipmentItemToState";
 
 export default function EquipmentPage() {
   const router = useRouter();
@@ -56,21 +56,13 @@ export default function EquipmentPage() {
     if (isEmpty(selectedEquipmentList) && isEmpty(selectedEquipmentSetList))
       return;
 
-    const convertItem = (
-      equipment: EquipmentListItemType
-    ): EquipmentListItemState => ({
-      equipmentId: equipment.id,
-      title: equipment.title,
-      price: equipment.price,
-      quantity: equipment.quantity,
-      totalPrice: equipment.price,
-    });
-
-    handleAddEquipmentList(selectedEquipmentList.map(convertItem));
+    handleAddEquipmentList(
+      selectedEquipmentList.map(convertEquipmentItemToState)
+    );
     handleAddEquipmentGroup(
       selectedEquipmentSetList.map((set) => ({
         ...set,
-        equipmentList: set.equipmentList.map(convertItem),
+        equipmentList: set.equipmentList.map(convertEquipmentItemToState),
       }))
     );
 

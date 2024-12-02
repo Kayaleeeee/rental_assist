@@ -8,6 +8,8 @@ import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import { EditableField } from "@/app/components/EditableField";
 import { QuoteEquipmentMoreMenu } from "./QuoteEquipmentMenu";
 import { Margin } from "@/app/components/Margin";
+import { isNil } from "lodash";
+import { getEquipmentTotalPrice } from "../../utils/reservationUtils";
 
 type Props = {
   rentalDays: number;
@@ -28,17 +30,21 @@ export const QuotationItemEditor = ({
   reservationId,
   quantityOnly = false,
 }: Props) => {
+  const quoteItemTotalPrice = useMemo(() => {
+    return getEquipmentTotalPrice(quoteState, rentalDays);
+  }, [quoteState, rentalDays]);
+
   const [quantityState, setQuantityState] = useState<number>(
     quoteState.quantity
   );
   const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
 
   const priceDiff = useMemo(() => {
-    const diff = (quoteState.totalPrice || 0) - quoteState.price * rentalDays;
+    const diff = quoteState.discountPrice;
 
-    if (diff === 0) return undefined;
-    return `${diff > 0 && "+"}${formatLocaleString(diff)}`;
-  }, [rentalDays, quoteState.totalPrice, quoteState.price]);
+    if (diff === 0 || isNil(diff)) return undefined;
+    return `${diff > 0 ? "+" : ""}${formatLocaleString(diff)}`;
+  }, [rentalDays, quoteState.discountPrice]);
 
   const styleByStatus = useMemo((): {
     color: string;
@@ -94,9 +100,9 @@ export const QuotationItemEditor = ({
           <QuoteEquipmentMoreMenu
             menuOpen={isOpenMenu}
             closeMenu={() => setIsOpenMenu(false)}
-            totalPrice={quoteState.totalPrice || 0}
+            currentPrice={quoteItemTotalPrice}
             onChangeTotalPrice={(changedPrice) =>
-              onChangeField({ ...quoteState, totalPrice: changedPrice })
+              onChangeField({ ...quoteState, discountPrice: changedPrice })
             }
             onConfirm={(menu) => {
               if (!menu) return;
@@ -140,13 +146,14 @@ export const QuotationItemEditor = ({
             <div className={styles.supplyPrice}>
               단가: {formatLocaleString(quoteState.price)}원
             </div>
+            <Margin right={8} />
             {priceDiff && (
               <div className={styles.diffPrice}>조정 가격: {priceDiff}원</div>
             )}
           </div>
         )}
         <div className={styles.totalPrice}>
-          총 {formatLocaleString(quoteState?.totalPrice || 0)}원
+          총 {formatLocaleString(quoteItemTotalPrice)}원
         </div>
       </div>
     </div>
