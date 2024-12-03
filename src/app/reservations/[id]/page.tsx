@@ -31,10 +31,10 @@ import { ReservationStatusText } from "../modules/ReservationStatusText";
 import { PaymentStatusChangeModal } from "../modules/list/PaymentStatusChangeModal";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
-import { QuotationItem } from "../modules/form/QuotationItem";
 import { isEmpty } from "lodash";
 import { convertQuoteItemToEquipmentItem } from "@/app/types/mapper/convertQuoteItemToEquipmentItem";
 import { GroupEquipment } from "@/app/equipments/sets/modules/GroupEquipment";
+import { ReservationItemTable } from "../modules/form/ReservationItemTable";
 
 const defaultString = "-";
 
@@ -237,18 +237,10 @@ const ReservationDetailPage = () => {
 
           <div className={formStyles.sectionWrapper}>
             <Label title="대여 장비 목록" />
-
-            <div className={styles.equipmentListWrapper}>
-              {reservationDetail.equipmentList.map((quote) => {
-                return (
-                  <QuotationItem
-                    key={quote.id}
-                    quoteItem={quote}
-                    rentalDays={rentalDays}
-                  />
-                );
-              })}
-            </div>
+            <ReservationItemTable
+              rentalDays={rentalDays}
+              rows={reservationDetail.equipmentList}
+            />
           </div>
 
           {!isEmpty(reservationDetail.setList) && (
@@ -266,6 +258,7 @@ const ReservationDetailPage = () => {
                       price={item.price}
                       totalPrice={item.totalPrice}
                       equipmentList={convertedList}
+                      rentalDays={rentalDays}
                     />
                   );
                 })}

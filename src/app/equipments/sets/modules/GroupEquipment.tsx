@@ -10,6 +10,7 @@ type Props = {
   price: number;
   totalPrice: number;
   equipmentList: EquipmentListItemType[];
+  rentalDays: number;
 };
 
 export const GroupEquipment = ({
@@ -17,6 +18,7 @@ export const GroupEquipment = ({
   price,
   totalPrice,
   equipmentList,
+  rentalDays,
 }: Props) => {
   return (
     <Accordion expanded className={styles.customAccordion}>
@@ -35,12 +37,34 @@ export const GroupEquipment = ({
             />
           ))}
         </div>
-        <Margin top={8} />
-        {price && (
-          <div className={styles.priceWrapper}>
-            총 {formatLocaleString(totalPrice)}원
+        <Margin top={20}>
+          <div className={styles.inlineWrapper}>
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <div className={styles.priceWrapper}>
+                단가: {formatLocaleString(price)}원
+              </div>
+              <div className={styles.priceWrapper}>* 1 개</div>
+
+              {rentalDays > 0 && (
+                <div className={styles.days}> * {rentalDays}일</div>
+              )}
+            </div>
+            <div
+              className={styles.priceWrapper}
+              style={{
+                fontWeight: "bold",
+              }}
+            >
+              총 {formatLocaleString(totalPrice)}원
+            </div>
           </div>
-        )}
+        </Margin>
       </AccordionDetails>
     </Accordion>
   );
