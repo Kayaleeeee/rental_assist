@@ -121,3 +121,57 @@ export const postSetEquipment = async (payload: {}) => {
     return result[0];
   }
 };
+
+export const getEquipmentRentalHistoryByDate = async ({
+  equipmentId,
+  startDate,
+  endDate,
+}: {
+  equipmentId: EquipmentListItemType["id"];
+  startDate: string;
+  endDate: string;
+}): Promise<EquipmentItemWithRentedDates[] | null> => {
+  const convertParams = () => {
+    if (!startDate || !endDate || !equipmentId) return {};
+
+    return {
+      start_date_param: startDate,
+      end_date_param: endDate,
+      equipment_id_param: equipmentId,
+    };
+  };
+
+  const result = await apiPost<EquipmentItemWithRentedDates[]>(
+    `/rpc/get_equipment_with_rented_dates`,
+    convertParams()
+  );
+
+  return isEmpty(result) ? [] : result;
+};
+
+export const getEquipmentListRentalHistoryByDate = async ({
+  idList,
+  startDate,
+  endDate,
+}: {
+  idList: EquipmentListItemType["id"][];
+  startDate: string;
+  endDate: string;
+}): Promise<EquipmentItemWithRentedDates[] | null> => {
+  const convertParams = () => {
+    if (!startDate || !endDate || isEmpty(idList)) return {};
+
+    return {
+      start_date_param: startDate,
+      end_date_param: endDate,
+      equipment_ids: idList,
+    };
+  };
+
+  const result = await apiPost<EquipmentItemWithRentedDates[]>(
+    `/rpc/get_equipment_list_with_rented_dates`,
+    convertParams()
+  );
+
+  return isEmpty(result) ? [] : result;
+};

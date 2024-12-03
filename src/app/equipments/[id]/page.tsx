@@ -12,8 +12,11 @@ import {
 } from "@/app/utils/priceUtils";
 import { useEquipmentDetail } from "./hooks/useEquipmentDetail";
 import { useParams, useRouter } from "next/navigation";
-import { EquipmentCategoryList } from "@/app/types/equipmentType";
-import { useCallback, useMemo, useState } from "react";
+import {
+  EquipmentCategoryList,
+  EquipmentItemWithRentedDates,
+} from "@/app/types/equipmentType";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
 import {
@@ -24,24 +27,36 @@ import { useEquipmentRentalDates } from "../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
 import { deleteEquipment } from "@/app/api/equipments";
 import { showToast } from "@/app/utils/toastUtils";
+import { getPaddingDateRange } from "@/app/utils/timeUtils";
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const equipmentId = Number(params.id);
   const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
-  const { rentalInfo } = useEquipmentRentalDates(equipmentId);
+  const [rentalInfo, setRentalInfo] = useState<EquipmentItemWithRentedDates[]>(
+    []
+  );
+  const { fetchSingleEquipmentRentalHistory } = useEquipmentRentalDates();
   const [currentDate, setCurrentDate] = useState(dayjs());
 
   const eventDateList: CalendarEventType[] = useMemo(() => {
+    const eventList: CalendarEventType[] = [];
+
     if (!rentalInfo) return [];
 
-    return rentalInfo.rentedDates.map((item) => ({
-      start: dayjs(item.startDate).toDate(),
-      end: dayjs(item.endDate).toDate(),
-      title: rentalInfo.userName,
-      id: rentalInfo.reservationId,
-    }));
+    rentalInfo.forEach((item) => {
+      item.rentedDates.forEach((date) => {
+        eventList.push({
+          start: dayjs(date.startDate).toDate(),
+          end: dayjs(date.endDate).toDate(),
+          title: item.userName,
+          id: item.reservationId,
+        });
+      });
+    });
+
+    return eventList;
   }, [rentalInfo]);
 
   const selectedCategory = useMemo(() => {
@@ -68,6 +83,18 @@ const EquipmentDetailPage = () => {
       showToast({ message: "장비를 삭제할 수 없습니다.", type: "error" });
     }
   }, [equipmentDetail, equipmentId, router]);
+
+  useEffect(() => {
+    if (!equipmentId || !currentDate) return;
+
+    const { startDate, endDate } = getPaddingDateRange(currentDate, 15, "day");
+
+    fetchSingleEquipmentRentalHistory({
+      equipmentId,
+      startDate,
+      endDate,
+    }).then((result) => setRentalInfo(result));
+  }, [currentDate, equipmentId]);
 
   if (!equipmentDetail) return null;
 

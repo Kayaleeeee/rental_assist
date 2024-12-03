@@ -13,6 +13,7 @@ const getColumns = (
     field: "id",
     width: 80,
     renderHeader: () => HeaderName("ID"),
+    renderCell: ({ row }) => row.equipmentId,
     filterable: false,
     disableColumnMenu: true,
     sortable: false,

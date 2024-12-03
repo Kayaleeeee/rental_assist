@@ -15,6 +15,7 @@ const getColumns = (): GridColDef<EquipmentListItemState>[] => [
     field: "id",
     width: 80,
     renderHeader: () => HeaderName("ID"),
+    renderCell: ({ row }) => row.equipmentId,
   },
   {
     field: "title",

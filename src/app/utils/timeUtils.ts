@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 export const getDiffDays = (startTime: string, endTime: string) => {
   const diffHours = Math.abs(dayjs(startTime).diff(dayjs(endTime), "hour"));
@@ -22,4 +22,21 @@ export const isDateRangeOverlap = (
   const end2 = dayjs(newEndDate);
 
   return start1.isBefore(end2) && start2.isBefore(end1);
+};
+
+export const getPaddingDateRange = (
+  currentTime: Dayjs,
+  paddingNumber: number,
+  paddingUnit: "day" | "month" | "year"
+) => {
+  return {
+    startDate: currentTime
+      .startOf("month")
+      .subtract(paddingNumber, paddingUnit)
+      .format("YYYY-MM-DD"),
+    endDate: currentTime
+      .endOf("month")
+      .add(paddingNumber, paddingUnit)
+      .format("YYYY-MM-DD"),
+  };
 };

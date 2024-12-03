@@ -5,10 +5,17 @@ import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { PageModelType } from "@/app/types/listType";
 import { formatLocaleString } from "@/app/utils/priceUtils";
-import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import {
+  GridCallbackDetails,
+  GridColDef,
+  GridPaginationModel,
+  GridRowSelectionModel,
+} from "@mui/x-data-grid";
 import Link from "next/link";
 import styles from "./equipmentListTable.module.scss";
 import { Margin } from "@/app/components/Margin";
+import { isEqual } from "lodash";
+import { useCallback } from "react";
 
 const getColumns = (
   isRowClickable: boolean
@@ -82,6 +89,7 @@ export const EquipmentListTable = ({
   margin = 10,
 }: Props) => {
   const columns = getColumns(isRowClickable);
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.searchBarWrapper}>
@@ -100,16 +108,34 @@ export const EquipmentListTable = ({
       <GridTable<EquipmentListItemType>
         height={height}
         checkboxSelection
-        onRowSelectionModelChange={(selected, details) => {
-          const valueList = Array.from(
-            details.api.getRowModels().values()
-          ) as EquipmentListItemType[];
-          const selectedList = valueList.filter((item) =>
-            selected.includes(item.id)
-          );
+        onRowSelectionModelChange={useCallback(
+          (selected: GridRowSelectionModel, details: GridCallbackDetails) => {
+            const valueList = Array.from(
+              details.api.getRowModels().values()
+            ) as EquipmentListItemType[];
 
-          onSelectCell(selectedList);
-        }}
+            // 현재 페이지에서 선택된 항목
+            const currentPageSelected = valueList.filter((item) =>
+              selected.includes(item.id)
+            );
+
+            // 이전 상태와 병합
+            const updatedSelectedList = [
+              ...selectedList.filter(
+                (item) => !list.some((row) => row.id === item.id)
+              ),
+              ...currentPageSelected,
+            ];
+
+            // 기존 상태와 비교
+            const hasChanged = !isEqual(updatedSelectedList, selectedList);
+
+            if (hasChanged) {
+              onSelectCell(updatedSelectedList);
+            }
+          },
+          [selectedList, list, onSelectCell]
+        )}
         rowSelectionModel={selectedList.map((item) => item.id)}
         columns={columns}
         rows={list}

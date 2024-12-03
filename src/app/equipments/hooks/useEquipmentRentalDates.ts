@@ -1,12 +1,16 @@
-import { getEquipmentRentedDates } from "@/app/api/equipments";
+import {
+  getEquipmentListRentalHistoryByDate,
+  getEquipmentRentalHistoryByDate,
+  getEquipmentRentedDates,
+} from "@/app/api/equipments";
 import {
   EquipmentItemWithRentedDates,
   EquipmentListItemType,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export const useEquipmentRentalDates = (id?: EquipmentListItemType["id"]) => {
+export const useEquipmentRentalDates = () => {
   const [rentalInfo, setRentalInfo] = useState<
     | {
         rentedDates: EquipmentItemWithRentedDates["rentedDates"];
@@ -39,11 +43,54 @@ export const useEquipmentRentalDates = (id?: EquipmentListItemType["id"]) => {
     }
   };
 
-  useEffect(() => {
-    if (!id) return;
+  const fetchSingleEquipmentRentalHistory = async (param: {
+    equipmentId: EquipmentListItemType["id"];
+    startDate: string;
+    endDate: string;
+  }) => {
+    try {
+      const result = await getEquipmentRentalHistoryByDate(param);
 
-    fetchRentalDateList(id);
-  }, [id]);
+      if (!result) {
+        return [];
+      } else {
+        return result;
+      }
+    } catch {
+      showToast({
+        message: "예약 히스토리를 조회하는데 실패했습니다.",
+        type: "error",
+      });
+      return [];
+    }
+  };
 
-  return { rentalInfo };
+  const fetchMultipleEquipmentRentalHistory = async (param: {
+    idList: EquipmentListItemType["id"][];
+    startDate: string;
+    endDate: string;
+  }) => {
+    try {
+      const result = await getEquipmentListRentalHistoryByDate(param);
+
+      if (!result) {
+        return [];
+      } else {
+        return result;
+      }
+    } catch {
+      showToast({
+        message: "예약 히스토리를 조회하는데 실패했습니다.",
+        type: "error",
+      });
+      return [];
+    }
+  };
+
+  return {
+    rentalInfo,
+    fetchRentalDateList,
+    fetchSingleEquipmentRentalHistory,
+    fetchMultipleEquipmentRentalHistory,
+  };
 };

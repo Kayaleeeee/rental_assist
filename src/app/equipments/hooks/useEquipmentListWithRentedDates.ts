@@ -3,7 +3,9 @@ import {
   EquipmentCategory,
   EquipmentItemWithRentalDatesParams,
   EquipmentItemWithRentedDates,
+  EquipmentListItemType,
 } from "@/app/types/equipmentType";
+import { isEmpty } from "lodash";
 import { useCallback, useState } from "react";
 
 export const useEquipmentListWithRentedDates = ({
@@ -48,10 +50,40 @@ export const useEquipmentListWithRentedDates = ({
     }
   };
 
+  const checkAvailabilityById = async (
+    id: EquipmentListItemType["id"],
+    quantity: number,
+    dateRange: { startDate: string; endDate: string }
+  ) => {
+    try {
+      const result = await getEquipmentListWithRentedDates({
+        equipmentId: id,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+      });
+
+      const sumOfQuantity = result.reduce((prev, acc) => {
+        return (prev += acc.quantity);
+      }, 0);
+
+      if (isEmpty(result) || quantity - sumOfQuantity < 0)
+        return { id, isAvailable: true, reservationId: undefined };
+
+      return {
+        id,
+        isAvailable: false,
+        reservationId: result[0].reservationId,
+      };
+    } catch {
+      throw new Error("장비 검색에 에러가 발생했습니다.");
+    }
+  };
+
   return {
     list,
     selectedCategory,
     toggleEquipmentCategory,
     fetchList,
+    checkAvailabilityById,
   };
 };

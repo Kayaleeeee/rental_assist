@@ -12,20 +12,33 @@ import {
   formatLocaleString,
 } from "@/app/utils/priceUtils";
 import { showToast } from "@/app/utils/toastUtils";
-
 import { useParams, useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./setDetailPage.module.scss";
 import { useSetEquipmentDetail } from "./hooks/useSetEquipmentDetail";
 import { isEmpty } from "lodash";
 import { GroupEquipmentItem } from "../modules/GroupEquipmentItem";
 
+import { useEquipmentRentalDates } from "../../hooks/useEquipmentRentalDates";
+import dayjs from "dayjs";
+import { getPaddingDateRange } from "@/app/utils/timeUtils";
+import { EquipmentItemWithRentedDates } from "@/app/types/equipmentType";
+import {
+  CalendarEventType,
+  MonthCalendar,
+} from "@/app/components/Calendar/MonthCalendar";
+
 const SetEquipmentDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const equipmentId = Number(params.id);
-
+  const [currentDate, setCurrentDate] = useState(dayjs());
   const { detail: setEquipmentDetail } = useSetEquipmentDetail(equipmentId);
+
+  const [rentalInfo, setRentalInfo] = useState<EquipmentItemWithRentedDates[]>(
+    []
+  );
+  const { fetchMultipleEquipmentRentalHistory } = useEquipmentRentalDates();
 
   const handleDeleteEquipment = useCallback(async () => {
     if (!setEquipmentDetail || !equipmentId) return;
@@ -41,6 +54,53 @@ const SetEquipmentDetailPage = () => {
       showToast({ message: "장비를 삭제할 수 없습니다.", type: "error" });
     }
   }, [setEquipmentDetail, equipmentId, router]);
+
+  const fetchEquipmentRentalDateList = useCallback(
+    async (idList: number[]) => {
+      const { startDate, endDate } = getPaddingDateRange(
+        currentDate,
+        15,
+        "day"
+      );
+
+      const result = await fetchMultipleEquipmentRentalHistory({
+        idList,
+        startDate,
+        endDate,
+      });
+
+      setRentalInfo(result);
+    },
+
+    [currentDate]
+  );
+
+  const eventDateList: CalendarEventType[] = useMemo(() => {
+    const eventList: CalendarEventType[] = [];
+
+    if (!rentalInfo) return [];
+
+    rentalInfo.forEach((item) => {
+      item.rentedDates.forEach((date) => {
+        eventList.push({
+          start: dayjs(date.startDate).toDate(),
+          end: dayjs(date.endDate).toDate(),
+          title: `${item.title} [${item.userName}]`,
+          id: item.reservationId,
+        });
+      });
+    });
+
+    return eventList;
+  }, [rentalInfo]);
+
+  useEffect(() => {
+    if (!setEquipmentDetail || isEmpty(setEquipmentDetail.equipmentList))
+      return;
+
+    const idList = setEquipmentDetail.equipmentList.map((item) => item.id);
+    fetchEquipmentRentalDateList(idList);
+  }, [setEquipmentDetail, fetchEquipmentRentalDateList]);
 
   if (!setEquipmentDetail) return null;
 
@@ -127,7 +187,7 @@ const SetEquipmentDetailPage = () => {
           </div>
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />
-            {/* <MonthCalendar
+            <MonthCalendar
               size={500}
               currentDate={currentDate}
               setCurrentDate={setCurrentDate}
@@ -135,7 +195,7 @@ const SetEquipmentDetailPage = () => {
               onClickEvent={(event) => {
                 window.open(`/reservations/${event.id}`, "_blank");
               }}
-            /> */}
+            />
           </div>
         </div>
 
