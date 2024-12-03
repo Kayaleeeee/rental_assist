@@ -33,7 +33,7 @@ import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined
 import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
 import { isEmpty } from "lodash";
 import { ReservationItemTable } from "../modules/form/ReservationItemTable";
-import { ReservationGroupTable } from "@/app/equipments/sets/modules/ReservationGroupTable";
+import { ReservationGroupTable } from "@/app/reservations/modules/form/ReservationGroupTable";
 
 const defaultString = "-";
 

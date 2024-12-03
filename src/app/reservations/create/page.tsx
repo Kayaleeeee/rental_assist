@@ -39,7 +39,7 @@ import {
 } from "@/app/utils/priceUtils";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGropEquipmentToState";
 import { ReservationItemTableEditor } from "../modules/form/ReservationItemTableEditor";
-import { ReservationGroupTableEditor } from "@/app/equipments/sets/modules/ReservationGroupTableEditor";
+import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 
 const ReservationCreatePage = () => {
   const router = useRouter();

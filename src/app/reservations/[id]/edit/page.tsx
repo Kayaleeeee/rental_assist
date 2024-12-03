@@ -45,7 +45,7 @@ import {
   getAllEquipmentTotalPrice,
 } from "../../utils/reservationUtils";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGropEquipmentToState";
-import { ReservationGroupTableEditor } from "@/app/equipments/sets/modules/ReservationGroupTableEditor";
+import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTableEditor";
 
 const ReservationEditPage = () => {
