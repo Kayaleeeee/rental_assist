@@ -16,6 +16,7 @@ import {
   QuoteEquipmentMoreMenu,
 } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
 import { useMemo, useState } from "react";
+import { Margin } from "@/app/components/Margin";
 
 type Props = {
   rentalDays: number;
@@ -137,15 +138,18 @@ export const ReservationGroupTableEditor = ({
         />
 
         <div className={styles.footer}>
+          <Margin top={4} />
           <div className={styles.supplyPrice}>
-            {`단가: ${formatLocaleString(
+            <b>단가 : </b>
+            {`${formatLocaleString(
               groupEquipment.price
             )} 원  * ${rentalDays}일`}
           </div>
           {!isNil(groupEquipment.discountPrice) &&
             groupEquipment.discountPrice !== 0 && (
               <div className={styles.supplyPrice}>
-                {`조정 금액: ${
+                <b>조정 금액 :</b>
+                {` ${
                   groupEquipment.discountPrice > 0 ? "-" : "+"
                 }${formatLocaleString(groupEquipment.discountPrice)} 원`}
               </div>

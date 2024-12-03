@@ -41,6 +41,8 @@ import {
   formatLocaleString,
 } from "@/app/utils/priceUtils";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGropEquipmentToState";
+import { ReservationItemTableEditor } from "../modules/form/ReservationItemTableEditor";
+import { ReservationGroupTableEditor } from "@/app/equipments/sets/modules/ReservationGroupTableEditor";
 
 const ReservationCreatePage = () => {
   const router = useRouter();
@@ -205,6 +207,7 @@ const ReservationCreatePage = () => {
     router,
     rentalDays,
   ]);
+
   return (
     <div>
       <FormWrapper title="예약 생성">
@@ -260,29 +263,18 @@ const ReservationCreatePage = () => {
           {rentalDays > 0 && (
             <div className={formStyles.sectionWrapper}>
               <Label title="대여 장비 목록" />
-
               <Margin top={10} />
 
               <Margin bottom={20}>
-                <Label title="단품 장비 리스트" />
-                <div className={styles.equipmentListWrapper}>
-                  {equipmentItemList.map((item) => {
-                    return (
-                      <QuotationItemEditor
-                        key={item.equipmentId}
-                        quoteState={item}
-                        rentalDays={rentalDays}
-                        onChangeField={handleChangeEquipmentItem}
-                        onDeleteEquipment={() =>
-                          handleDeleteEquipmentItem(item.equipmentId)
-                        }
-                        availableStatus={getAvailableStatus(
-                          isChecked,
-                          item.isAvailable
-                        )}
-                      />
-                    );
-                  })}
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Label title="단품 장비 리스트" />
                   <Button
                     size="Small"
                     variant="outlined"
@@ -291,19 +283,24 @@ const ReservationCreatePage = () => {
                     단품 장비 추가
                   </Button>
                 </div>
+                <ReservationItemTableEditor
+                  rows={equipmentItemList}
+                  rentalDays={rentalDays}
+                  onDeleteEquipment={handleDeleteEquipmentItem}
+                  onChangeField={handleChangeEquipmentItem}
+                />
               </Margin>
-
               <Margin>
                 <Label title="풀세트 리스트" />
+                <Margin top={20} />
                 <div className={styles.equipmentListWrapper}>
                   {equipmentGroupList.map((item) => {
                     return (
-                      <SetEquipmentAccordionEditor
+                      <ReservationGroupTableEditor
                         key={item.setId}
-                        isChecked={isChecked}
-                        equipmentSet={item}
+                        groupEquipment={item}
+                        rentalDays={rentalDays}
                         changeSetEquipment={handleChangeGroupEquipment}
-                        showPrice
                         onClickAddEquipment={() =>
                           handleOpenEquipmentModal({
                             mode: "group",

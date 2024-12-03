@@ -304,8 +304,8 @@ const ReservationEditPage = () => {
           {rentalDays > 0 && (
             <div className={formStyles.sectionWrapper}>
               <Label title="대여 장비 목록" />
-
               <Margin top={10} />
+
               <Margin bottom={20}>
                 <div
                   style={{
