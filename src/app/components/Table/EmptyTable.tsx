@@ -1,16 +1,16 @@
 import styles from "./index.module.scss";
 
 type Props = {
-  height?: number;
+  height?: string;
   title?: string;
 };
 
-export const EmptyTable = ({ height = 300, title }: Props) => {
+export const EmptyTable = ({ height = "300px", title }: Props) => {
   return (
     <div
       className={styles.emptyTableWrapper}
       style={{
-        height: `${height}px`,
+        height,
       }}
     >
       {title || "내역이 존재하지 않습니다."}

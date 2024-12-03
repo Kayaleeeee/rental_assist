@@ -1,5 +1,5 @@
 import {
-  ReservationDetailType,
+  ReservationDetailResponse,
   ReservationPostPayload,
   ReservationPutPayload,
   ReservationSearchParams,
@@ -28,7 +28,7 @@ export const getReservationList = (params?: ReservationSearchParams) => {
 };
 
 export const getReservationDetail = async (id: number) => {
-  const result = await apiGet<ReservationDetailType[]>(detailUrl, { id });
+  const result = await apiGet<ReservationDetailResponse[]>(detailUrl, { id });
 
   if (isEmpty(result)) throw new Error("No data found");
 

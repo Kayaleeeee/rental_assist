@@ -1,17 +1,3 @@
-.wrapper {
-  top: -10px;
-  left: 20px;
-  width: 120px;
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 16px;
-  padding: 16px 0;
-  box-shadow: var(--shadow);
-  flex: 1;
-}
-
 .item {
   display: inline-flex;
   align-items: center;
@@ -40,4 +26,40 @@
   align-items: center;
   margin-top: 10px;
   justify-content: flex-end;
+}
+
+.iconButton {
+  color: var(--grey);
+}
+
+.moreIconWrapper {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.menuListWrapper {
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.quantityChangeRow {
+  display: inline-flex;
+  align-items: center;
+  flex: 1;
+  gap: 12px;
+}
+
+.priceChangeModelText {
+  font-size: 14px;
+}
+
+.priceChangeRow {
+  display: inline-flex;
+  align-items: center;
+  flex: 1;
+  gap: 12px;
 }

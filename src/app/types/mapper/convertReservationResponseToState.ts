@@ -1,9 +1,12 @@
 import { SetEquipmentStateType } from "@/app/store/useCartStore";
-import { ReservationDetailType } from "../reservationType";
+import {
+  ReservationDetailResponse,
+  ReservationDetailStateType,
+} from "../reservationType";
 import { convertQuoteItemToEquipmentState } from "./convertQuoteItemToEquipmentState";
 
 export const convertReservationGroupEquipmentToState = (
-  set: ReservationDetailType["setList"][number]
+  set: ReservationDetailResponse["setList"][number]
 ): SetEquipmentStateType => {
   return {
     setId: set.setId,
@@ -13,5 +16,17 @@ export const convertReservationGroupEquipmentToState = (
     discountPrice: set.discountedPrice,
     quoteSetId: set.id,
     equipmentList: set.equipmentList.map(convertQuoteItemToEquipmentState),
+  };
+};
+
+export const convertReservationDetailResponseToState = (
+  reservation: ReservationDetailResponse
+): ReservationDetailStateType => {
+  return {
+    ...reservation,
+    equipmentList: reservation.equipmentList.map(
+      convertQuoteItemToEquipmentState
+    ),
+    setList: reservation.setList.map(convertReservationGroupEquipmentToState),
   };
 };

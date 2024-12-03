@@ -127,9 +127,6 @@ export const EquipmentListTable = ({
             limit: model.pageSize,
           });
         }}
-        sx={{
-          marginTop: "-20px",
-        }}
       />
     </div>
   );

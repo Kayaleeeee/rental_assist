@@ -9,6 +9,7 @@ type Props = {
     title: string;
     onClick: () => void | Promise<void>;
     buttonStyle?: HtmlHTMLAttributes<HTMLButtonElement>["style"];
+    size?: "Small" | "Medium" | "Large";
   }[];
 };
 
@@ -35,7 +36,7 @@ export const Modal = (props: PropsWithChildren<Props>) => {
                     ...button.buttonStyle,
                   }}
                   onClick={button.onClick}
-                  size="Medium"
+                  size={button.size || "Medium"}
                   variant={isFirst ? "outlined" : "filled"}
                 >
                   {button.title}

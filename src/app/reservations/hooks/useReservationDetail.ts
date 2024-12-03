@@ -1,16 +1,17 @@
 import { getReservationDetail } from "@/app/api/reservation";
-import { ReservationDetailType } from "@/app/types/reservationType";
+import { convertReservationDetailResponseToState } from "@/app/types/mapper/convertReservationResponseToState";
+import { ReservationDetailStateType } from "@/app/types/reservationType";
 import { useEffect, useState } from "react";
 
 export const useReservationDetail = (id?: number) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [detail, setDetail] = useState<ReservationDetailType>();
+  const [detail, setDetail] = useState<ReservationDetailStateType>();
 
   const fetchDetail = async (id: number) => {
     try {
       setIsLoading(true);
       const result = await getReservationDetail(id);
-      setDetail(result);
+      setDetail(convertReservationDetailResponseToState(result));
     } catch {
       setDetail(undefined);
     } finally {

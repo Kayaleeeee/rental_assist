@@ -1,73 +1,81 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import styles from "./quoteEquipmentMenu.module.scss";
 import { Modal } from "@/app/components/Modal";
 import { Margin } from "@/app/components/Margin";
 import { EditableField } from "@/app/components/EditableField";
 import { formatLocaleString } from "@/app/utils/priceUtils";
-// import { Button } from "@/app/components/Button";
+import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
+import { Popover } from "@mui/material";
 
-const menu = [
-  { key: "delete", title: "제거" },
+export const QUOTE_ITEM_MENU = [
+  { key: "delete", title: "삭제하기" },
   { key: "price", title: "가격 변경" },
+  { key: "quantity", title: "수량 변경" },
 ];
 
+export const GROUP_QUOTE_MENU = [
+  { key: "delete", title: "삭제하기" },
+  { key: "price", title: "가격 변경" },
+  { key: "item", title: "장비 추가하기" },
+];
+
+export const GROUP_QUOTE_ITEM_MENU = [{ key: "delete", title: "삭제하기" }];
+
 type Props = {
-  currentPrice: number;
-  onChangeTotalPrice: (price: number) => void;
+  menu: { key: string; title: string }[];
   onConfirm: (menu?: { key: string; title: string }) => void;
-  menuOpen: boolean;
-  closeMenu: () => void;
 };
 
-export const QuoteEquipmentMoreMenu = ({
-  currentPrice,
-  onChangeTotalPrice,
-  onConfirm,
-  closeMenu,
-  menuOpen,
-}: Props) => {
-  const divRef = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useState<undefined | string>(undefined);
+export const QuoteEquipmentMoreMenu = ({ onConfirm, menu }: Props) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleConfirm = (menu?: { key: string; title: string }) => {
-    closeMenu();
-
-    if (!menu) {
-      setMode(undefined);
-      onConfirm(undefined);
-    } else {
-      setMode(menu.key);
-      onConfirm(menu);
-    }
+    handleClose();
+    onConfirm(menu);
   };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (divRef.current && !divRef.current.contains(event.target as Node)) {
-      closeMenu();
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
     <>
-      {mode === "price" && (
-        <PriceChangingModal
-          currentPrice={currentPrice}
-          onClose={() => {
-            handleConfirm(undefined);
-          }}
-          onConfirm={onChangeTotalPrice}
-        />
-      )}
-      {menuOpen ? (
-        <div id="equipment_quote_menu" ref={divRef} className={styles.wrapper}>
+      <div
+        className={styles.moreIconWrapper}
+        onClick={(event: React.MouseEvent<HTMLElement>) =>
+          setAnchorEl(event.currentTarget)
+        }
+      >
+        <MoreVertOutlinedIcon className={styles.iconButton} />
+      </div>
+      <Popover
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        id="equipment_quote_menu"
+        sx={{
+          boxShadow: "var(--shadow)",
+          borderRadius: "24px",
+        }}
+        slotProps={{
+          paper: {
+            style: {
+              padding: "16px 0",
+              borderRadius: "16px",
+              boxShadow: "var(--shadow)",
+            },
+          },
+        }}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <div className={styles.menuListWrapper}>
           {menu.map((item) => {
             return (
               <div
@@ -80,21 +88,23 @@ export const QuoteEquipmentMoreMenu = ({
             );
           })}
         </div>
-      ) : null}
+      </Popover>
     </>
   );
 };
 
-const PriceChangingModal = ({
-  currentPrice,
+export const PriceChangingModal = ({
+  currentTotalPrice,
+  currentDiscountPrice,
   onConfirm,
   onClose,
 }: {
-  currentPrice: number;
+  currentTotalPrice: number;
+  currentDiscountPrice: number;
   onConfirm: (price: number) => void;
   onClose: () => void;
 }) => {
-  const [price, setPrice] = useState<number>(currentPrice);
+  const [price, setPrice] = useState<number>(currentDiscountPrice);
 
   return (
     <Modal
@@ -117,16 +127,16 @@ const PriceChangingModal = ({
         },
       ]}
     >
-      <div>
-        <div className={styles.priceModalTitle}>가격 변경</div>
-        <Margin top={10} bottom={10}>
-          현재 총 가격: {formatLocaleString(currentPrice)}원
-        </Margin>
-
-        <Margin top={10} bottom={10}>
-          변경할 가격
-        </Margin>
-
+      <div className={styles.priceModalTitle}>가격 변경</div>
+      <Margin top={10} bottom={10}>
+        <div className={styles.priceChangeModelText}>
+          변경 전 가격: {formatLocaleString(currentTotalPrice)}원
+        </div>
+      </Margin>
+      <Margin bottom={10}>
+        <div className={styles.priceChangeModelText}>할인 금액</div>
+      </Margin>
+      <div className={styles.priceChangeRow}>
         <EditableField
           fullWidth
           value={price}
@@ -138,7 +148,64 @@ const PriceChangingModal = ({
             setPrice(value);
           }}
         />
-        <Margin top={20} />
+        원
+      </div>
+
+      <Margin top={20} />
+    </Modal>
+  );
+};
+
+export const QuantityChangingModal = ({
+  currentQuantity,
+  onConfirm,
+  onClose,
+}: {
+  currentQuantity: number;
+  onConfirm: (price: number) => void;
+  onClose: () => void;
+}) => {
+  const [quantityState, setQuantityState] = useState<number>(currentQuantity);
+
+  return (
+    <Modal
+      onCloseModal={onClose}
+      ButtonListWrapperStyle={{
+        width: "200px",
+        placeSelf: "flex-end",
+      }}
+      ButtonProps={[
+        {
+          title: "닫기",
+          onClick: onClose,
+          size: "Small",
+        },
+        {
+          title: "변경하기",
+          onClick: () => {
+            onConfirm(quantityState);
+            onClose();
+          },
+          size: "Small",
+        },
+      ]}
+    >
+      <div className={styles.priceModalTitle}>가격 변경</div>
+      <Margin top={20} />
+
+      <div className={styles.quantityChangeRow}>
+        <EditableField
+          fullWidth
+          value={quantityState}
+          size="small"
+          onChange={(e) => {
+            const value = Number(e.target.value);
+
+            if (isNaN(value)) return;
+            setQuantityState(value);
+          }}
+        />
+        개
       </div>
     </Modal>
   );

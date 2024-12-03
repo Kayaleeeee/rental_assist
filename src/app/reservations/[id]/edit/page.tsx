@@ -10,7 +10,6 @@ import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EquipmentSearchModal } from "../../modules/form/EquipmentSearchModal";
-import { QuotationItemEditor } from "../../modules/form/QuotationItemEditor";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../../users/modules/UserSearchModal";
@@ -27,16 +26,14 @@ import {
 } from "@/app/store/useCartStore";
 import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { onUpdateReservation } from "../../actions/updateReservation";
-import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
-import { getAvailableStatus } from "@/app/components/Cart";
-import { ReservationDetailType } from "@/app/types/reservationType";
+import { ReservationDetailStateType } from "@/app/types/reservationType";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 import {
   EquipmentListItemType,
   SetEquipmentType,
 } from "@/app/types/equipmentType";
 import { GroupEquipmentSearchModal } from "../../modules/form/GroupEquipmentSearchModal";
-import { convertQuoteItemToEquipmentState } from "@/app/types/mapper/convertQuoteItemToEquipmentState";
+
 import {
   formatKoreanCurrency,
   formatLocaleString,
@@ -48,7 +45,8 @@ import {
   getAllEquipmentTotalPrice,
 } from "../../utils/reservationUtils";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGropEquipmentToState";
-import { convertReservationGroupEquipmentToState } from "@/app/types/mapper/convertReservationResponseToState";
+import { ReservationGroupTableEditor } from "@/app/equipments/sets/modules/ReservationGroupTableEditor";
+import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTableEditor";
 
 const ReservationEditPage = () => {
   const router = useRouter();
@@ -71,7 +69,7 @@ const ReservationEditPage = () => {
     handleChangeDate,
     dateRange,
     // handleCheckAvailability,
-    isChecked,
+    // isChecked,
     rentalDays,
     equipmentItemList,
     handleAddEquipmentList,
@@ -86,7 +84,7 @@ const ReservationEditPage = () => {
     handleSetEquipmentGroup,
   } = useEquipmentCart();
 
-  const initializeForm = useCallback((detail: ReservationDetailType) => {
+  const initializeForm = useCallback((detail: ReservationDetailStateType) => {
     setForm({
       userId: detail.userId,
       guestName: detail.userName,
@@ -98,18 +96,14 @@ const ReservationEditPage = () => {
       endDate: detail.endDate,
     });
 
-    const quoteItemList = detail.equipmentList.map(
-      convertQuoteItemToEquipmentState
-    );
+    const quoteItemList = detail.equipmentList;
     handleSetEquipmentList(quoteItemList);
-
-    const setList = detail.setList.map(convertReservationGroupEquipmentToState);
-    handleSetEquipmentGroup(setList);
     quoteItemListStateRef.current = quoteItemList;
+
+    const setList = detail.setList;
+    handleSetEquipmentGroup(setList);
     setListStateRef.current = setList;
   }, []);
-
-  console.log(equipmentGroupList);
 
   useEffect(() => {
     if (!reservationId || !detail) return;
@@ -312,27 +306,16 @@ const ReservationEditPage = () => {
               <Label title="대여 장비 목록" />
 
               <Margin top={10} />
-
               <Margin bottom={20}>
-                <Label title="단품 장비 리스트" />
-                <div className={styles.equipmentListWrapper}>
-                  {equipmentItemList.map((item) => {
-                    return (
-                      <QuotationItemEditor
-                        key={item.equipmentId}
-                        quoteState={item}
-                        rentalDays={rentalDays}
-                        onChangeField={handleChangeEquipmentItem}
-                        onDeleteEquipment={() =>
-                          handleDeleteEquipmentItem(item.equipmentId)
-                        }
-                        availableStatus={getAvailableStatus(
-                          isChecked,
-                          item.isAvailable
-                        )}
-                      />
-                    );
-                  })}
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                  }}
+                >
+                  <Label title="단품 장비 리스트" />
                   <Button
                     size="Small"
                     variant="outlined"
@@ -341,18 +324,23 @@ const ReservationEditPage = () => {
                     단품 장비 추가
                   </Button>
                 </div>
+                <ReservationItemTableEditor
+                  rows={equipmentItemList}
+                  rentalDays={rentalDays}
+                  onDeleteEquipment={handleDeleteEquipmentItem}
+                  onChangeField={handleChangeEquipmentItem}
+                />
               </Margin>
 
               <Margin>
                 <Label title="풀세트 리스트" />
+                <Margin top={20} />
                 <div className={styles.equipmentListWrapper}>
                   {equipmentGroupList.map((item) => {
                     return (
-                      <SetEquipmentAccordionEditor
-                        showPrice
+                      <ReservationGroupTableEditor
                         key={item.setId}
-                        isChecked={isChecked}
-                        equipmentSet={item}
+                        groupEquipment={item}
                         rentalDays={rentalDays}
                         changeSetEquipment={handleChangeGroupEquipment}
                         onClickAddEquipment={() =>

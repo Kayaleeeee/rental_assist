@@ -32,9 +32,8 @@ import { PaymentStatusChangeModal } from "../modules/list/PaymentStatusChangeMod
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
 import { isEmpty } from "lodash";
-import { convertQuoteItemToEquipmentItem } from "@/app/types/mapper/convertQuoteItemToEquipmentItem";
-import { GroupEquipment } from "@/app/equipments/sets/modules/GroupEquipment";
 import { ReservationItemTable } from "../modules/form/ReservationItemTable";
+import { ReservationGroupTable } from "@/app/equipments/sets/modules/ReservationGroupTable";
 
 const defaultString = "-";
 
@@ -248,18 +247,20 @@ const ReservationDetailPage = () => {
               <Label title="풀세트 리스트" />
               <div>
                 {reservationDetail.setList.map((item) => {
-                  const convertedList = item.equipmentList.map(
-                    convertQuoteItemToEquipmentItem
-                  );
                   return (
-                    <GroupEquipment
-                      key={item.id}
-                      title={item.title}
-                      price={item.price}
-                      totalPrice={item.totalPrice}
-                      equipmentList={convertedList}
+                    <ReservationGroupTable
+                      key={item.setId}
                       rentalDays={rentalDays}
+                      groupEquipment={item}
                     />
+                    // <GroupEquipment
+                    //   key={item.quoteSetId}
+                    //   title={item.title}
+                    //   price={item.price}
+                    //   totalPrice={item.totalPrice}
+                    //   equipmentList={item.equipmentList}
+                    //   rentalDays={rentalDays}
+                    // />
                   );
                 })}
               </div>

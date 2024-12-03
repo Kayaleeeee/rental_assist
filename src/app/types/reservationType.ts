@@ -1,3 +1,7 @@
+import {
+  EquipmentListItemState,
+  SetEquipmentStateType,
+} from "../store/useCartStore";
 import { SetEquipmentType } from "./equipmentType";
 import { ListParamsType } from "./listType";
 import { QuoteItemType, QuoteSetType } from "./quoteType";
@@ -42,7 +46,7 @@ export type ReservationPostPayload = {
   userId?: number;
 };
 
-export type ReservationDetailType = ReservationType & {
+export type ReservationDetailResponse = ReservationType & {
   quoteId: QuoteItemType["id"];
   quoteTitle: string;
   createdBy: string;
@@ -62,6 +66,20 @@ export type ReservationDetailType = ReservationType & {
     equipmentList: QuoteItemType[];
     setId: SetEquipmentType["id"];
   }[];
+};
+
+export type ReservationDetailStateType = ReservationType & {
+  quoteId: QuoteItemType["id"];
+  quoteTitle: string;
+  createdBy: string;
+  userId: UserType["id"];
+  phoneNumber: UserType["phoneNumber"];
+  supplyPrice: number;
+  discountPrice?: number;
+  totalPrice: number;
+  paymentMethod?: PaymentMethod;
+  equipmentList: EquipmentListItemState[];
+  setList: SetEquipmentStateType[];
 };
 
 export type ReservationSearchParams = ListParamsType<{

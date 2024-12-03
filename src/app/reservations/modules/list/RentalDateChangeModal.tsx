@@ -6,14 +6,14 @@ import { Label } from "@/app/components/Form/Label";
 import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 import dayjs from "dayjs";
 import { updateQuote } from "@/app/api/quote";
-import { ReservationDetailType } from "@/app/types/reservationType";
+import { ReservationDetailResponse } from "@/app/types/reservationType";
 import { showToast } from "@/app/utils/toastUtils";
 
 type Props = {
   dateRange: { startDate: string; endDate: string };
   onCloseModal: () => void;
   onChangeDate: (date: { startDate: string; endDate: string }) => void;
-  quoteId: ReservationDetailType["quoteId"];
+  quoteId: ReservationDetailResponse["quoteId"];
 };
 
 export const RentalDateChangeModal = ({

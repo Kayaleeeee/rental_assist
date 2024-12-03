@@ -1,5 +1,4 @@
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
-
 import styles from "./setEquipmentAccordion.module.scss";
 import { Margin } from "@/app/components/Margin";
 import { Button } from "@/app/components/Button";
@@ -7,9 +6,7 @@ import { SetEquipmentItemEditor } from "./SetEquipmentItemEditor";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import { SetEquipmentStateType } from "@/app/store/useCartStore";
 import { getAvailableStatus } from "@/app/components/Cart";
-import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
-import { useMemo, useState } from "react";
-import { QuoteEquipmentMoreMenu } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
+import { useMemo } from "react";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { convertStateToEquipmentItem } from "@/app/types/mapper/convertStateToEquipmentItem";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
@@ -29,13 +26,10 @@ export const SetEquipmentAccordionEditor = ({
   isChecked,
   equipmentSet,
   onClickAddEquipment,
-  deleteSetEquipment,
   changeSetEquipment,
   showPrice,
   rentalDays = 0,
 }: Props) => {
-  const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
-
   const currentTotalPrice = useMemo(() => {
     return getEquipmentGroupTotalPrice(equipmentSet, rentalDays);
   }, [equipmentSet, rentalDays]);
@@ -45,32 +39,6 @@ export const SetEquipmentAccordionEditor = ({
       <AccordionSummary>
         <div className={styles.titleWrapper}>
           <div>{equipmentSet.title}</div>
-        </div>
-        <div className={styles.moreIconWrapper}>
-          <MoreVertOutlinedIcon
-            onClick={() => setIsOpenMenu(true)}
-            className={styles.iconButton}
-          />
-
-          <QuoteEquipmentMoreMenu
-            menuOpen={isOpenMenu}
-            closeMenu={() => setIsOpenMenu(false)}
-            currentPrice={currentTotalPrice}
-            onChangeTotalPrice={(changedPrice) =>
-              changeSetEquipment({
-                ...equipmentSet,
-                discountPrice: changedPrice,
-              })
-            }
-            onConfirm={(menu) => {
-              if (!menu) return;
-
-              if (menu.key === "delete") {
-                deleteSetEquipment();
-                return;
-              }
-            }}
-          />
         </div>
       </AccordionSummary>
       <AccordionDetails>

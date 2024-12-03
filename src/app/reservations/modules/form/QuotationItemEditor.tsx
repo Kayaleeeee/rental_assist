@@ -4,9 +4,7 @@ import { EquipmentListItemState } from "@/app/store/useCartStore";
 import { useCallback, useMemo, useState } from "react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
-import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import { EditableField } from "@/app/components/EditableField";
-import { QuoteEquipmentMoreMenu } from "./QuoteEquipmentMenu";
 import { Margin } from "@/app/components/Margin";
 import { isNil } from "lodash";
 import { getEquipmentTotalPrice } from "../../utils/reservationUtils";
@@ -25,7 +23,7 @@ export const QuotationItemEditor = ({
   quoteState,
   rentalDays,
   onChangeField,
-  onDeleteEquipment,
+  // onDeleteEquipment,
   availableStatus,
   reservationId,
   quantityOnly = false,
@@ -37,7 +35,6 @@ export const QuotationItemEditor = ({
   const [quantityState, setQuantityState] = useState<number>(
     quoteState.quantity
   );
-  const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
 
   const priceDiff = useMemo(() => {
     const diff = quoteState.discountPrice;
@@ -90,29 +87,6 @@ export const QuotationItemEditor = ({
           }}
         >
           {quoteState.title}
-        </div>
-        <div className={styles.moreIconWrapper}>
-          <MoreVertOutlinedIcon
-            onClick={() => setIsOpenMenu(true)}
-            className={styles.iconButton}
-          />
-
-          <QuoteEquipmentMoreMenu
-            menuOpen={isOpenMenu}
-            closeMenu={() => setIsOpenMenu(false)}
-            currentPrice={quoteItemTotalPrice}
-            onChangeTotalPrice={(changedPrice) =>
-              onChangeField({ ...quoteState, discountPrice: changedPrice })
-            }
-            onConfirm={(menu) => {
-              if (!menu) return;
-
-              if (menu.key === "delete") {
-                onDeleteEquipment();
-                return;
-              }
-            }}
-          />
         </div>
       </div>
       <div className={styles.inlineWrapper}>

@@ -77,20 +77,6 @@
   cursor: pointer;
 }
 
-.iconButton {
-  color: var(--grey);
-}
-
-.moreIconWrapper {
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 24px;
-  position: relative;
-}
-
 .quantity {
   @include cell();
   display: inline-flex;
