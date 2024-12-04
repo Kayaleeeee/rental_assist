@@ -1,7 +1,6 @@
 import {
   EquipmentGroupPriceItem,
   EquipmentPriceItem,
-  PostEquipmentPricePayload,
 } from "@/app/types/equipmentPriceType";
 import { PriceItemStateType } from "../modules/PriceSettingModal/PriceSettingModal";
 import { isEmpty, isEqual, isNil } from "lodash";

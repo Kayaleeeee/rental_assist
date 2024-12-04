@@ -137,7 +137,7 @@ export const SetEquipmentList = ({
           return (
             <SetEquipmentAccordion
               key={item.id}
-              disabledGroup={disabledSetIdList.includes(item.id.toString())}
+              disabledGroup={disabledSetIdList.includes(item.id)}
               disabledEquipmentIdList={disabledEquipmentIdList}
               setId={item.id}
               title={item.title}

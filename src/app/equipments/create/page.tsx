@@ -59,6 +59,7 @@ const EquipmentCreatePage = () => {
         memo,
         detail,
         category: category.key,
+        price: priceList[0].price,
       };
 
       await createEquipment({ form: payload, priceList });

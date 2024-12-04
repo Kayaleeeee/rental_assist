@@ -101,6 +101,7 @@ export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
           {buttonList.map(({ day }) => {
             return (
               <Button
+                key={day}
                 variant="outlined"
                 size="Small"
                 onClick={() => handleAddCell(day)}

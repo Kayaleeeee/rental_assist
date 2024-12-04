@@ -6,7 +6,7 @@ import { UserType } from "./userType";
 export type EquipmentListItemType = {
   id: number;
   title: string;
-  price?: number;
+  price: number;
   category: string;
   detail?: string;
   disabled?: boolean;
@@ -16,7 +16,7 @@ export type EquipmentListItemType = {
 export type EquipmentDetailType = {
   id: number;
   title: string;
-  price?: number;
+  price: number;
   quantity: number;
   category: string;
   detail: string;
@@ -26,7 +26,7 @@ export type EquipmentDetailType = {
 
 export type EquipmentPostBody = {
   title: string;
-  price?: number;
+  price: number;
   quantity: number;
   category: EquipmentCategory;
   detail: string;
@@ -121,7 +121,7 @@ export type SetEquipmentType = {
 };
 
 export type SetEquipmentListItemType = {
-  id: string;
+  id: number;
   title: string;
   detail: string;
   price: number;
@@ -135,7 +135,7 @@ export type SetEquipmentPayload = {
 };
 
 export type SetEquipmentItemType = {
-  id: string;
+  id: number;
   setId: SetEquipmentType["id"];
   quoteSetId?: QuoteSetType["id"];
   equipmentId: EquipmentListItemType["id"];

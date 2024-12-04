@@ -62,7 +62,7 @@ const column: GridColDef<ReservationType>[] = [
 
 const UserDetailPage = () => {
   const params = useParams();
-  const userId = params.id.toString();
+  const userId = Number(params.id);
   const router = useRouter();
 
   const { detail } = useUserDetail(userId);

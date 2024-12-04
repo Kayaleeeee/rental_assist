@@ -10,7 +10,7 @@ export const useSetEquipmentDetail = (id: number) => {
     if (isNaN(id)) return;
 
     setIsLoading(true);
-    getSetEquipmentDetail(id.toString())
+    getSetEquipmentDetail(id)
       .then((res) => setDetail(res[0]))
       .catch(() => setDetail(null))
       .finally(() => {

@@ -199,7 +199,7 @@ const EquipmentEditPage = () => {
             size="Medium"
             style={{ width: "150px" }}
             onClick={() =>
-              onEditSetEquipment(id.toString(), originalEquipmentList.current)
+              onEditSetEquipment(Number(id), originalEquipmentList.current)
             }
           >
             수정

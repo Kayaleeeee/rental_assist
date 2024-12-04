@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export type ReservationFormState = {
-  userId?: string;
+  userId?: number;
   guestName: string;
   guestPhoneNumber: string;
   discountPrice: number;

@@ -78,7 +78,7 @@ export type QuoteItemPutPayload = {
 };
 
 export type QuoteSetType = {
-  id: string;
+  id: number;
   setId: SetEquipmentType["id"];
   price: number;
   quoteId: QuoteType["id"];
