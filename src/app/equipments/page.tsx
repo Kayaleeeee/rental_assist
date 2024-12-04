@@ -20,7 +20,7 @@ import { SetEquipmentList } from "./sets/modules/SetEquipmentList";
 import { showToast } from "../utils/toastUtils";
 import { useEquipmentCart } from "./hooks/useEquipmentCart";
 import { convertEquipmentItemToState } from "../types/mapper/convertEquipmentItemToState";
-import { convertGroupEquipmentToState } from "../types/mapper/convertGropEquipmentToState";
+import { convertGroupEquipmentToState } from "../types/mapper/convertGroupEquipmentToState";
 
 export default function EquipmentPage() {
   const router = useRouter();

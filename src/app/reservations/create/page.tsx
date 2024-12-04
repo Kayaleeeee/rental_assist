@@ -37,7 +37,7 @@ import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
-import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGropEquipmentToState";
+import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 import { ReservationItemTableEditor } from "../modules/form/ReservationItemTableEditor";
 import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 

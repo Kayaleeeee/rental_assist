@@ -44,7 +44,7 @@ import {
   getAllEquipmentSupplyPrice,
   getAllEquipmentTotalPrice,
 } from "../../utils/reservationUtils";
-import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGropEquipmentToState";
+import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTableEditor";
 
