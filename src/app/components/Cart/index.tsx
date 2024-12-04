@@ -12,7 +12,7 @@ import dayjs from "dayjs";
 import { QuotationItemEditor } from "@/app/reservations/modules/form/QuotationItemEditor";
 import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
 import { isEmpty } from "lodash";
-import { EquipmentSearchModal } from "@/app/reservations/modules/form/EquipmentSearchModal";
+import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { SetEquipmentType } from "@/app/types/equipmentType";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 

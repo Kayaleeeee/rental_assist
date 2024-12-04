@@ -17,8 +17,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./setDetailPage.module.scss";
 import { useSetEquipmentDetail } from "./hooks/useSetEquipmentDetail";
 import { isEmpty } from "lodash";
-import { GroupEquipmentItem } from "../modules/GroupEquipmentItem";
-
 import { useEquipmentRentalDates } from "../../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
 import { getPaddingDateRange } from "@/app/utils/timeUtils";
@@ -27,6 +25,7 @@ import {
   CalendarEventType,
   MonthCalendar,
 } from "@/app/components/Calendar/MonthCalendar";
+import { GroupEquipmentListTable } from "../modules/GroupEquipmentListTable";
 
 const SetEquipmentDetailPage = () => {
   const router = useRouter();
@@ -159,17 +158,10 @@ const SetEquipmentDetailPage = () => {
               <Label title="포함 장비 정보" />
               {!isEmpty(setEquipmentDetail.equipmentList) && (
                 <Margin top={20}>
-                  <div className={styles.equipmentListWrapper}>
-                    {setEquipmentDetail.equipmentList.map((item) => {
-                      return (
-                        <GroupEquipmentItem
-                          key={item.id}
-                          item={item}
-                          isSelectable={false}
-                        />
-                      );
-                    })}
-                  </div>
+                  <GroupEquipmentListTable
+                    checkboxSelection={false}
+                    equipmentList={setEquipmentDetail.equipmentList}
+                  />
                 </Margin>
               )}
             </div>

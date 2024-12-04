@@ -9,7 +9,7 @@ import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 
 import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EquipmentSearchModal } from "../../modules/form/EquipmentSearchModal";
+import { EquipmentSearchModal } from "../../../equipments/modules/EquipmentSearchModal";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../../users/modules/UserSearchModal";

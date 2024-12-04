@@ -9,7 +9,7 @@ import { Button } from "@/app/components/Button";
 import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 
-import { EquipmentSearchModal } from "@/app/reservations/modules/form/EquipmentSearchModal";
+import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { useEffect, useRef, useState } from "react";
 import { isEmpty } from "lodash";
 

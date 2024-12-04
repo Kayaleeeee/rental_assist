@@ -14,11 +14,15 @@ import { isEqual } from "lodash";
 type Props = {
   selectedEquipmentSetList: SetEquipmentType[];
   setSelectedEquipmentSetList: Dispatch<SetStateAction<SetEquipmentType[]>>;
+  disabledSetIdList?: SetEquipmentType["id"][];
+  disabledEquipmentIdList?: EquipmentListItemType["id"][];
 };
 
 export const SetEquipmentList = ({
   selectedEquipmentSetList,
   setSelectedEquipmentSetList,
+  disabledSetIdList = [],
+  disabledEquipmentIdList = [],
 }: Props) => {
   const {
     list = [],
@@ -46,12 +50,21 @@ export const SetEquipmentList = ({
 
   const addEquipmentToSet = useCallback(
     (equipment: EquipmentListItemType, targetSet: SetEquipmentType) => {
-      setSelectedEquipmentSetList((prev) =>
-        prev.concat({
-          ...targetSet,
-          equipmentList: [...targetSet.equipmentList, equipment],
-        })
-      );
+      setSelectedEquipmentSetList((prev) => {
+        const setIndex = prev.findIndex((set) => set.id === targetSet.id);
+
+        if (setIndex === -1) {
+          return prev.concat({ ...targetSet, equipmentList: [equipment] });
+        }
+
+        const changedSet = [...prev];
+        changedSet[setIndex] = {
+          ...changedSet[setIndex],
+          equipmentList: [...changedSet[setIndex].equipmentList, equipment],
+        };
+
+        return changedSet;
+      });
     },
     []
   );
@@ -124,6 +137,8 @@ export const SetEquipmentList = ({
           return (
             <SetEquipmentAccordion
               key={item.id}
+              disabledGroup={disabledSetIdList.includes(item.id.toString())}
+              disabledEquipmentIdList={disabledEquipmentIdList}
               setId={item.id}
               title={item.title}
               price={item.price}

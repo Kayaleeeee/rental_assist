@@ -64,13 +64,13 @@ Props) => {
           width: "80vw",
           maxWidth: "900px",
           maxHeight: "80vh",
+          overflow: "scroll",
         }}
       >
         <SetEquipmentList
           selectedEquipmentSetList={selectedGroupList}
           setSelectedEquipmentSetList={setSelectedGroupList}
         />
-
         <Margin bottom={50} />
       </div>
     </Modal>

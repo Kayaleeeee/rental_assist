@@ -245,7 +245,11 @@ const ReservationDetailPage = () => {
           {!isEmpty(reservationDetail.setList) && (
             <Margin>
               <Label title="풀세트 리스트" />
-              <div>
+              <div
+                style={{
+                  gap: "16px",
+                }}
+              >
                 {reservationDetail.setList.map((item) => {
                   return (
                     <ReservationGroupTable
@@ -253,14 +257,6 @@ const ReservationDetailPage = () => {
                       rentalDays={rentalDays}
                       groupEquipment={item}
                     />
-                    // <GroupEquipment
-                    //   key={item.quoteSetId}
-                    //   title={item.title}
-                    //   price={item.price}
-                    //   totalPrice={item.totalPrice}
-                    //   equipmentList={item.equipmentList}
-                    //   rentalDays={rentalDays}
-                    // />
                   );
                 })}
               </div>
