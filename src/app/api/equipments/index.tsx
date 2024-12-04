@@ -61,8 +61,18 @@ export const getEquipmentList = async (params?: EquipmentListParams) => {
   };
 };
 
-export const createEquipment = (payload: EquipmentPostBody) => {
-  return apiPost(apiUrl, payload);
+export const postEquipmentForm = async (payload: EquipmentPostBody) => {
+  const result = await apiPost<EquipmentListItemType[]>(apiUrl, payload, {
+    headers: {
+      Prefer: "return=representation",
+    },
+  });
+
+  if (isEmpty(result)) {
+    throw new Error("No data found");
+  }
+
+  return result[0];
 };
 
 export const editEquipment = (

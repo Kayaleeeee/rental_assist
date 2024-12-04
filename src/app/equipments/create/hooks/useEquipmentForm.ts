@@ -1,4 +1,4 @@
-import { createEquipment, editEquipment } from "@/app/api/equipments";
+import { postEquipmentForm, editEquipment } from "@/app/api/equipments";
 import {
   EquipmentCategory,
   EquipmentCategoryList,
@@ -76,7 +76,7 @@ export const useEquipmentForm = () => {
     };
 
     try {
-      await createEquipment(form);
+      await postEquipmentForm(form);
       showToast({
         message: "장비가 등록되었습니다.",
         type: "success",

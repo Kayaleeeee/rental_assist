@@ -45,7 +45,7 @@ const SetEquipmentDetailPage = () => {
     if (!confirm("장비를 삭제하시겠습니까?")) return;
 
     try {
-      await deleteSetEquipment(equipmentId.toString());
+      await deleteSetEquipment(equipmentId);
 
       showToast({ message: "장비를 삭제했습니다", type: "success" });
       router.push(`/equipments`);

@@ -6,17 +6,13 @@ import styles from "../page.module.scss";
 import { EditableField } from "@/app/components/EditableField";
 import { Label } from "@/app/components/Form/Label";
 import { Button } from "@/app/components/Button";
-import {
-  formatKoreanCurrency,
-  formatLocaleString,
-} from "@/app/utils/priceUtils";
 import { useEquipmentDetail } from "./hooks/useEquipmentDetail";
 import { useParams, useRouter } from "next/navigation";
 import {
   EquipmentCategoryList,
   EquipmentItemWithRentedDates,
 } from "@/app/types/equipmentType";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
 import {
@@ -28,6 +24,28 @@ import dayjs from "dayjs";
 import { deleteEquipment } from "@/app/api/equipments";
 import { showToast } from "@/app/utils/toastUtils";
 import { getPaddingDateRange } from "@/app/utils/timeUtils";
+import { PriceListTable } from "../modules/PriceSettingModal/PriceSettingModal";
+import { useEquipmentPriceList } from "./hooks/useEquipmentPriceList";
+import { EquipmentPriceItem } from "@/app/types/equipmentPriceType";
+import { isEmpty } from "lodash";
+
+const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
+  const eventList: CalendarEventType[] = [];
+
+  if (!rentalInfo) return [];
+
+  rentalInfo.forEach((item) => {
+    item.rentedDates.forEach((date) => {
+      eventList.push({
+        start: dayjs(date.startDate).toDate(),
+        end: dayjs(date.endDate).toDate(),
+        title: item.userName,
+        id: item.reservationId,
+      });
+    });
+  });
+  return eventList;
+};
 
 const EquipmentDetailPage = () => {
   const router = useRouter();
@@ -37,26 +55,16 @@ const EquipmentDetailPage = () => {
   const [rentalInfo, setRentalInfo] = useState<EquipmentItemWithRentedDates[]>(
     []
   );
-  const { fetchSingleEquipmentRentalHistory } = useEquipmentRentalDates();
+  const [priceList, setPriceList] = useState<EquipmentPriceItem[]>([]);
+  const originalPriceList = useRef<EquipmentPriceItem[]>([]);
+
   const [currentDate, setCurrentDate] = useState(dayjs());
 
+  const { fetchSingleEquipmentRentalHistory } = useEquipmentRentalDates();
+  const { fetchPriceList } = useEquipmentPriceList();
+
   const eventDateList: CalendarEventType[] = useMemo(() => {
-    const eventList: CalendarEventType[] = [];
-
-    if (!rentalInfo) return [];
-
-    rentalInfo.forEach((item) => {
-      item.rentedDates.forEach((date) => {
-        eventList.push({
-          start: dayjs(date.startDate).toDate(),
-          end: dayjs(date.endDate).toDate(),
-          title: item.userName,
-          id: item.reservationId,
-        });
-      });
-    });
-
-    return eventList;
+    return isEmpty(rentalInfo) ? [] : convertToEventList(rentalInfo);
   }, [rentalInfo]);
 
   const selectedCategory = useMemo(() => {
@@ -68,6 +76,15 @@ const EquipmentDetailPage = () => {
       )?.title || ""
     );
   }, [equipmentDetail]);
+
+  const handleFetchPriceList = useCallback((id: number) => {
+    fetchPriceList(id)
+      .then((response) => {
+        setPriceList(response);
+        originalPriceList.current = response;
+      })
+      .catch(() => setPriceList([]));
+  }, []);
 
   const handleDeleteEquipment = useCallback(async () => {
     if (!equipmentDetail || !equipmentId) return;
@@ -95,6 +112,12 @@ const EquipmentDetailPage = () => {
       endDate,
     }).then((result) => setRentalInfo(result));
   }, [currentDate, equipmentId]);
+
+  useEffect(() => {
+    if (!equipmentId || isNaN(equipmentId)) return;
+
+    handleFetchPriceList(equipmentId);
+  }, [equipmentId, handleFetchPriceList]);
 
   if (!equipmentDetail) return null;
 
@@ -138,19 +161,9 @@ const EquipmentDetailPage = () => {
 
             <div className={styles.sectionWrapper}>
               <Label title="렌탈 가격" />
-              <div className={styles.detailPriceWrapper}>
-                <EditableField
-                  isEditable={false}
-                  fullWidth
-                  value={formatLocaleString(equipmentDetail.price)}
-                />
-                <div
-                  className={styles.convertedPrice}
-                  style={{ marginLeft: "10px" }}
-                >
-                  ({formatKoreanCurrency(equipmentDetail.price)})
-                </div>
-              </div>
+              <Margin top={20} right={20}>
+                <PriceListTable priceList={priceList} />
+              </Margin>
             </div>
             <Margin top={20} />
 

@@ -42,7 +42,7 @@ export const apiInstance = axios.create({
   },
 
   paramsSerializer: (params) => {
-    const keyPrefix = ["or", "offset", "limit", "select", "count"];
+    const keyPrefix = ["or", "offset", "limit", "select", "count", "order"];
     const valuePrefix = [
       "lt.",
       "lte.",
