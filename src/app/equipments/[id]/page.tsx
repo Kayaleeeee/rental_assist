@@ -127,6 +127,16 @@ const EquipmentDetailPage = () => {
             <Margin top={20} />
 
             <div className={styles.sectionWrapper}>
+              <Label title="수량" />
+              <EditableField
+                isEditable={false}
+                fullWidth
+                value={equipmentDetail.quantity}
+              />
+            </div>
+            <Margin top={20} />
+
+            <div className={styles.sectionWrapper}>
               <Label title="렌탈 가격" />
               <div className={styles.detailPriceWrapper}>
                 <EditableField
@@ -153,7 +163,17 @@ const EquipmentDetailPage = () => {
                 value={equipmentDetail.detail}
               />
             </div>
+
             <Margin top={20} />
+            <div className={styles.sectionWrapper}>
+              <Label title="메모" />
+              <EditableField
+                isEditable={false}
+                fullWidth
+                multiline
+                value={equipmentDetail?.memo || ""}
+              />
+            </div>
           </div>
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />

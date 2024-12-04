@@ -12,6 +12,7 @@ import styles from "../../page.module.scss";
 import { useParams } from "next/navigation";
 import { useEquipmentDetail } from "../hooks/useEquipmentDetail";
 import { useEffect } from "react";
+import { Margin } from "@/app/components/Margin";
 
 const EditEquipmentPage = () => {
   const { id } = useParams();
@@ -29,6 +30,10 @@ const EditEquipmentPage = () => {
     editEquipmentForm,
     detail,
     setDetail,
+    memo,
+    setMemo,
+    quantity,
+    setQuantity,
   } = useEquipmentForm();
 
   const { detail: equipmentDetail } = useEquipmentDetail(equipmentId);
@@ -74,6 +79,21 @@ const EditEquipmentPage = () => {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
+
+      <div className={styles.sectionWrapper}>
+        <Label title="수량" />
+        <EditableField
+          fullWidth
+          value={quantity}
+          onChange={(e) => {
+            const value = Number(e.target.value);
+
+            if (isNaN(value)) return;
+            setQuantity(value);
+          }}
+        />
+      </div>
+
       <div className={styles.sectionWrapper}>
         <Label title="렌탈 가격" />
         <TextField
@@ -102,6 +122,19 @@ const EditEquipmentPage = () => {
           value={detail}
           placeholder="상세 정보를 입력해주세요."
           onChange={(e) => setDetail(e.target.value)}
+        />
+      </div>
+
+      <Margin top={30} />
+
+      <div className={styles.sectionWrapper}>
+        <Label title="메모" />
+        <EditableField
+          isEditable
+          fullWidth
+          multiline
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
         />
       </div>
 

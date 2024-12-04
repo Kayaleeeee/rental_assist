@@ -17,17 +17,21 @@ export type EquipmentDetailType = {
   id: number;
   title: string;
   price: number;
+  quantity: number;
   category: string;
   detail: string;
   disabled: boolean;
+  memo?: string;
 };
 
 export type EquipmentPostBody = {
   title: string;
   price: number;
+  quantity: number;
   category: EquipmentCategory;
   detail: string;
   disabled?: boolean;
+  memo?: string;
 };
 
 export type EquipmentListParams = ListParamsType<{

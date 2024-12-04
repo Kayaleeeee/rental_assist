@@ -22,6 +22,8 @@ export const useEquipmentForm = () => {
   const [title, setTitle] = useState<string>("");
   const [price, setPrice] = useState<number>(0);
   const [detail, setDetail] = useState<string>("");
+  const [memo, setMemo] = useState<string>("");
+  const [quantity, setQuantity] = useState<number>(1);
 
   const onChangeCategory = (key: string) => {
     const selectedCategoryIndex = categoryMenu.findIndex(
@@ -69,6 +71,8 @@ export const useEquipmentForm = () => {
       title,
       price,
       detail,
+      memo,
+      quantity,
     };
 
     try {
@@ -85,7 +89,7 @@ export const useEquipmentForm = () => {
         type: "error",
       });
     }
-  }, [category, title, price, detail, router, getIsValidForm]);
+  }, [category, title, price, detail, router, memo, quantity, getIsValidForm]);
 
   const editEquipmentForm = useCallback(
     async (id: EquipmentListItemType["id"]) => {
@@ -96,6 +100,8 @@ export const useEquipmentForm = () => {
         title,
         price,
         detail,
+        memo,
+        quantity,
       };
 
       try {
@@ -113,7 +119,7 @@ export const useEquipmentForm = () => {
         });
       }
     },
-    [category, title, price, detail, router, getIsValidForm]
+    [category, quantity, title, price, detail, router, memo, getIsValidForm]
   );
 
   return {
@@ -128,5 +134,9 @@ export const useEquipmentForm = () => {
     setDetail,
     submitEquipmentForm,
     editEquipmentForm,
+    memo,
+    setMemo,
+    setQuantity,
+    quantity,
   };
 };

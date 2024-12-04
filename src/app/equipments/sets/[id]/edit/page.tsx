@@ -8,17 +8,20 @@ import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
-
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { isEmpty } from "lodash";
-
-import { Margin } from "@/app/components/Margin";
 import { useSetEquipmentForm } from "../../create/hooks/useSetEquipmentForm";
-import { SetEquipmentItemEditor } from "../../modules/SetEquipmentItemEditor";
 import { useSetEquipmentDetail } from "../hooks/useSetEquipmentDetail";
 import { useParams } from "next/navigation";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
+import { GridTable } from "@/app/components/Table/GridTable";
+import {
+  GROUP_QUOTE_ITEM_MENU,
+  QuoteEquipmentMoreMenu,
+} from "@/app/reservations/modules/form/QuoteEquipmentMenu";
+import { GridColDef } from "@mui/x-data-grid";
+import { HeaderName } from "@/app/components/DataTable/HeaderName";
 
 const EquipmentEditPage = () => {
   const { id } = useParams();
@@ -42,6 +45,68 @@ const EquipmentEditPage = () => {
   const { detail: setEquipmentDetail, isLoading } = useSetEquipmentDetail(
     Number(id)
   );
+
+  const columns = useMemo((): GridColDef<EquipmentListItemType>[] => {
+    return [
+      {
+        field: "id",
+        width: 80,
+        renderHeader: () => HeaderName("ID"),
+        renderCell: ({ row }) => row.id,
+        filterable: false,
+        disableColumnMenu: true,
+        sortable: false,
+      },
+      {
+        field: "title",
+        renderHeader: () => HeaderName("장비명"),
+        renderCell: ({ row }) => row.title,
+        flex: 1,
+        filterable: false,
+        disableColumnMenu: true,
+        sortable: false,
+      },
+      {
+        field: "quantity",
+        renderHeader: () => HeaderName("수량"),
+        renderCell: ({ row }) => <>{row.quantity}개</>,
+        filterable: false,
+        disableColumnMenu: true,
+        sortable: false,
+      },
+      {
+        field: "edit",
+        renderHeader: () => HeaderName(""),
+        renderCell: ({ row }) => (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+            }}
+          >
+            <QuoteEquipmentMoreMenu
+              menu={GROUP_QUOTE_ITEM_MENU}
+              onConfirm={(menu) => {
+                if (!menu) return;
+
+                if (menu.key === "delete") {
+                  setEquipmentList(
+                    equipmentList.filter((item) => item.id !== row.id)
+                  );
+                }
+              }}
+            />
+          </div>
+        ),
+        width: 30,
+        filterable: false,
+        disableColumnMenu: true,
+        sortable: false,
+      },
+    ];
+  }, [equipmentList]);
 
   useEffect(() => {
     if (!setEquipmentDetail) return;
@@ -110,30 +175,12 @@ const EquipmentEditPage = () => {
           </Button>
 
           {!isEmpty(equipmentList) && (
-            <Margin top={20}>
-              <div className={styles.equipmentListWrapper}>
-                {equipmentList.map((item) => {
-                  return (
-                    <SetEquipmentItemEditor
-                      key={item.id}
-                      item={item}
-                      onChangeField={(state) =>
-                        setEquipmentList((prev) =>
-                          prev.map((item) =>
-                            item.id === state.id ? state : item
-                          )
-                        )
-                      }
-                      onDeleteEquipment={() =>
-                        setEquipmentList((prev) =>
-                          prev.filter((prevItem) => prevItem.id !== item.id)
-                        )
-                      }
-                    />
-                  );
-                })}
-              </div>
-            </Margin>
+            <GridTable<EquipmentListItemType>
+              hideFooter
+              rows={equipmentList}
+              columns={columns}
+              getRowId={(row) => row.id}
+            />
           )}
         </div>
 

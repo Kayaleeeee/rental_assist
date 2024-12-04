@@ -9,6 +9,7 @@ import { Button } from "@/app/components/Button";
 import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { useEquipmentForm } from "./hooks/useEquipmentForm";
+import { Margin } from "@/app/components/Margin";
 
 const EquipmentCreatePage = () => {
   const {
@@ -22,6 +23,10 @@ const EquipmentCreatePage = () => {
     submitEquipmentForm,
     detail,
     setDetail,
+    memo,
+    setMemo,
+    quantity,
+    setQuantity,
   } = useEquipmentForm();
 
   return (
@@ -56,6 +61,22 @@ const EquipmentCreatePage = () => {
           onChange={(e) => setTitle(e.target.value)}
         />
       </div>
+
+      <Margin top={20} />
+      <div className={styles.sectionWrapper}>
+        <Label title="수량" />
+        <EditableField
+          fullWidth
+          value={quantity}
+          onChange={(e) => {
+            const value = Number(e.target.value);
+
+            if (isNaN(value)) return;
+            setQuantity(value);
+          }}
+        />
+      </div>
+      <Margin top={20} />
       <div className={styles.sectionWrapper}>
         <Label title="렌탈 가격" />
         <TextField
@@ -76,6 +97,7 @@ const EquipmentCreatePage = () => {
         </div>
       </div>
 
+      <Margin top={20} />
       <div className={styles.sectionWrapper}>
         <Label title="상세 정보" />
         <TextField
@@ -84,6 +106,17 @@ const EquipmentCreatePage = () => {
           value={detail}
           placeholder="상세 정보를 입력해주세요."
           onChange={(e) => setDetail(e.target.value)}
+        />
+      </div>
+
+      <Margin top={40} />
+      <div className={styles.sectionWrapper}>
+        <Label title="메모" />
+        <EditableField
+          fullWidth
+          multiline
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
         />
       </div>
 
