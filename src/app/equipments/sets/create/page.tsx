@@ -6,36 +6,64 @@ import { Label } from "@/app/components/Form/Label";
 import styles from "../../page.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
-import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { useSetEquipmentForm } from "./hooks/useSetEquipmentForm";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { isEmpty } from "lodash";
 import { SetEquipmentItemEditor } from "../modules/SetEquipmentItemEditor";
 import { Margin } from "@/app/components/Margin";
 import {
+  PriceItemStateType,
   PriceListTable,
   PriceSettingModal,
 } from "../../modules/PriceSettingModal/PriceSettingModal";
+import { SetEquipmentPayload } from "@/app/types/equipmentType";
+import { createGroupEquipment } from "../actions/createGroupEquipment";
+import { showToast } from "@/app/utils/toastUtils";
+import { useRouter } from "next/navigation";
 
 const EquipmentCreatePage = () => {
+  const router = useRouter();
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
+  const [priceList, setPriceList] = useState<PriceItemStateType[]>([]);
 
   const {
     title,
     setTitle,
-    price,
-    setPrice,
     detail,
     setDetail,
     memo,
     setMemo,
-    onCreateSetEquipment,
     equipmentList,
     setEquipmentList,
   } = useSetEquipmentForm();
+
+  const handleUpdatePriceList = useCallback(
+    async (list: PriceItemStateType[]) => {
+      setPriceList(list);
+      setIsOpenPriceSettingModal(false);
+    },
+    []
+  );
+
+  const handleCreateEquipment = useCallback(async () => {
+    try {
+      const payload: SetEquipmentPayload = {
+        title,
+        memo,
+        detail,
+      };
+
+      await createGroupEquipment({ form: payload, equipmentList, priceList });
+      showToast({ message: "장비가 등록되었습니다.", type: "success" });
+
+      router.push("/equipments");
+    } catch {
+      showToast({ message: "장비등록에 실패했습니다", type: "error" });
+    }
+  }, [title, memo, detail, router, equipmentList]);
 
   return (
     <div>
@@ -48,27 +76,7 @@ const EquipmentCreatePage = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-        <Margin top={20} />
 
-        <div className={formStyles.sectionWrapper}>
-          <Label title="렌탈 가격" />
-          <TextField
-            fullWidth
-            value={price}
-            onChange={(e) => {
-              const value = Number(e.target.value);
-
-              if (isNaN(value)) return;
-              if (value < 0) return;
-
-              setPrice(value);
-            }}
-          />
-          <div style={{ marginTop: "10px" }} />
-          <div className={styles.convertedPrice}>
-            {formatKoreanCurrency(price)}
-          </div>
-        </div>
         <Margin top={40} />
 
         <div className={styles.sectionWrapper}>
@@ -86,12 +94,12 @@ const EquipmentCreatePage = () => {
               size="Small"
               onClick={() => setIsOpenPriceSettingModal(true)}
             >
-              가격 수정하기
+              {isEmpty(priceList) ? "가격 등록하기" : "가격 수정하기"}
             </Button>
           </div>
 
           <Margin top={20} />
-          <PriceListTable priceList={[]} />
+          <PriceListTable priceList={priceList} />
         </div>
 
         <Margin top={40} />
@@ -165,7 +173,7 @@ const EquipmentCreatePage = () => {
           <Button
             size="Medium"
             style={{ width: "150px" }}
-            onClick={onCreateSetEquipment}
+            onClick={handleCreateEquipment}
           >
             등록
           </Button>
@@ -181,9 +189,9 @@ const EquipmentCreatePage = () => {
       )}
       {isOpenPriceSettingModal && (
         <PriceSettingModal
-          priceList={[]}
+          priceList={priceList}
           onClose={() => setIsOpenPriceSettingModal(false)}
-          onConfirm={() => {}}
+          onConfirm={handleUpdatePriceList}
           mode={"group"}
         />
       )}

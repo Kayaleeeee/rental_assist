@@ -9,7 +9,7 @@ import { Label } from "@/app/components/Form/Label";
 import { Margin } from "@/app/components/Margin";
 import { showToast } from "@/app/utils/toastUtils";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./setDetailPage.module.scss";
 import { useSetEquipmentDetail } from "./hooks/useSetEquipmentDetail";
 import { isEmpty } from "lodash";
@@ -23,33 +23,56 @@ import {
 } from "@/app/components/Calendar/MonthCalendar";
 import { GroupEquipmentListTable } from "../modules/GroupEquipmentListTable";
 import { PriceListTable } from "../../modules/PriceSettingModal/PriceSettingModal";
+import { EquipmentGroupPriceItem } from "@/app/types/equipmentPriceType";
+import { useGroupEquipmentPriceList } from "../../[id]/hooks/useGroupEquipmentPriceList";
+
+const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
+  const eventList: CalendarEventType[] = [];
+
+  if (!rentalInfo) return [];
+
+  rentalInfo.forEach((item) => {
+    item.rentedDates.forEach((date) => {
+      eventList.push({
+        start: dayjs(date.startDate).toDate(),
+        end: dayjs(date.endDate).toDate(),
+        title: `${item.title} [${item.userName}]`,
+        id: item.reservationId,
+      });
+    });
+  });
+  return eventList;
+};
 
 const SetEquipmentDetailPage = () => {
   const router = useRouter();
   const params = useParams();
-  const equipmentId = Number(params.id);
+  const setId = Number(params.id);
   const [currentDate, setCurrentDate] = useState(dayjs());
-  const { detail: setEquipmentDetail } = useSetEquipmentDetail(equipmentId);
+  const { detail: setEquipmentDetail } = useSetEquipmentDetail(setId);
+  const [priceList, setPriceList] = useState<EquipmentGroupPriceItem[]>([]);
+  const originalPriceList = useRef<EquipmentGroupPriceItem[]>([]);
 
   const [rentalInfo, setRentalInfo] = useState<EquipmentItemWithRentedDates[]>(
     []
   );
   const { fetchMultipleEquipmentRentalHistory } = useEquipmentRentalDates();
+  const { fetchGroupPriceList } = useGroupEquipmentPriceList();
 
   const handleDeleteEquipment = useCallback(async () => {
-    if (!setEquipmentDetail || !equipmentId) return;
+    if (!setEquipmentDetail || !setId) return;
 
     if (!confirm("장비를 삭제하시겠습니까?")) return;
 
     try {
-      await deleteSetEquipment(equipmentId);
+      await deleteSetEquipment(setId);
 
       showToast({ message: "장비를 삭제했습니다", type: "success" });
       router.push(`/equipments`);
     } catch {
       showToast({ message: "장비를 삭제할 수 없습니다.", type: "error" });
     }
-  }, [setEquipmentDetail, equipmentId, router]);
+  }, [setEquipmentDetail, setId, router]);
 
   const fetchEquipmentRentalDateList = useCallback(
     async (idList: number[]) => {
@@ -71,23 +94,17 @@ const SetEquipmentDetailPage = () => {
     [currentDate]
   );
 
+  const handleFetchPriceList = useCallback((id: number) => {
+    fetchGroupPriceList(id)
+      .then((response) => {
+        setPriceList(response);
+        originalPriceList.current = response;
+      })
+      .catch(() => setPriceList([]));
+  }, []);
+
   const eventDateList: CalendarEventType[] = useMemo(() => {
-    const eventList: CalendarEventType[] = [];
-
-    if (!rentalInfo) return [];
-
-    rentalInfo.forEach((item) => {
-      item.rentedDates.forEach((date) => {
-        eventList.push({
-          start: dayjs(date.startDate).toDate(),
-          end: dayjs(date.endDate).toDate(),
-          title: `${item.title} [${item.userName}]`,
-          id: item.reservationId,
-        });
-      });
-    });
-
-    return eventList;
+    return convertToEventList(rentalInfo);
   }, [rentalInfo]);
 
   useEffect(() => {
@@ -97,6 +114,12 @@ const SetEquipmentDetailPage = () => {
     const idList = setEquipmentDetail.equipmentList.map((item) => item.id);
     fetchEquipmentRentalDateList(idList);
   }, [setEquipmentDetail, fetchEquipmentRentalDateList]);
+
+  useEffect(() => {
+    if (!setId || isNaN(setId)) return;
+
+    handleFetchPriceList(setId);
+  }, [setId, handleFetchPriceList]);
 
   if (!setEquipmentDetail) return null;
 
@@ -126,7 +149,7 @@ const SetEquipmentDetailPage = () => {
               <div className={styles.sectionWrapper}>
                 <Label title="렌탈 가격" />
                 <Margin top={20} right={20}>
-                  <PriceListTable priceList={[]} />
+                  <PriceListTable priceList={priceList} />
                 </Margin>
               </div>
             </div>
@@ -195,7 +218,7 @@ const SetEquipmentDetailPage = () => {
             size="Small"
             style={{ width: "100px" }}
             onClick={() => {
-              router.push(`/equipments/sets/${equipmentId}/edit`);
+              router.push(`/equipments/sets/${setId}/edit`);
             }}
           >
             수정

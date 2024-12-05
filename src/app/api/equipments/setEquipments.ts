@@ -64,7 +64,7 @@ export const getSetEquipmentList = async (params?: EquipmentListParams) => {
   };
 };
 
-export const createSetEquipment = async (payload: SetEquipmentPayload) => {
+export const postSetEquipment = async (payload: SetEquipmentPayload) => {
   const result = await apiPost<SetEquipmentType[]>(apiUrl, payload, {
     headers: {
       Prefer: "return=representation",

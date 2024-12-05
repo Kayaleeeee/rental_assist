@@ -41,12 +41,8 @@ const EquipmentCreatePage = () => {
 
   const handleUpdatePriceList = useCallback(
     async (list: PriceItemStateType[]) => {
-      try {
-        setPriceList(list);
-        setIsOpenPriceSettingModal(false);
-      } catch {
-        showToast({ message: "가격을 수정할 수 없습니다.", type: "error" });
-      }
+      setPriceList(list);
+      setIsOpenPriceSettingModal(false);
     },
     []
   );

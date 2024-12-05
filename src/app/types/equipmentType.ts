@@ -26,7 +26,7 @@ export type EquipmentDetailType = {
 
 export type EquipmentPostBody = {
   title: string;
-  price: number;
+  price?: number;
   quantity: number;
   category: EquipmentCategory;
   detail: string;
@@ -130,7 +130,7 @@ export type SetEquipmentListItemType = {
 export type SetEquipmentPayload = {
   title: string;
   detail: string;
-  price: number;
+  price?: number;
   memo?: string;
 };
 

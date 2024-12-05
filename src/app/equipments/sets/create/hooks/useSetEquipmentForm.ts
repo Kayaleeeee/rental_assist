@@ -1,5 +1,4 @@
 import {
-  createSetEquipment,
   createSetEquipmentItemList,
   deleteSetEquipmentItemList,
   editSetEquipment,
@@ -7,7 +6,6 @@ import {
 import {
   EquipmentListItemType,
   SetEquipmentItemPostPayload,
-  SetEquipmentPayload,
   SetEquipmentType,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
@@ -51,51 +49,6 @@ export const useSetEquipmentForm = () => {
     return true;
   }, [title, price, equipmentList]);
 
-  const convertEquipmentToPayload = (
-    equipmentList: EquipmentListItemType[],
-    setId: SetEquipmentType["id"]
-  ) => {
-    return equipmentList.map((item) => {
-      return {
-        equipmentId: item.id,
-        quantity: item.quantity,
-        setId,
-      };
-    });
-  };
-
-  const onCreateSetEquipment = useCallback(async () => {
-    if (!validateForm()) return;
-
-    const form: SetEquipmentPayload = {
-      title,
-      price,
-      detail,
-    };
-
-    try {
-      const setCreateResult = await createSetEquipment(form);
-
-      const convertedSetEquipmentList: SetEquipmentItemPostPayload[] =
-        convertEquipmentToPayload(equipmentList, setCreateResult.id);
-
-      await createSetEquipmentItemList(convertedSetEquipmentList);
-
-      showToast({
-        message: "풀 세트 장비가 등록되었습니다.",
-        type: "success",
-      });
-
-      router.push("/equipments/sets");
-    } catch (e) {
-      console.log("등록 실패", e);
-      showToast({
-        message: "풀 세트 장비 등록에 실패했습니다.",
-        type: "error",
-      });
-    }
-  }, [title, price, detail, router, memo, validateForm, equipmentList]);
-
   const onEditSetEquipment = useCallback(
     async (
       setId: SetEquipmentType["id"],
@@ -138,6 +91,7 @@ export const useSetEquipmentForm = () => {
     },
     [router, validateForm, equipmentList]
   );
+
   return {
     title,
     setTitle,
@@ -148,7 +102,6 @@ export const useSetEquipmentForm = () => {
     memo,
     setMemo,
     onEditSetEquipment,
-    onCreateSetEquipment,
     equipmentList,
     setEquipmentList,
   };

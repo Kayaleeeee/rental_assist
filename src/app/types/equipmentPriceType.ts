@@ -20,4 +20,4 @@ export type PostEquipmentPricePayload = {
   equipmentId: EquipmentListItemType["id"];
 };
 
-export type PostGroupPricePayload = Omit<EquipmentGroupPriceItem, "id">[];
+export type PostGroupPricePayload = Omit<EquipmentGroupPriceItem, "id">;

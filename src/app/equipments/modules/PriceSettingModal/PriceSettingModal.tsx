@@ -37,6 +37,10 @@ const defaultPriceItem = {
 
 const buttonList = [{ day: 1 }, { day: 10 }, { day: 30 }];
 
+const convertPriceStateToPriceList = (list: PriceItemStateType[]) => {
+  return list.map((item, index) => ({ ...item, day: index + 1 }));
+};
+
 export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
   const [priceListState, setPriceListState] =
     useState<PriceItemStateType[]>(priceList);
@@ -74,6 +78,11 @@ export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
     );
   };
 
+  const handleConfirmList = (list: PriceItemStateType[]) => {
+    const convertedList = convertPriceStateToPriceList(list);
+    onConfirm(convertedList);
+  };
+
   return (
     <Modal
       onCloseModal={onClose}
@@ -89,9 +98,7 @@ export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
         },
         {
           title: "저장하기",
-          onClick: () => {
-            onConfirm(priceListState);
-          },
+          onClick: () => handleConfirmList(priceListState),
         },
       ]}
     >

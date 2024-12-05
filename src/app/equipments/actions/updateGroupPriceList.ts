@@ -1,19 +1,17 @@
-import {
-  EquipmentGroupPriceItem,
-  EquipmentPriceItem,
-} from "@/app/types/equipmentPriceType";
+import { EquipmentGroupPriceItem } from "@/app/types/equipmentPriceType";
 import { PriceItemStateType } from "../modules/PriceSettingModal/PriceSettingModal";
 import { isEmpty, isEqual, isNil } from "lodash";
 import {
-  postEquipmentPrice,
-  deleteEquipmentPriceList,
-  patchEquipmentPriceItem,
+  postGroupEquipmentPrice,
+  patchGroupEquipmentPriceItem,
+  deleteGroupEquipmentPriceList,
 } from "@/app/api/equipments/equipmentPrice";
+import { SetEquipmentType } from "@/app/types/equipmentType";
 
-export const updatePriceList = async (
-  id: EquipmentPriceItem["equipmentId"],
+export const updateGroupPriceList = async (
+  id: SetEquipmentType["id"],
   list: PriceItemStateType[],
-  originalList: EquipmentPriceItem[]
+  originalList: EquipmentGroupPriceItem[]
 ) => {
   const { updateList, deleteList, createList } = getListByType(
     list,
@@ -21,22 +19,24 @@ export const updatePriceList = async (
   );
 
   if (!isEmpty(createList)) {
-    await postEquipmentPrice(
-      createList.map((item) => ({ ...item, equipmentId: id }))
+    await postGroupEquipmentPrice(
+      createList.map((item) => ({ ...item, setId: id }))
     );
   }
 
   if (!isEmpty(deleteList)) {
-    await deleteEquipmentPriceList(deleteList.map((item) => item.id).join(","));
+    await deleteGroupEquipmentPriceList(
+      deleteList.map((item) => item.id).join(",")
+    );
   }
 
   if (!isEmpty(updateList)) {
     await Promise.all(
       updateList.map((item) => {
-        patchEquipmentPriceItem(item.id, {
+        patchGroupEquipmentPriceItem(item.id, {
           day: item.day,
           price: item.price,
-          equipmentId: id,
+          setId: id,
         });
       })
     );
@@ -45,10 +45,10 @@ export const updatePriceList = async (
 
 const getListByType = (
   list: PriceItemStateType[],
-  originalList: EquipmentPriceItem[]
+  originalList: EquipmentGroupPriceItem[]
 ) => {
   const updateList: {
-    id: EquipmentPriceItem["id"] | EquipmentGroupPriceItem["id"];
+    id: EquipmentGroupPriceItem["id"];
     day: number;
     price: number;
   }[] = [];
@@ -71,8 +71,9 @@ const getListByType = (
       if (isEqual(originalItem, item)) return;
 
       updateList.push({
-        ...item,
         id: item.id,
+        day: item.day,
+        price: item.price,
       });
     }
   });

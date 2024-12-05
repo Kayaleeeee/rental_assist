@@ -1,3 +1,5 @@
+import { isNil } from "lodash";
+
 export function formatKoreanCurrency(amount: number): string {
   if (amount >= 100000000) {
     return `${Math.floor(amount / 100000000)}억 ${formatKoreanCurrency(
@@ -21,5 +23,6 @@ export function formatKoreanCurrency(amount: number): string {
 }
 
 export const formatLocaleString = (number: number) => {
+  if (isNil(number)) return "-";
   return number.toLocaleString("ko-KR");
 };

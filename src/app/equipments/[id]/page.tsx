@@ -57,7 +57,6 @@ const EquipmentDetailPage = () => {
   );
   const [priceList, setPriceList] = useState<EquipmentPriceItem[]>([]);
   const originalPriceList = useRef<EquipmentPriceItem[]>([]);
-
   const [currentDate, setCurrentDate] = useState(dayjs());
 
   const { fetchSingleEquipmentRentalHistory } = useEquipmentRentalDates();

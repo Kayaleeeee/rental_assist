@@ -5,7 +5,6 @@ import {
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import styles from "./setEquipmentAccordion.module.scss";
-import { formatLocaleString } from "@/app/utils/priceUtils";
 import { Margin } from "@/app/components/Margin";
 import { Button } from "@/app/components/Button";
 import Link from "next/link";
@@ -28,7 +27,6 @@ type Props = {
 
 export const SetEquipmentAccordion = ({
   title,
-  price,
   hideDetailButton = false,
   equipmentList = [],
   isAllSelected = false,
@@ -66,7 +64,6 @@ export const SetEquipmentAccordion = ({
         />
         <Margin top={16} />
         <div className={styles.accordionFooter}>
-          <div className={styles.price}>{formatLocaleString(price)}원</div>
           {!hideDetailButton && (
             <Link href={`/equipments/sets/${setId}`}>
               <Button variant="outlined" size="Small">

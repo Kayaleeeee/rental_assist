@@ -8,7 +8,7 @@ import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { EditableField } from "@/app/components/EditableField";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { isEmpty } from "lodash";
 import { useSetEquipmentForm } from "../../create/hooks/useSetEquipmentForm";
 import { useSetEquipmentDetail } from "../hooks/useSetEquipmentDetail";
@@ -23,15 +23,90 @@ import { GridColDef } from "@mui/x-data-grid";
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { Margin } from "@/app/components/Margin";
 import {
+  PriceItemStateType,
   PriceListTable,
   PriceSettingModal,
 } from "@/app/equipments/modules/PriceSettingModal/PriceSettingModal";
+import { EquipmentGroupPriceItem } from "@/app/types/equipmentPriceType";
+import { useGroupEquipmentPriceList } from "@/app/equipments/[id]/hooks/useGroupEquipmentPriceList";
+import { updateGroupPriceList } from "@/app/equipments/actions/updateGroupPriceList";
+import { showToast } from "@/app/utils/toastUtils";
+
+const getColumns = (
+  equipmentList: EquipmentListItemType[],
+  setEquipmentList: React.Dispatch<
+    React.SetStateAction<EquipmentListItemType[]>
+  >
+): GridColDef<EquipmentListItemType>[] => {
+  return [
+    {
+      field: "id",
+      width: 80,
+      renderHeader: () => HeaderName("ID"),
+      renderCell: ({ row }) => row.id,
+      filterable: false,
+      disableColumnMenu: true,
+      sortable: false,
+    },
+    {
+      field: "title",
+      renderHeader: () => HeaderName("장비명"),
+      renderCell: ({ row }) => row.title,
+      flex: 1,
+      filterable: false,
+      disableColumnMenu: true,
+      sortable: false,
+    },
+    {
+      field: "quantity",
+      renderHeader: () => HeaderName("수량"),
+      renderCell: ({ row }) => <>{row.quantity}개</>,
+      filterable: false,
+      disableColumnMenu: true,
+      sortable: false,
+    },
+    {
+      field: "edit",
+      renderHeader: () => HeaderName(""),
+      renderCell: ({ row }) => (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+          }}
+        >
+          <QuoteEquipmentMoreMenu
+            menu={GROUP_QUOTE_ITEM_MENU}
+            onConfirm={(menu) => {
+              if (!menu) return;
+
+              if (menu.key === "delete") {
+                setEquipmentList(
+                  equipmentList.filter((item) => item.id !== row.id)
+                );
+              }
+            }}
+          />
+        </div>
+      ),
+      width: 30,
+      filterable: false,
+      disableColumnMenu: true,
+      sortable: false,
+    },
+  ];
+};
 
 const EquipmentEditPage = () => {
   const { id } = useParams();
+  const setId = Number(id);
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const originalEquipmentList = useRef<EquipmentListItemType[]>([]);
   const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
+  const [priceList, setPriceList] = useState<EquipmentGroupPriceItem[]>([]);
+  const originalPriceList = useRef<EquipmentGroupPriceItem[]>([]);
 
   const {
     title,
@@ -49,68 +124,33 @@ const EquipmentEditPage = () => {
   const { detail: setEquipmentDetail, isLoading } = useSetEquipmentDetail(
     Number(id)
   );
+  const { fetchGroupPriceList } = useGroupEquipmentPriceList();
 
-  const columns = useMemo((): GridColDef<EquipmentListItemType>[] => {
-    return [
-      {
-        field: "id",
-        width: 80,
-        renderHeader: () => HeaderName("ID"),
-        renderCell: ({ row }) => row.id,
-        filterable: false,
-        disableColumnMenu: true,
-        sortable: false,
-      },
-      {
-        field: "title",
-        renderHeader: () => HeaderName("장비명"),
-        renderCell: ({ row }) => row.title,
-        flex: 1,
-        filterable: false,
-        disableColumnMenu: true,
-        sortable: false,
-      },
-      {
-        field: "quantity",
-        renderHeader: () => HeaderName("수량"),
-        renderCell: ({ row }) => <>{row.quantity}개</>,
-        filterable: false,
-        disableColumnMenu: true,
-        sortable: false,
-      },
-      {
-        field: "edit",
-        renderHeader: () => HeaderName(""),
-        renderCell: ({ row }) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-            }}
-          >
-            <QuoteEquipmentMoreMenu
-              menu={GROUP_QUOTE_ITEM_MENU}
-              onConfirm={(menu) => {
-                if (!menu) return;
+  const handleFetchPriceList = useCallback((id: number) => {
+    fetchGroupPriceList(id)
+      .then((response) => {
+        setPriceList(response);
+        originalPriceList.current = response;
+      })
+      .catch(() => setPriceList([]));
+  }, []);
 
-                if (menu.key === "delete") {
-                  setEquipmentList(
-                    equipmentList.filter((item) => item.id !== row.id)
-                  );
-                }
-              }}
-            />
-          </div>
-        ),
-        width: 30,
-        filterable: false,
-        disableColumnMenu: true,
-        sortable: false,
-      },
-    ];
-  }, [equipmentList]);
+  const handleUpdatePriceList = useCallback(
+    async (list: PriceItemStateType[]) => {
+      try {
+        await updateGroupPriceList(setId, list, originalPriceList.current);
+        setIsOpenPriceSettingModal(false);
+        showToast({
+          message: "가격이 수정되었습니다.",
+          type: "success",
+        });
+        handleFetchPriceList(setId);
+      } catch {
+        showToast({ message: "가격을 수정할 수 없습니다.", type: "error" });
+      }
+    },
+    [setId, handleFetchPriceList]
+  );
 
   useEffect(() => {
     if (!setEquipmentDetail) return;
@@ -122,6 +162,17 @@ const EquipmentEditPage = () => {
     setEquipmentList(setEquipmentDetail.equipmentList);
     originalEquipmentList.current = setEquipmentDetail.equipmentList;
   }, [setEquipmentDetail]);
+
+  useEffect(() => {
+    if (!setId || isNaN(setId)) return;
+
+    handleFetchPriceList(setId);
+  }, [setId, handleFetchPriceList]);
+
+  const columns = useMemo(
+    () => getColumns(equipmentList, setEquipmentList),
+    [equipmentList]
+  );
 
   return (
     <div>
@@ -156,7 +207,7 @@ const EquipmentEditPage = () => {
           </div>
 
           <Margin top={20} />
-          <PriceListTable priceList={[]} />
+          <PriceListTable priceList={priceList} />
         </div>
         <Margin top={40} />
 
@@ -228,9 +279,9 @@ const EquipmentEditPage = () => {
       )}
       {isOpenPriceSettingModal && (
         <PriceSettingModal
-          priceList={[]}
+          priceList={priceList}
           onClose={() => setIsOpenPriceSettingModal(false)}
-          onConfirm={() => {}}
+          onConfirm={handleUpdatePriceList}
           mode={"group"}
           id={Number(id)}
         />
