@@ -154,10 +154,10 @@ const EquipmentDetailPage = () => {
               <EditableField
                 isEditable={false}
                 fullWidth
-                value={equipmentDetail.quantity}
+                value={`${equipmentDetail.quantity} 개`}
               />
             </div>
-            <Margin top={20} />
+            <Margin top={40} />
 
             <div className={styles.sectionWrapper}>
               <Label title="렌탈 가격" />
@@ -165,7 +165,7 @@ const EquipmentDetailPage = () => {
                 <PriceListTable priceList={priceList} />
               </Margin>
             </div>
-            <Margin top={20} />
+            <Margin top={40} />
 
             <div className={styles.sectionWrapper}>
               <Label title="상세 정보" />
@@ -177,7 +177,7 @@ const EquipmentDetailPage = () => {
               />
             </div>
 
-            <Margin top={20} />
+            <Margin top={40} />
             <div className={styles.sectionWrapper}>
               <Label title="메모" />
               <EditableField

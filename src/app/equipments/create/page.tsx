@@ -95,6 +95,7 @@ const EquipmentCreatePage = () => {
             ))}
           </Select>
         </div>
+        <Margin top={20} />
 
         <div className={styles.sectionWrapper}>
           <Label title="장비명" />
@@ -104,8 +105,8 @@ const EquipmentCreatePage = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-
         <Margin top={20} />
+
         <div className={styles.sectionWrapper}>
           <Label title="수량" />
           <EditableField
@@ -119,7 +120,8 @@ const EquipmentCreatePage = () => {
             }}
           />
         </div>
-        <Margin top={30} />
+
+        <Margin top={40} />
         <div className={styles.sectionWrapper}>
           <div
             style={{
@@ -143,7 +145,7 @@ const EquipmentCreatePage = () => {
           <PriceListTable priceList={priceList} />
         </div>
 
-        <Margin top={30} />
+        <Margin top={40} />
         <div className={styles.sectionWrapper}>
           <Label title="상세 정보" />
           <TextField

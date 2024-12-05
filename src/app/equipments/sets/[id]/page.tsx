@@ -7,10 +7,6 @@ import { EditableField } from "@/app/components/EditableField";
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
 import { Label } from "@/app/components/Form/Label";
 import { Margin } from "@/app/components/Margin";
-import {
-  formatKoreanCurrency,
-  formatLocaleString,
-} from "@/app/utils/priceUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -26,6 +22,7 @@ import {
   MonthCalendar,
 } from "@/app/components/Calendar/MonthCalendar";
 import { GroupEquipmentListTable } from "../modules/GroupEquipmentListTable";
+import { PriceListTable } from "../../modules/PriceSettingModal/PriceSettingModal";
 
 const SetEquipmentDetailPage = () => {
   const router = useRouter();
@@ -126,22 +123,15 @@ const SetEquipmentDetailPage = () => {
             <Margin top={20} />
 
             <div className={styles.sectionWrapper}>
-              <Label title="렌탈 가격" />
-              <div className={styles.detailPriceWrapper}>
-                <EditableField
-                  isEditable={false}
-                  fullWidth
-                  value={formatLocaleString(setEquipmentDetail.price)}
-                />
-                <div
-                  className={styles.convertedPrice}
-                  style={{ marginLeft: "10px" }}
-                >
-                  ({formatKoreanCurrency(setEquipmentDetail.price)})
-                </div>
+              <div className={styles.sectionWrapper}>
+                <Label title="렌탈 가격" />
+                <Margin top={20} right={20}>
+                  <PriceListTable priceList={[]} />
+                </Margin>
               </div>
             </div>
-            <Margin top={20} />
+
+            <Margin top={40} />
 
             <div className={styles.sectionWrapper}>
               <Label title="상세 정보" />
@@ -152,8 +142,8 @@ const SetEquipmentDetailPage = () => {
                 value={setEquipmentDetail.detail}
               />
             </div>
+            <Margin top={40} />
 
-            <Margin top={30} />
             <div className={styles.sectionWrapper}>
               <Label title="포함 장비 정보" />
               {!isEmpty(setEquipmentDetail.equipmentList) && (
@@ -166,15 +156,15 @@ const SetEquipmentDetailPage = () => {
               )}
             </div>
 
-            <Margin top={30} />
+            <Margin top={40} />
             <div className={styles.sectionWrapper}>
               <Label title="메모" />
-
               <EditableField
                 isEditable={false}
                 value={setEquipmentDetail.memo || ""}
               />
             </div>
+
             <Margin top={20} />
           </div>
           <div className={styles.reservationCalendarWrapper}>

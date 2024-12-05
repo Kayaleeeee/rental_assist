@@ -1,10 +1,8 @@
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { SearchBar } from "@/app/components/SearchBar";
-
 import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { PageModelType } from "@/app/types/listType";
-import { formatLocaleString } from "@/app/utils/priceUtils";
 import {
   GridCallbackDetails,
   GridColDef,
@@ -44,11 +42,6 @@ const getColumns = (
         row.title
       ),
     flex: 1,
-  },
-  {
-    field: "price",
-    renderHeader: () => HeaderName("단가"),
-    renderCell: ({ row }) => formatLocaleString(row.price),
   },
   { field: "detail", flex: 1, renderHeader: () => HeaderName("상세설명") },
 ];

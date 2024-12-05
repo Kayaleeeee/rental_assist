@@ -6,7 +6,6 @@ import { Label } from "@/app/components/Form/Label";
 import styles from "../setDetailPage.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
-import { formatKoreanCurrency } from "@/app/utils/priceUtils";
 import { EditableField } from "@/app/components/EditableField";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -22,16 +21,21 @@ import {
 } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
 import { GridColDef } from "@mui/x-data-grid";
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
+import { Margin } from "@/app/components/Margin";
+import {
+  PriceListTable,
+  PriceSettingModal,
+} from "@/app/equipments/modules/PriceSettingModal/PriceSettingModal";
 
 const EquipmentEditPage = () => {
   const { id } = useParams();
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const originalEquipmentList = useRef<EquipmentListItemType[]>([]);
+  const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
 
   const {
     title,
     setTitle,
-    price,
     setPrice,
     detail,
     setDetail,
@@ -130,25 +134,31 @@ const EquipmentEditPage = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-        <div className={formStyles.sectionWrapper}>
-          <Label title="렌탈 가격" />
-          <TextField
-            fullWidth
-            value={price}
-            onChange={(e) => {
-              const value = Number(e.target.value);
+        <Margin top={20} />
 
-              if (isNaN(value)) return;
-              if (value < 0) return;
-
-              setPrice(value);
+        <div className={styles.sectionWrapper}>
+          <div
+            style={{
+              width: "100%",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
-          />
-          <div style={{ marginTop: "10px" }} />
-          <div className={styles.convertedPrice}>
-            {formatKoreanCurrency(price)}
+          >
+            <Label title="렌탈 가격" />
+            <Button
+              variant="outlined"
+              size="Small"
+              onClick={() => setIsOpenPriceSettingModal(true)}
+            >
+              가격 수정하기
+            </Button>
           </div>
+
+          <Margin top={20} />
+          <PriceListTable priceList={[]} />
         </div>
+        <Margin top={40} />
 
         <div className={formStyles.sectionWrapper}>
           <Label title="상세 정보" />
@@ -160,6 +170,7 @@ const EquipmentEditPage = () => {
             onChange={(e) => setDetail(e.target.value)}
           />
         </div>
+        <Margin top={40} />
 
         <div className={formStyles.sectionWrapper}>
           <Label title="포함 장비" />
@@ -183,6 +194,7 @@ const EquipmentEditPage = () => {
             />
           )}
         </div>
+        <Margin top={40} />
 
         <div className={formStyles.sectionWrapper}>
           <Label title="메모" />
@@ -212,6 +224,15 @@ const EquipmentEditPage = () => {
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={(list) => setEquipmentList((prev) => [...prev, ...list])}
           disabledIdList={equipmentList.map((item) => item.id)}
+        />
+      )}
+      {isOpenPriceSettingModal && (
+        <PriceSettingModal
+          priceList={[]}
+          onClose={() => setIsOpenPriceSettingModal(false)}
+          onConfirm={() => {}}
+          mode={"group"}
+          id={Number(id)}
         />
       )}
     </div>

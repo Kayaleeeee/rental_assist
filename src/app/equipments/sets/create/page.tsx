@@ -14,9 +14,14 @@ import { useState } from "react";
 import { isEmpty } from "lodash";
 import { SetEquipmentItemEditor } from "../modules/SetEquipmentItemEditor";
 import { Margin } from "@/app/components/Margin";
+import {
+  PriceListTable,
+  PriceSettingModal,
+} from "../../modules/PriceSettingModal/PriceSettingModal";
 
 const EquipmentCreatePage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
+  const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
 
   const {
     title,
@@ -43,6 +48,8 @@ const EquipmentCreatePage = () => {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
+        <Margin top={20} />
+
         <div className={formStyles.sectionWrapper}>
           <Label title="렌탈 가격" />
           <TextField
@@ -62,18 +69,32 @@ const EquipmentCreatePage = () => {
             {formatKoreanCurrency(price)}
           </div>
         </div>
+        <Margin top={40} />
 
-        <div className={formStyles.sectionWrapper}>
-          <Label title="상세 정보" />
-          <TextField
-            fullWidth
-            multiline
-            value={detail}
-            placeholder="상세 정보를 입력해주세요."
-            onChange={(e) => setDetail(e.target.value)}
-          />
+        <div className={styles.sectionWrapper}>
+          <div
+            style={{
+              width: "100%",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Label title="렌탈 가격" />
+            <Button
+              variant="outlined"
+              size="Small"
+              onClick={() => setIsOpenPriceSettingModal(true)}
+            >
+              가격 수정하기
+            </Button>
+          </div>
+
+          <Margin top={20} />
+          <PriceListTable priceList={[]} />
         </div>
 
+        <Margin top={40} />
         <div className={formStyles.sectionWrapper}>
           <Label title="포함 장비" />
           <Button
@@ -115,6 +136,20 @@ const EquipmentCreatePage = () => {
           )}
         </div>
 
+        <Margin top={40} />
+        <div className={formStyles.sectionWrapper}>
+          <Label title="상세 정보" />
+          <TextField
+            fullWidth
+            multiline
+            value={detail}
+            placeholder="상세 정보를 입력해주세요."
+            onChange={(e) => setDetail(e.target.value)}
+          />
+        </div>
+        <Margin top={40} />
+
+        <Margin top={40} />
         <div className={formStyles.sectionWrapper}>
           <Label title="메모" />
           <TextField
@@ -142,6 +177,14 @@ const EquipmentCreatePage = () => {
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={setEquipmentList}
           disabledIdList={equipmentList.map((item) => item.id)}
+        />
+      )}
+      {isOpenPriceSettingModal && (
+        <PriceSettingModal
+          priceList={[]}
+          onClose={() => setIsOpenPriceSettingModal(false)}
+          onConfirm={() => {}}
+          mode={"group"}
         />
       )}
     </div>

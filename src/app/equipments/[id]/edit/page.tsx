@@ -65,6 +65,7 @@ const EditEquipmentPage = () => {
 
     setTitle(equipmentDetail.title);
     setDetail(equipmentDetail.detail);
+    setQuantity(equipmentDetail.quantity);
     onChangeCategory(equipmentDetail.category);
   }, [equipmentDetail]);
 
@@ -120,6 +121,7 @@ const EditEquipmentPage = () => {
             ))}
           </Select>
         </div>
+        <Margin top={20} />
 
         <div className={styles.sectionWrapper}>
           <Label title="장비명" />
@@ -130,6 +132,7 @@ const EditEquipmentPage = () => {
           />
         </div>
 
+        <Margin top={20} />
         <div className={styles.sectionWrapper}>
           <Label title="수량" />
           <EditableField
@@ -144,8 +147,7 @@ const EditEquipmentPage = () => {
           />
         </div>
 
-        <Margin top={30} />
-
+        <Margin top={40} />
         <div className={styles.sectionWrapper}>
           <div
             style={{
@@ -168,7 +170,8 @@ const EditEquipmentPage = () => {
           <Margin top={20} />
           <PriceListTable priceList={priceList} />
         </div>
-        <Margin top={30} />
+
+        <Margin top={40} />
 
         <div className={styles.sectionWrapper}>
           <Label title="상세 정보" />
@@ -181,8 +184,7 @@ const EditEquipmentPage = () => {
           />
         </div>
 
-        <Margin top={30} />
-
+        <Margin top={40} />
         <div className={styles.sectionWrapper}>
           <Label title="메모" />
           <EditableField
