@@ -44,7 +44,6 @@ export const onUpdateReservation = async ({
   originSetList,
   equipmentItemList,
   groupEquipmentList,
-  rentalDays,
 }: {
   quoteId: number;
   reservationId: number;
@@ -54,7 +53,6 @@ export const onUpdateReservation = async ({
   dateRange: { startDate?: string; endDate?: string };
   equipmentItemList: EquipmentListItemState[];
   groupEquipmentList: SetEquipmentStateType[];
-  rentalDays: number;
 }) => {
   try {
     const validForm = await getValidReservationForm({
@@ -62,7 +60,6 @@ export const onUpdateReservation = async ({
       dateRange,
       equipmentItemList,
       groupEquipmentList,
-      rentalDays,
     });
 
     if (!validForm) throw new Error("form validation 실패");
@@ -99,7 +96,7 @@ export const onUpdateReservation = async ({
             setId: set.setId,
             quoteId,
             price: set.price,
-            totalPrice: getEquipmentGroupTotalPrice(set, rentalDays),
+            totalPrice: getEquipmentGroupTotalPrice(set),
             discountPrice: set.discountPrice || 0,
           },
         ]);
@@ -127,7 +124,7 @@ export const onUpdateReservation = async ({
           updateQuoteSet(set.quoteSetId!, {
             quoteId: quoteId,
             price: set.price,
-            totalPrice: getEquipmentGroupTotalPrice(set, rentalDays),
+            totalPrice: getEquipmentGroupTotalPrice(set),
             discountPrice: set.discountPrice,
           })
         )
@@ -192,7 +189,11 @@ export const onUpdateReservation = async ({
               quoteId,
               price: item.price,
               quantity: item.quantity,
-              totalPrice: getEquipmentTotalPrice(item, rentalDays),
+              totalPrice: getEquipmentTotalPrice({
+                itemPrice: item.price,
+                quantity: item.quantity,
+                discountPrice: item.discountPrice,
+              }),
               quoteSetId,
               setId,
             })
@@ -223,7 +224,11 @@ export const onUpdateReservation = async ({
         equipmentId: item.equipmentId,
         quantity: item.quantity,
         price: item.price,
-        totalPrice: getEquipmentTotalPrice(item, rentalDays),
+        totalPrice: getEquipmentTotalPrice({
+          itemPrice: item.price,
+          discountPrice: item.discountPrice,
+          quantity: item.quantity,
+        }),
         quoteId,
         setId: null,
         quoteSetId: null,
@@ -238,7 +243,11 @@ export const onUpdateReservation = async ({
             quantity: item.quantity,
             price: item.price,
             quoteId,
-            totalPrice: getEquipmentTotalPrice(item, rentalDays),
+            totalPrice: getEquipmentTotalPrice({
+              itemPrice: item.price,
+              discountPrice: item.discountPrice,
+              quantity: item.quantity,
+            }),
             setId: null,
             quoteSetId: null,
           })

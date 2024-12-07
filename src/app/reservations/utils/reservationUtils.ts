@@ -8,74 +8,84 @@ import {
 } from "@/app/store/useCartStore";
 
 //equipment list 총 가격
-export const getAllEquipmentTotalPrice = (
-  list: EquipmentListItemState[],
-  rentalDays: number
-) => {
+export const getAllEquipmentTotalPrice = (list: EquipmentListItemState[]) => {
   return list.reduce((prev, item) => {
-    return (prev += getEquipmentTotalPrice(item, rentalDays));
+    return (prev += getEquipmentTotalPrice({
+      itemPrice: item.price,
+      quantity: item.quantity,
+      discountPrice: item.discountPrice,
+    }));
   }, 0);
 };
 
 //equipment 단품 최종 가격
-export const getEquipmentTotalPrice = (
-  item: EquipmentListItemState,
-  rentalDays: number
-) => {
-  return item.price * item.quantity * rentalDays - (item.discountPrice || 0);
+export const getEquipmentTotalPrice = ({
+  itemPrice,
+  quantity,
+  discountPrice,
+}: {
+  itemPrice: number;
+  quantity: number;
+  discountPrice?: number;
+}) => {
+  return itemPrice * quantity - (discountPrice || 0);
 };
 
 // 세트 구성 하나당 총 가격
-export const getEquipmentGroupTotalPrice = (
-  list: SetEquipmentStateType,
-  rentalDays: number
-) => {
-  return list.price * rentalDays - (list.discountPrice || 0);
+export const getEquipmentGroupTotalPrice = ({
+  price,
+  discountPrice,
+}: {
+  price: number;
+  discountPrice?: number;
+}) => {
+  return price - (discountPrice || 0);
 };
 
 // 세트 리스트 최종 합산 가격
 export const getAllEquipmentGroupTotalPrice = (
-  list: SetEquipmentStateType[],
-  rentalDays: number
+  list: SetEquipmentStateType[]
 ) => {
   return list.reduce((prev, item) => {
-    return (prev += getEquipmentGroupTotalPrice(item, rentalDays));
+    return (prev += getEquipmentGroupTotalPrice({
+      price: item.price,
+      discountPrice: item.discountPrice,
+    }));
   }, 0);
 };
 
 //equipment list 정가 합산 가격
-export const getAllEquipmentSupplyPrice = (
-  list: EquipmentListItemState[],
-  rentalDays: number
-) => {
+export const getAllEquipmentSupplyPrice = (list: EquipmentListItemState[]) => {
   return list.reduce((prev, item) => {
-    return (prev += getEquipmentSupplyPrice(item, rentalDays));
+    return (prev += getEquipmentSupplyPrice({
+      price: item.price,
+      quantity: item.quantity,
+    }));
   }, 0);
 };
 
 //equipment 단품 정가
-export const getEquipmentSupplyPrice = (
-  item: EquipmentListItemState,
-  rentalDays: number
-) => {
-  return item.price * item.quantity * rentalDays;
+export const getEquipmentSupplyPrice = ({
+  price,
+  quantity,
+}: {
+  price: number;
+  quantity: number;
+}) => {
+  return price * quantity;
 };
 
 // 세트 구성 하나당 공급 가격
-export const getEquipmentGroupSupplyPrice = (
-  list: SetEquipmentStateType,
-  rentalDays: number
-) => {
-  return list.price * rentalDays;
+export const getEquipmentGroupSupplyPrice = (list: SetEquipmentStateType) => {
+  return list.price;
 };
 
 // 세트 리스트 정가 합산 가격
 export const getAllEquipmentGroupSupplyPrice = (
-  list: SetEquipmentStateType[],
-  rentalDays: number
+  list: SetEquipmentStateType[]
 ) => {
   return list.reduce((prev, item) => {
-    return (prev += getEquipmentGroupSupplyPrice(item, rentalDays));
+    return (prev += getEquipmentGroupSupplyPrice(item));
   }, 0);
 };
 
@@ -84,13 +94,11 @@ export const getValidReservationForm = ({
   dateRange,
   equipmentItemList,
   groupEquipmentList,
-  rentalDays,
 }: {
   form: ReservationFormState;
   dateRange: { startDate?: string; endDate?: string };
   equipmentItemList: EquipmentListItemState[];
   groupEquipmentList: SetEquipmentStateType[];
-  rentalDays: number;
 }): QuotePostPayload | null => {
   if (!form.userId) {
     showToast({
@@ -125,12 +133,12 @@ export const getValidReservationForm = ({
   }
 
   const totalPrice =
-    getAllEquipmentTotalPrice(equipmentItemList, rentalDays) +
-    getAllEquipmentGroupTotalPrice(groupEquipmentList, rentalDays);
+    getAllEquipmentTotalPrice(equipmentItemList) +
+    getAllEquipmentGroupTotalPrice(groupEquipmentList);
 
   const supplyPrice =
-    getAllEquipmentSupplyPrice(equipmentItemList, rentalDays) +
-    getAllEquipmentGroupSupplyPrice(groupEquipmentList, rentalDays);
+    getAllEquipmentSupplyPrice(equipmentItemList) +
+    getAllEquipmentGroupSupplyPrice(groupEquipmentList);
 
   return {
     ...form,

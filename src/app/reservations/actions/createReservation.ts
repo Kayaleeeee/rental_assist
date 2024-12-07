@@ -19,13 +19,11 @@ export const onCreateReservation = async ({
   dateRange,
   equipmentItemList,
   groupEquipmentList,
-  rentalDays,
 }: {
   form: ReservationFormState;
   dateRange: { startDate?: string; endDate?: string };
   equipmentItemList: EquipmentListItemState[];
   groupEquipmentList: SetEquipmentStateType[];
-  rentalDays: number;
 }) => {
   try {
     // 유효한 예약 데이터 확인
@@ -34,7 +32,6 @@ export const onCreateReservation = async ({
       dateRange,
       equipmentItemList,
       groupEquipmentList,
-      rentalDays,
     });
 
     if (!validForm) throw new Error("form validation 실패");
@@ -48,7 +45,11 @@ export const onCreateReservation = async ({
         equipmentId: item.equipmentId,
         quantity: item.quantity,
         price: item.price,
-        totalPrice: getEquipmentTotalPrice(item, rentalDays),
+        totalPrice: getEquipmentTotalPrice({
+          itemPrice: item.price,
+          quantity: item.quantity,
+          discountPrice: item.discountPrice,
+        }),
         quoteId: quoteResult.id,
         quoteSetId: null,
         setId: null,
@@ -64,7 +65,10 @@ export const onCreateReservation = async ({
             setId: set.setId,
             quoteId: quoteResult.id,
             price: set.price,
-            totalPrice: getEquipmentGroupTotalPrice(set, rentalDays),
+            totalPrice: getEquipmentGroupTotalPrice({
+              price: set.price,
+              discountPrice: set.discountPrice,
+            }),
             discountPrice: set.discountPrice || 0,
           },
         ]);

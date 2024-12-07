@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 
 type Props = {
   rows: EquipmentListItemState[];
-  rentalDays: number;
+  rounds: number;
   onDeleteEquipment: (
     equipmentId: EquipmentListItemState["equipmentId"]
   ) => void;
@@ -23,7 +23,7 @@ type Props = {
 };
 export const ReservationItemTableEditor = ({
   rows,
-  rentalDays,
+  rounds,
   onDeleteEquipment,
   onChangeField,
 }: Props) => {
@@ -55,9 +55,9 @@ export const ReservationItemTableEditor = ({
         renderCell: ({ row }) => <>{row.quantity}개</>,
       },
       {
-        field: "rentalDays",
+        field: "rounds",
         renderHeader: () => HeaderName("대여기간"),
-        renderCell: () => <>{rentalDays}일</>,
+        renderCell: () => <>{rounds}일</>,
       },
       {
         field: "discountPrice",
@@ -74,7 +74,13 @@ export const ReservationItemTableEditor = ({
         renderHeader: () => HeaderName("총 금액"),
         renderCell: ({ row }) =>
           HeaderName(
-            `${formatLocaleString(getEquipmentTotalPrice(row, rentalDays))}원`
+            `${formatLocaleString(
+              getEquipmentTotalPrice({
+                itemPrice: row.price,
+                quantity: row.price,
+                discountPrice: row.discountPrice,
+              })
+            )}원`
           ),
       },
       {
@@ -111,7 +117,7 @@ export const ReservationItemTableEditor = ({
         ),
       },
     ];
-  }, [rentalDays]);
+  }, [rounds]);
 
   return (
     <>
@@ -127,7 +133,7 @@ export const ReservationItemTableEditor = ({
         <PriceChangingModal
           currentTotalPrice={
             modalProps.selectedRow.price *
-            rentalDays *
+            rounds *
             modalProps.selectedRow.quantity
           }
           currentDiscountPrice={modalProps.selectedRow.discountPrice || 0}

@@ -6,6 +6,7 @@ import {
   useCartStore,
 } from "@/app/store/useCartStore";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
+import { mapEquipmentStateWithPrice } from "@/app/types/mapper/mapEquipmentStateWithPrice";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
@@ -180,6 +181,27 @@ export const useEquipmentCart = () => {
     []
   );
 
+  const handleAddEquipmentListWithPrice = useCallback(
+    async (equipmentList: EquipmentListItemState[], rounds: number) => {
+      try {
+        const priceByRounds = await calculateEquipmentPrice(
+          equipmentList,
+          rounds
+        );
+
+        const listWithPrice = mapEquipmentStateWithPrice(
+          equipmentList,
+          priceByRounds
+        );
+        addEquipment(listWithPrice);
+        setIsChecked(false);
+      } catch {
+        return;
+      }
+    },
+    []
+  );
+
   const handleSetEquipmentGroup = useCallback(
     (equipmentList: SetEquipmentStateType[]) => {
       setEquipmentGroupList(equipmentList);
@@ -264,5 +286,6 @@ export const useEquipmentCart = () => {
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
     handleSetEquipmentList,
+    handleAddEquipmentListWithPrice,
   };
 };

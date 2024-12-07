@@ -142,7 +142,6 @@ const ReservationEditPage = () => {
         originSetList: setListStateRef.current,
         equipmentItemList,
         groupEquipmentList: equipmentGroupList,
-        rentalDays,
       });
 
       showToast({
@@ -227,23 +226,12 @@ const ReservationEditPage = () => {
 
   const { total: reservationTotalPrice, supply: reservationSupplyPrice } =
     useMemo(() => {
-      const listTotalPrice = getAllEquipmentTotalPrice(
-        equipmentItemList,
-        rentalDays
-      );
-      const groupTotalPrice = getAllEquipmentGroupTotalPrice(
-        equipmentGroupList,
-        rentalDays
-      );
+      const listTotalPrice = getAllEquipmentTotalPrice(equipmentItemList);
+      const groupTotalPrice =
+        getAllEquipmentGroupTotalPrice(equipmentGroupList);
 
-      const listSupply = getAllEquipmentSupplyPrice(
-        equipmentItemList,
-        rentalDays
-      );
-      const groupSupply = getAllEquipmentGroupSupplyPrice(
-        equipmentGroupList,
-        rentalDays
-      );
+      const listSupply = getAllEquipmentSupplyPrice(equipmentItemList);
+      const groupSupply = getAllEquipmentGroupSupplyPrice(equipmentGroupList);
 
       return {
         total: listTotalPrice + groupTotalPrice,
@@ -328,7 +316,7 @@ const ReservationEditPage = () => {
                 </div>
                 <ReservationItemTableEditor
                   rows={equipmentItemList}
-                  rentalDays={rentalDays}
+                  rounds={form.rounds}
                   onDeleteEquipment={handleDeleteEquipmentItem}
                   onChangeField={handleChangeEquipmentItem}
                 />

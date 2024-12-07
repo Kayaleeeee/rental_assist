@@ -29,7 +29,11 @@ export const QuotationItemEditor = ({
   quantityOnly = false,
 }: Props) => {
   const quoteItemTotalPrice = useMemo(() => {
-    return getEquipmentTotalPrice(quoteState, rentalDays);
+    return getEquipmentTotalPrice({
+      itemPrice: quoteState.price,
+      discountPrice: quoteState.discountPrice,
+      quantity: quoteState.quantity,
+    });
   }, [quoteState, rentalDays]);
 
   const [quantityState, setQuantityState] = useState<number>(

@@ -31,8 +31,11 @@ export const SetEquipmentAccordionEditor = ({
   rentalDays = 0,
 }: Props) => {
   const currentTotalPrice = useMemo(() => {
-    return getEquipmentGroupTotalPrice(equipmentSet, rentalDays);
-  }, [equipmentSet, rentalDays]);
+    return getEquipmentGroupTotalPrice({
+      price: equipmentSet.price,
+      discountPrice: equipmentSet.discountPrice,
+    });
+  }, [equipmentSet]);
 
   return (
     <Accordion expanded className={styles.customAccordion}>

@@ -57,7 +57,7 @@ const ReservationCreatePage = () => {
 
   const {
     // hasUnavailableItem,
-    calculateEquipmentPrice,
+
     handleChangeDate,
     dateRange,
     // handleCheckAvailability,
@@ -65,9 +65,9 @@ const ReservationCreatePage = () => {
     rentalDays,
     resetCart,
     equipmentItemList,
-    handleAddEquipmentList,
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
+    handleAddEquipmentListWithPrice,
 
     equipmentGroupList,
     handleDeleteGroupEquipment,
@@ -149,10 +149,9 @@ const ReservationCreatePage = () => {
       if (!changingStatus) return;
 
       const convertedList = list.map(convertEquipmentItemToState);
-      await calculateEquipmentPrice(convertedList, form.rounds);
 
       if (changingStatus.mode === "item") {
-        handleAddEquipmentList(convertedList);
+        handleAddEquipmentListWithPrice(convertedList, form.rounds);
         return;
       }
 
@@ -174,29 +173,18 @@ const ReservationCreatePage = () => {
 
   const { total: reservationTotalPrice, supply: reservationSupplyPrice } =
     useMemo(() => {
-      const listTotalPrice = getAllEquipmentTotalPrice(
-        equipmentItemList,
-        form.rounds
-      );
-      const groupTotalPrice = getAllEquipmentGroupTotalPrice(
-        equipmentGroupList,
-        form.rounds
-      );
+      const listTotalPrice = getAllEquipmentTotalPrice(equipmentItemList);
+      const groupTotalPrice =
+        getAllEquipmentGroupTotalPrice(equipmentGroupList);
 
-      const listSupply = getAllEquipmentSupplyPrice(
-        equipmentItemList,
-        form.rounds
-      );
-      const groupSupply = getAllEquipmentGroupSupplyPrice(
-        equipmentGroupList,
-        form.rounds
-      );
+      const listSupply = getAllEquipmentSupplyPrice(equipmentItemList);
+      const groupSupply = getAllEquipmentGroupSupplyPrice(equipmentGroupList);
 
       return {
         total: listTotalPrice + groupTotalPrice,
         supply: listSupply + groupSupply,
       };
-    }, [equipmentGroupList, equipmentItemList, form.rounds]);
+    }, [equipmentGroupList, equipmentItemList]);
 
   const existIdList = useMemo(() => {
     return equipmentItemList.map((item) => item.equipmentId);
@@ -213,7 +201,6 @@ const ReservationCreatePage = () => {
         dateRange,
         equipmentItemList,
         groupEquipmentList: equipmentGroupList,
-        rentalDays,
       });
 
       showToast({
@@ -326,7 +313,7 @@ const ReservationCreatePage = () => {
               </div>
               <ReservationItemTableEditor
                 rows={equipmentItemList}
-                rentalDays={form.rounds}
+                rounds={form.rounds}
                 onDeleteEquipment={handleDeleteEquipmentItem}
                 onChangeField={handleChangeEquipmentItem}
               />

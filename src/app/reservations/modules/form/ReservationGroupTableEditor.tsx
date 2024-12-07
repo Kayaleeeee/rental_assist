@@ -156,7 +156,10 @@ export const ReservationGroupTableEditor = ({
             )}
           <div className={styles.totalPrice}>
             {`총 ${formatLocaleString(
-              getEquipmentGroupTotalPrice(groupEquipment, rentalDays)
+              getEquipmentGroupTotalPrice({
+                price: groupEquipment.price,
+                discountPrice: groupEquipment.discountPrice,
+              })
             )} 원`}
           </div>
         </div>

@@ -69,7 +69,7 @@ export const ReservationGroupTable = ({
           )}
         <div className={styles.totalPrice}>
           {`총 ${formatLocaleString(
-            getEquipmentGroupTotalPrice(groupEquipment, rentalDays)
+            getEquipmentGroupTotalPrice(groupEquipment)
           )} 원`}
         </div>
       </div>

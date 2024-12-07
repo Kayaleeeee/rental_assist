@@ -62,7 +62,13 @@ const getColumns = (
     renderHeader: () => HeaderName("총 금액"),
     renderCell: ({ row }) =>
       HeaderName(
-        `${formatLocaleString(getEquipmentTotalPrice(row, rentalDays))}원`
+        `${formatLocaleString(
+          getEquipmentTotalPrice({
+            itemPrice: row.price,
+            quantity: row.quantity,
+            discountPrice: row.discountPrice,
+          })
+        )}원`
       ),
     filterable: false,
     disableColumnMenu: true,
