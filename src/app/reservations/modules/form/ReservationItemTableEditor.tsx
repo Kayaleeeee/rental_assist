@@ -55,16 +55,10 @@ export const ReservationItemTableEditor = ({
         renderCell: ({ row }) => <>{row.quantity}개</>,
       },
       {
-        field: "price",
-        renderHeader: () => HeaderName("단가"),
-        renderCell: ({ row }) => formatLocaleString(row.price),
-      },
-      {
         field: "rentalDays",
         renderHeader: () => HeaderName("대여기간"),
         renderCell: () => <>{rentalDays}일</>,
       },
-
       {
         field: "discountPrice",
         renderHeader: () => HeaderName("조정 금액"),

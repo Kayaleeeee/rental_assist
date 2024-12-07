@@ -30,6 +30,7 @@ export type QuoteType = {
   startDate: string;
   endDate: string;
   reservationId?: ReservationType["id"];
+  rounds: number;
 };
 
 export type QuoteDetailType = QuoteType & {
@@ -53,6 +54,7 @@ export type QuotePostPayload = {
   endDate: string;
   createdBy?: string;
   reservationId?: ReservationType["id"];
+  rounds: number;
 };
 
 export type QuoteItemPostPayload = {

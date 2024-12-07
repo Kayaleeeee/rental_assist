@@ -9,18 +9,13 @@ import { Button } from "@/app/components/Button";
 import { EditableField } from "@/app/components/EditableField";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { useSetEquipmentForm } from "../../create/hooks/useSetEquipmentForm";
 import { useSetEquipmentDetail } from "../hooks/useSetEquipmentDetail";
 import { useParams } from "next/navigation";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { GridTable } from "@/app/components/Table/GridTable";
-import {
-  GROUP_QUOTE_ITEM_MENU,
-  QuoteEquipmentMoreMenu,
-} from "@/app/reservations/modules/form/QuoteEquipmentMenu";
-import { GridColDef } from "@mui/x-data-grid";
-import { HeaderName } from "@/app/components/DataTable/HeaderName";
+import { QuantityChangingModal } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
 import { Margin } from "@/app/components/Margin";
 import {
   PriceItemStateType,
@@ -31,73 +26,7 @@ import { EquipmentGroupPriceItem } from "@/app/types/equipmentPriceType";
 import { useGroupEquipmentPriceList } from "@/app/equipments/[id]/hooks/useGroupEquipmentPriceList";
 import { updateGroupPriceList } from "@/app/equipments/actions/updateGroupPriceList";
 import { showToast } from "@/app/utils/toastUtils";
-
-const getColumns = (
-  equipmentList: EquipmentListItemType[],
-  setEquipmentList: React.Dispatch<
-    React.SetStateAction<EquipmentListItemType[]>
-  >
-): GridColDef<EquipmentListItemType>[] => {
-  return [
-    {
-      field: "id",
-      width: 80,
-      renderHeader: () => HeaderName("ID"),
-      renderCell: ({ row }) => row.id,
-      filterable: false,
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: "title",
-      renderHeader: () => HeaderName("장비명"),
-      renderCell: ({ row }) => row.title,
-      flex: 1,
-      filterable: false,
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: "quantity",
-      renderHeader: () => HeaderName("수량"),
-      renderCell: ({ row }) => <>{row.quantity}개</>,
-      filterable: false,
-      disableColumnMenu: true,
-      sortable: false,
-    },
-    {
-      field: "edit",
-      renderHeader: () => HeaderName(""),
-      renderCell: ({ row }) => (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            height: "100%",
-          }}
-        >
-          <QuoteEquipmentMoreMenu
-            menu={GROUP_QUOTE_ITEM_MENU}
-            onConfirm={(menu) => {
-              if (!menu) return;
-
-              if (menu.key === "delete") {
-                setEquipmentList(
-                  equipmentList.filter((item) => item.id !== row.id)
-                );
-              }
-            }}
-          />
-        </div>
-      ),
-      width: 30,
-      filterable: false,
-      disableColumnMenu: true,
-      sortable: false,
-    },
-  ];
-};
+import { getGroupEquipmentListColumns } from "../../modules/getGroupEquipmentListColumns";
 
 const EquipmentEditPage = () => {
   const { id } = useParams();
@@ -105,6 +34,11 @@ const EquipmentEditPage = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const originalEquipmentList = useRef<EquipmentListItemType[]>([]);
   const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
+  const [isOpenQuantityChangeModal, setIsOpenQuantityChangeModal] =
+    useState(false);
+  const [selectedRow, setSelectedRow] = useState<
+    EquipmentListItemType | undefined
+  >(undefined);
   const [priceList, setPriceList] = useState<EquipmentGroupPriceItem[]>([]);
   const originalPriceList = useRef<EquipmentGroupPriceItem[]>([]);
 
@@ -170,7 +104,15 @@ const EquipmentEditPage = () => {
   }, [setId, handleFetchPriceList]);
 
   const columns = useMemo(
-    () => getColumns(equipmentList, setEquipmentList),
+    () =>
+      getGroupEquipmentListColumns({
+        onDeleteItem: (id) =>
+          setEquipmentList(equipmentList.filter((item) => item.id !== id)),
+        onSelectQuantityChange: (row: EquipmentListItemType) => {
+          setSelectedRow(row);
+          setIsOpenQuantityChangeModal(true);
+        },
+      }),
     [equipmentList]
   );
 
@@ -284,6 +226,23 @@ const EquipmentEditPage = () => {
           onConfirm={handleUpdatePriceList}
           mode={"group"}
           id={Number(id)}
+        />
+      )}
+
+      {isOpenQuantityChangeModal && !isNil(selectedRow) && (
+        <QuantityChangingModal
+          currentQuantity={selectedRow.quantity}
+          onConfirm={(quantity) => {
+            setEquipmentList((prev) =>
+              prev.map((item) =>
+                item.id === selectedRow.id ? { ...item, quantity } : item
+              )
+            );
+          }}
+          onClose={() => {
+            setSelectedRow(undefined);
+            setIsOpenQuantityChangeModal(false);
+          }}
         />
       )}
     </div>

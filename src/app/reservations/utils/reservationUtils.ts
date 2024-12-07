@@ -108,6 +108,14 @@ export const getValidReservationForm = ({
     return null;
   }
 
+  if (form.rounds < 1) {
+    showToast({
+      message: "회차는 1회보다 작을 수 없습니다.",
+      type: "error",
+    });
+    return null;
+  }
+
   if (isEmpty(equipmentItemList) && isEmpty(groupEquipmentList)) {
     showToast({
       message: "장비를 선택해주세요.",

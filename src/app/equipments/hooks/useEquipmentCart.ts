@@ -1,4 +1,5 @@
 import { getEquipmentListWithRentedDates } from "@/app/api/equipments";
+import { requestPriceByRounds } from "@/app/api/equipments/equipmentPrice";
 import {
   EquipmentListItemState,
   SetEquipmentStateType,
@@ -142,6 +143,27 @@ export const useEquipmentCart = () => {
     []
   );
 
+  const calculateEquipmentPrice = async (
+    equipmentList: EquipmentListItemState[],
+    rounds: number
+  ) => {
+    try {
+      const idList = equipmentList.map((item) => item.equipmentId);
+      const result = await requestPriceByRounds({
+        equipmentIds: idList,
+        rounds: [rounds],
+      });
+
+      return result;
+    } catch (e) {
+      showToast({
+        message: "가격 정보 조회에 실패했습니다.",
+        type: "error",
+      });
+      throw e;
+    }
+  };
+
   const handleAddEquipmentGroup = useCallback(
     (equipmentList: SetEquipmentStateType[]) => {
       addEquipmentGroup(equipmentList);
@@ -220,6 +242,7 @@ export const useEquipmentCart = () => {
     handleChangeDate,
     resetCart,
     rentalDays,
+    calculateEquipmentPrice,
 
     //flag 변수
     isCartOpen,

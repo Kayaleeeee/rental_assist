@@ -40,11 +40,15 @@ import {
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 import { ReservationItemTableEditor } from "../modules/form/ReservationItemTableEditor";
 import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { RoundChangeModal } from "../modules/form/RoundChangeModal";
 
 const ReservationCreatePage = () => {
   const router = useRouter();
   const [isOpenGroupSearchModal, setIsOpenGroupSearchModal] = useState(false);
   const [isOpenUserModal, setIsOpenUserModal] = useState(false);
+  const [isOpenRoundChangeModal, setIsOpenRoundChangeModal] = useState(false);
+
   const [isDiscounted, setIsDiscounted] = useState<boolean>(false);
   const [discountPriceState, setDiscountPriceState] = useState<number>(0);
   const [changingStatus, setChangingStatus] = useState<
@@ -53,6 +57,7 @@ const ReservationCreatePage = () => {
 
   const {
     // hasUnavailableItem,
+    calculateEquipmentPrice,
     handleChangeDate,
     dateRange,
     // handleCheckAvailability,
@@ -78,6 +83,11 @@ const ReservationCreatePage = () => {
     setIsDiscounted(form.discountPrice > 0);
   }, [form]);
 
+  useEffect(() => {
+    onChangeForm("rounds", rentalDays);
+    // change equipment price
+  }, [rentalDays]);
+
   useUnmount(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -92,8 +102,16 @@ const ReservationCreatePage = () => {
       | { mode: "item" }
       | { mode: "group"; groupId: SetEquipmentType["id"] }
   ) => {
-    if (rentalDays === 0) {
+    if (form.rounds === 0) {
       showToast({ message: "기간을 설정해주세요.", type: "error" });
+      return;
+    }
+
+    if (form.rounds < 1) {
+      showToast({
+        message: "회차는 1회보다 작을 수 없습니다.",
+        type: "error",
+      });
       return;
     }
 
@@ -101,8 +119,16 @@ const ReservationCreatePage = () => {
   };
 
   const onClickGroupEquipmentModal = () => {
-    if (rentalDays === 0) {
+    if (form.rounds === 0) {
       showToast({ message: "기간을 설정해주세요.", type: "error" });
+      return;
+    }
+
+    if (form.rounds < 1) {
+      showToast({
+        message: "회차는 1회보다 작을 수 없습니다.",
+        type: "error",
+      });
       return;
     }
 
@@ -119,10 +145,11 @@ const ReservationCreatePage = () => {
   };
 
   const handleConfirmEquipmentModal = useCallback(
-    (list: EquipmentListItemType[]) => {
+    async (list: EquipmentListItemType[]) => {
       if (!changingStatus) return;
 
       const convertedList = list.map(convertEquipmentItemToState);
+      await calculateEquipmentPrice(convertedList, form.rounds);
 
       if (changingStatus.mode === "item") {
         handleAddEquipmentList(convertedList);
@@ -142,38 +169,42 @@ const ReservationCreatePage = () => {
         }
       }
     },
-    [changingStatus, equipmentGroupList, equipmentItemList]
+    [changingStatus, equipmentGroupList, equipmentItemList, form.rounds]
   );
 
   const { total: reservationTotalPrice, supply: reservationSupplyPrice } =
     useMemo(() => {
       const listTotalPrice = getAllEquipmentTotalPrice(
         equipmentItemList,
-        rentalDays
+        form.rounds
       );
       const groupTotalPrice = getAllEquipmentGroupTotalPrice(
         equipmentGroupList,
-        rentalDays
+        form.rounds
       );
 
       const listSupply = getAllEquipmentSupplyPrice(
         equipmentItemList,
-        rentalDays
+        form.rounds
       );
       const groupSupply = getAllEquipmentGroupSupplyPrice(
         equipmentGroupList,
-        rentalDays
+        form.rounds
       );
 
       return {
         total: listTotalPrice + groupTotalPrice,
         supply: listSupply + groupSupply,
       };
-    }, [equipmentGroupList, equipmentItemList, rentalDays]);
+    }, [equipmentGroupList, equipmentItemList, form.rounds]);
 
   const existIdList = useMemo(() => {
     return equipmentItemList.map((item) => item.equipmentId);
   }, [equipmentItemList]);
+
+  const handleChangeRounds = useCallback((rounds: number) => {
+    onChangeForm("rounds", rounds);
+  }, []);
 
   const handleCreateReservation = useCallback(async () => {
     try {
@@ -256,120 +287,132 @@ const ReservationCreatePage = () => {
             />
           </div>
           <Margin top={20} />
+        </div>
 
-          {rentalDays > 0 && (
-            <div className={formStyles.sectionWrapper}>
-              <Label title="대여 장비 목록" />
-              <Margin top={10} />
+        {rentalDays > 0 && (
+          <div className={formStyles.sectionWrapper}>
+            <Label title={`회차 정보`} />
 
-              <Margin bottom={20}>
-                <div
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <Label title="단품 장비 리스트" />
-                  <Button
-                    size="Small"
-                    variant="outlined"
-                    onClick={() => handleOpenEquipmentModal({ mode: "item" })}
-                  >
-                    단품 장비 추가
-                  </Button>
-                </div>
-                <ReservationItemTableEditor
-                  rows={equipmentItemList}
-                  rentalDays={rentalDays}
-                  onDeleteEquipment={handleDeleteEquipmentItem}
-                  onChangeField={handleChangeEquipmentItem}
-                />
-              </Margin>
-              <Margin>
-                <Label title="풀세트 리스트" />
-                <Margin top={20} />
-                <div className={styles.equipmentListWrapper}>
-                  {equipmentGroupList.map((item) => {
-                    return (
-                      <ReservationGroupTableEditor
-                        key={item.setId}
-                        groupEquipment={item}
-                        rentalDays={rentalDays}
-                        changeSetEquipment={handleChangeGroupEquipment}
-                        onClickAddEquipment={() =>
-                          handleOpenEquipmentModal({
-                            mode: "group",
-                            groupId: item.setId,
-                          })
-                        }
-                        deleteSetEquipment={() =>
-                          handleDeleteGroupEquipment(item.setId)
-                        }
-                      />
-                    );
-                  })}
-                  <Button
-                    size="Small"
-                    variant="outlined"
-                    onClick={onClickGroupEquipmentModal}
-                  >
-                    풀세트 추가
-                  </Button>
-                </div>
-              </Margin>
+            <div
+              className={styles.roundRow}
+              onClick={() => setIsOpenRoundChangeModal(true)}
+            >
+              {form.rounds} 회차
+              <EditOutlinedIcon sx={{ color: "var(--grey)" }} />
             </div>
-          )}
-          {!isEmpty(equipmentItemList) && (
-            <div className={styles.priceSection}>
-              <div className={styles.discountPriceWrapper}>
-                <Label title="정가" />
-                <div>{formatLocaleString(reservationSupplyPrice)}원</div>
-              </div>
-              {isDiscounted ? (
-                <div className={styles.discountPriceWrapper}>
-                  <Label title="할인 금액" />
-                  <EditableField
-                    value={discountPriceState}
-                    size="small"
-                    onChange={(e) => {
-                      const value = Number(e.target.value);
+            <Margin top={20} />
+          </div>
+        )}
 
-                      if (isNaN(value)) return;
-                      setDiscountPriceState(value);
-                    }}
-                  />
-                  <Button
-                    variant="outlined"
-                    size="Small"
-                    onClick={() => {
-                      onChangeForm("discountPrice", discountPriceState);
-                      setIsDiscounted(false);
-                    }}
-                  >
-                    적용
-                  </Button>
-                </div>
-              ) : (
+        {form.rounds > 0 && (
+          <div className={formStyles.sectionWrapper}>
+            <Margin bottom={20}>
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <Label title="단품 장비 리스트" />
+                <Button
+                  size="Small"
+                  variant="outlined"
+                  onClick={() => handleOpenEquipmentModal({ mode: "item" })}
+                >
+                  단품 장비 추가
+                </Button>
+              </div>
+              <ReservationItemTableEditor
+                rows={equipmentItemList}
+                rentalDays={form.rounds}
+                onDeleteEquipment={handleDeleteEquipmentItem}
+                onChangeField={handleChangeEquipmentItem}
+              />
+            </Margin>
+            <Margin>
+              <Label title="풀세트 리스트" />
+              <Margin top={20} />
+              <div className={styles.equipmentListWrapper}>
+                {equipmentGroupList.map((item) => {
+                  return (
+                    <ReservationGroupTableEditor
+                      key={item.setId}
+                      groupEquipment={item}
+                      rentalDays={form.rounds}
+                      changeSetEquipment={handleChangeGroupEquipment}
+                      onClickAddEquipment={() =>
+                        handleOpenEquipmentModal({
+                          mode: "group",
+                          groupId: item.setId,
+                        })
+                      }
+                      deleteSetEquipment={() =>
+                        handleDeleteGroupEquipment(item.setId)
+                      }
+                    />
+                  );
+                })}
+                <Button
+                  size="Small"
+                  variant="outlined"
+                  onClick={onClickGroupEquipmentModal}
+                >
+                  풀세트 추가
+                </Button>
+              </div>
+            </Margin>
+          </div>
+        )}
+        {!isEmpty(equipmentItemList) && (
+          <div className={styles.priceSection}>
+            <div className={styles.discountPriceWrapper}>
+              <Label title="정가" />
+              <div>{formatLocaleString(reservationSupplyPrice)}원</div>
+            </div>
+            {isDiscounted ? (
+              <div className={styles.discountPriceWrapper}>
+                <Label title="할인 금액" />
+                <EditableField
+                  value={discountPriceState}
+                  size="small"
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+
+                    if (isNaN(value)) return;
+                    setDiscountPriceState(value);
+                  }}
+                />
                 <Button
                   variant="outlined"
                   size="Small"
-                  onClick={() => setIsDiscounted(true)}
+                  onClick={() => {
+                    onChangeForm("discountPrice", discountPriceState);
+                    setIsDiscounted(false);
+                  }}
                 >
-                  할인추가
+                  적용
                 </Button>
-              )}
-
-              <div className={styles.totalPriceWrapper}>
-                <div className={styles.totalPrice}>
-                  총 {formatLocaleString(reservationTotalPrice)}원 (
-                </div>
-                <div> {formatKoreanCurrency(reservationTotalPrice)})</div>
               </div>
+            ) : (
+              <Button
+                variant="outlined"
+                size="Small"
+                onClick={() => setIsDiscounted(true)}
+              >
+                할인추가
+              </Button>
+            )}
+
+            <div className={styles.totalPriceWrapper}>
+              <div className={styles.totalPrice}>
+                총 {formatLocaleString(reservationTotalPrice)}원 (
+              </div>
+              <div> {formatKoreanCurrency(reservationTotalPrice)})</div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className={styles.buttonWrapper}>
           <Button
@@ -401,6 +444,13 @@ const ReservationCreatePage = () => {
         <UserSearchModal
           onCloseModal={() => setIsOpenUserModal(false)}
           onConfirm={handleSelectUser}
+        />
+      )}
+      {isOpenRoundChangeModal && (
+        <RoundChangeModal
+          currentValue={form.rounds}
+          onConfirm={handleChangeRounds}
+          onClose={() => setIsOpenRoundChangeModal(false)}
         />
       )}
     </div>

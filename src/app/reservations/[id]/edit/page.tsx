@@ -90,7 +90,9 @@ const ReservationEditPage = () => {
       guestName: detail.userName,
       guestPhoneNumber: detail.phoneNumber || "",
       discountPrice: detail.discountPrice ?? 0,
+      rounds: detail.rounds,
     });
+
     handleChangeDate({
       startDate: detail.startDate,
       endDate: detail.endDate,

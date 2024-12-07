@@ -21,6 +21,7 @@ export type ReservationType = {
   userName: string;
   memo?: string;
   paymentMethod?: PaymentMethod;
+  rounds: number;
 };
 
 export enum ReservationStatus {

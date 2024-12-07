@@ -36,14 +36,6 @@ const getColumns = (
     sortable: false,
   },
   {
-    field: "price",
-    renderHeader: () => HeaderName("단가"),
-    renderCell: ({ row }) => formatLocaleString(row.price),
-    filterable: false,
-    disableColumnMenu: true,
-    sortable: false,
-  },
-  {
     field: "rentalDays",
     renderHeader: () => HeaderName("대여기간"),
     renderCell: () => <>{rentalDays}일</>,

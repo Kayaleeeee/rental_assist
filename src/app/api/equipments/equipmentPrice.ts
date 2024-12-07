@@ -1,6 +1,7 @@
 import {
   EquipmentGroupPriceItem,
   EquipmentPriceItem,
+  EquipmentPriceRequestPayload,
   PostEquipmentPricePayload,
   PostGroupPricePayload,
 } from "@/app/types/equipmentPriceType";
@@ -55,4 +56,11 @@ export const patchGroupEquipmentPriceItem = (
   payload: PostGroupPricePayload
 ) => {
   return apiPatch(set_url, payload, { params: { id } });
+};
+
+export const requestPriceByRounds = (payload: EquipmentPriceRequestPayload) => {
+  return apiPost<EquipmentPriceItem[]>(
+    "/rpc/get_equipment_prices_by_round",
+    payload
+  );
 };

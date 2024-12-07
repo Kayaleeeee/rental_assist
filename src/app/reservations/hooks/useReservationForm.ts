@@ -5,6 +5,7 @@ export type ReservationFormState = {
   guestName: string;
   guestPhoneNumber: string;
   discountPrice: number;
+  rounds: number;
 };
 
 export const useReservationForm = () => {
@@ -13,6 +14,7 @@ export const useReservationForm = () => {
     guestName: "",
     guestPhoneNumber: "",
     discountPrice: 0,
+    rounds: 0,
   });
 
   const onChangeForm = (

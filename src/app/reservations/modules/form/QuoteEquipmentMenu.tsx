@@ -21,6 +21,11 @@ export const GROUP_QUOTE_MENU = [
 
 export const GROUP_QUOTE_ITEM_MENU = [{ key: "delete", title: "삭제하기" }];
 
+export const GROUP_EQUIPMENT_ITEM_MENU = [
+  { key: "delete", title: "삭제하기" },
+  { key: "quantity", title: "수량 변경" },
+];
+
 type Props = {
   menu: { key: string; title: string }[];
   onConfirm: (menu?: { key: string; title: string }) => void;
@@ -190,9 +195,7 @@ export const QuantityChangingModal = ({
         },
       ]}
     >
-      <div className={styles.priceModalTitle}>가격 변경</div>
-      <Margin top={20} />
-
+      <div className={styles.priceModalTitle}>수량 변경</div>
       <div className={styles.quantityChangeRow}>
         <EditableField
           fullWidth
