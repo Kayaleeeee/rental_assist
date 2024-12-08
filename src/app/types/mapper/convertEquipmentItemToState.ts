@@ -11,3 +11,16 @@ export const convertEquipmentItemToState = (
   discountPrice: 0,
   isAvailable: true,
 });
+
+export const convertEquipmentItemToStateWithOption = (
+  equipment: EquipmentListItemType,
+  options?: Partial<EquipmentListItemState>
+): EquipmentListItemState => ({
+  equipmentId: equipment.id,
+  title: equipment.title,
+  quantity: equipment.quantity,
+  price: equipment.price,
+  discountPrice: 0,
+  isAvailable: true,
+  ...options,
+});

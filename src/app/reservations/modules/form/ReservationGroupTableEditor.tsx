@@ -19,7 +19,7 @@ import { useMemo, useState } from "react";
 import { Margin } from "@/app/components/Margin";
 
 type Props = {
-  rentalDays: number;
+  rounds: number;
   groupEquipment: SetEquipmentStateType;
   onClickAddEquipment: () => void;
   deleteSetEquipment: () => void;
@@ -27,7 +27,7 @@ type Props = {
 };
 
 export const ReservationGroupTableEditor = ({
-  rentalDays,
+  rounds,
   groupEquipment,
   onClickAddEquipment,
   deleteSetEquipment,
@@ -140,10 +140,7 @@ export const ReservationGroupTableEditor = ({
         <div className={styles.footer}>
           <Margin top={4} />
           <div className={styles.supplyPrice}>
-            <b>단가 : </b>
-            {`${formatLocaleString(
-              groupEquipment.price
-            )} 원  * ${rentalDays}일`}
+            {`${rounds}회차 ${formatLocaleString(groupEquipment.price)} 원 `}
           </div>
           {!isNil(groupEquipment.discountPrice) &&
             groupEquipment.discountPrice !== 0 && (
@@ -166,7 +163,7 @@ export const ReservationGroupTableEditor = ({
       </div>
       {isOpenPriceChangingModal && (
         <PriceChangingModal
-          currentTotalPrice={groupEquipment.price * rentalDays}
+          currentTotalPrice={groupEquipment.price}
           currentDiscountPrice={groupEquipment.discountPrice || 0}
           onConfirm={(price) =>
             changeSetEquipment({ ...groupEquipment, discountPrice: price })

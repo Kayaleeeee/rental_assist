@@ -1,7 +1,10 @@
 import {
   EquipmentGroupPriceItem,
   EquipmentPriceItem,
+  EquipmentPriceItemByRound,
   EquipmentPriceRequestPayload,
+  GroupPriceItemByRound,
+  GroupPriceRequestPayload,
   PostEquipmentPricePayload,
   PostGroupPricePayload,
 } from "@/app/types/equipmentPriceType";
@@ -34,6 +37,16 @@ export const patchEquipmentPriceItem = (
   return apiPatch(item_url, payload, { params: { id } });
 };
 
+export const requestPriceByRounds = (payload: EquipmentPriceRequestPayload) => {
+  return apiPost<EquipmentPriceItemByRound[]>(
+    "/rpc/get_equipment_prices_by_round",
+    payload
+  );
+};
+
+// group equipment
+// 관련 api
+
 export const getGroupEquipmentPriceList = (
   id: EquipmentGroupPriceItem["setId"]
 ) => {
@@ -58,9 +71,11 @@ export const patchGroupEquipmentPriceItem = (
   return apiPatch(set_url, payload, { params: { id } });
 };
 
-export const requestPriceByRounds = (payload: EquipmentPriceRequestPayload) => {
-  return apiPost<EquipmentPriceItem[]>(
-    "/rpc/get_equipment_prices_by_round",
+export const requestGroupPriceByRounds = (
+  payload: GroupPriceRequestPayload
+) => {
+  return apiPost<GroupPriceItemByRound[]>(
+    "/rpc/get_equipment_set_prices_by_round",
     payload
   );
 };

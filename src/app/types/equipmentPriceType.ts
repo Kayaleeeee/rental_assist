@@ -32,3 +32,14 @@ export type EquipmentPriceItemByRound = {
   round: number;
   price: number;
 };
+
+export type GroupPriceItemByRound = {
+  setId: SetEquipmentType["id"];
+  round: number;
+  price: number;
+};
+
+export type GroupPriceRequestPayload = {
+  setIds: SetEquipmentType["id"][];
+  rounds: number[];
+};

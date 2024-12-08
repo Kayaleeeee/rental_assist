@@ -26,7 +26,7 @@ import {
 import { isEmpty, isNil } from "lodash";
 import { onCreateReservation } from "../actions/createReservation";
 import { useRouter } from "next/navigation";
-import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
+import { convertEquipmentItemToStateWithOption } from "@/app/types/mapper/convertEquipmentItemToState";
 import {
   getAllEquipmentGroupSupplyPrice,
   getAllEquipmentGroupTotalPrice,
@@ -71,8 +71,8 @@ const ReservationCreatePage = () => {
 
     equipmentGroupList,
     handleDeleteGroupEquipment,
-    handleAddEquipmentGroup,
     handleChangeGroupEquipment,
+    handleAddEquipmentGroupWithPrice,
   } = useEquipmentCart();
 
   const { form, setForm, onChangeForm } = useReservationForm();
@@ -148,7 +148,9 @@ const ReservationCreatePage = () => {
     async (list: EquipmentListItemType[]) => {
       if (!changingStatus) return;
 
-      const convertedList = list.map(convertEquipmentItemToState);
+      const convertedList = list.map((item) =>
+        convertEquipmentItemToStateWithOption(item, { quantity: 1 })
+      );
 
       if (changingStatus.mode === "item") {
         handleAddEquipmentListWithPrice(convertedList, form.rounds);
@@ -327,7 +329,7 @@ const ReservationCreatePage = () => {
                     <ReservationGroupTableEditor
                       key={item.setId}
                       groupEquipment={item}
-                      rentalDays={form.rounds}
+                      rounds={form.rounds}
                       changeSetEquipment={handleChangeGroupEquipment}
                       onClickAddEquipment={() =>
                         handleOpenEquipmentModal({
@@ -422,7 +424,10 @@ const ReservationCreatePage = () => {
         <GroupEquipmentSearchModal
           onCloseModal={() => setIsOpenGroupSearchModal(false)}
           onConfirm={(list) =>
-            handleAddEquipmentGroup(list.map(convertGroupEquipmentToState))
+            handleAddEquipmentGroupWithPrice(
+              list.map(convertGroupEquipmentToState),
+              form.rounds
+            )
           }
           disabledIdList={existIdList}
         />

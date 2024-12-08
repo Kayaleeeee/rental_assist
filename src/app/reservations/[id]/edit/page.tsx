@@ -331,7 +331,7 @@ const ReservationEditPage = () => {
                       <ReservationGroupTableEditor
                         key={item.setId}
                         groupEquipment={item}
-                        rentalDays={rentalDays}
+                        rounds={form.rounds}
                         changeSetEquipment={handleChangeGroupEquipment}
                         onClickAddEquipment={() =>
                           handleOpenEquipmentModal({

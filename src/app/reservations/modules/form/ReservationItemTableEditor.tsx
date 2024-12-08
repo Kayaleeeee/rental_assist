@@ -77,7 +77,7 @@ export const ReservationItemTableEditor = ({
             `${formatLocaleString(
               getEquipmentTotalPrice({
                 itemPrice: row.price,
-                quantity: row.price,
+                quantity: row.quantity,
                 discountPrice: row.discountPrice,
               })
             )}원`
@@ -132,9 +132,7 @@ export const ReservationItemTableEditor = ({
       {!isNil(modalProps) && modalProps.mode === "price" && (
         <PriceChangingModal
           currentTotalPrice={
-            modalProps.selectedRow.price *
-            rounds *
-            modalProps.selectedRow.quantity
+            modalProps.selectedRow.price * modalProps.selectedRow.quantity
           }
           currentDiscountPrice={modalProps.selectedRow.discountPrice || 0}
           onConfirm={(price) =>

@@ -1,12 +1,18 @@
 import { getEquipmentListWithRentedDates } from "@/app/api/equipments";
-import { requestPriceByRounds } from "@/app/api/equipments/equipmentPrice";
+import {
+  requestGroupPriceByRounds,
+  requestPriceByRounds,
+} from "@/app/api/equipments/equipmentPrice";
 import {
   EquipmentListItemState,
   SetEquipmentStateType,
   useCartStore,
 } from "@/app/store/useCartStore";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
-import { mapEquipmentStateWithPrice } from "@/app/types/mapper/mapEquipmentStateWithPrice";
+import {
+  mapEquipmentGroupStateWithPrice,
+  mapEquipmentStateWithPrice,
+} from "@/app/types/mapper/mapEquipmentStateWithPrice";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
@@ -158,7 +164,28 @@ export const useEquipmentCart = () => {
       return result;
     } catch (e) {
       showToast({
-        message: "가격 정보 조회에 실패했습니다.",
+        message: "단품 가격 정보 조회에 실패했습니다.",
+        type: "error",
+      });
+      throw e;
+    }
+  };
+
+  const calculateEquipmentGroupPrice = async (
+    setList: SetEquipmentStateType[],
+    rounds: number
+  ) => {
+    try {
+      const idList = setList.map((item) => item.setId);
+      const result = await requestGroupPriceByRounds({
+        setIds: idList,
+        rounds: [rounds],
+      });
+
+      return result;
+    } catch (e) {
+      showToast({
+        message: "세트 가격 정보 조회에 실패했습니다.",
         type: "error",
       });
       throw e;
@@ -169,6 +196,28 @@ export const useEquipmentCart = () => {
     (equipmentList: SetEquipmentStateType[]) => {
       addEquipmentGroup(equipmentList);
       setIsChecked(false);
+    },
+    []
+  );
+
+  const handleAddEquipmentGroupWithPrice = useCallback(
+    async (setList: SetEquipmentStateType[], rounds: number) => {
+      try {
+        const priceByRounds = await calculateEquipmentGroupPrice(
+          setList,
+          rounds
+        );
+
+        const listWithPrice = mapEquipmentGroupStateWithPrice(
+          setList,
+          priceByRounds
+        );
+
+        addEquipmentGroup(listWithPrice);
+        setIsChecked(false);
+      } catch {
+        return;
+      }
     },
     []
   );
@@ -193,6 +242,7 @@ export const useEquipmentCart = () => {
           equipmentList,
           priceByRounds
         );
+
         addEquipment(listWithPrice);
         setIsChecked(false);
       } catch {
@@ -279,6 +329,7 @@ export const useEquipmentCart = () => {
     handleChangeGroupEquipment,
     handleAddEquipmentGroup,
     handleSetEquipmentGroup,
+    handleAddEquipmentGroupWithPrice,
 
     //단품 아이템
     equipmentItemList,
