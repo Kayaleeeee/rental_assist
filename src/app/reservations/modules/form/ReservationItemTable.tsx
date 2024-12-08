@@ -6,9 +6,7 @@ import { GridColDef } from "@mui/x-data-grid";
 import { getEquipmentTotalPrice } from "../../utils/reservationUtils";
 import { isEmpty, isNil } from "lodash";
 
-const getColumns = (
-  rentalDays: number
-): GridColDef<EquipmentListItemState>[] => [
+const getColumns = (rounds: number): GridColDef<EquipmentListItemState>[] => [
   {
     field: "id",
     width: 80,
@@ -38,7 +36,7 @@ const getColumns = (
   {
     field: "rentalDays",
     renderHeader: () => HeaderName("대여기간"),
-    renderCell: () => <>{rentalDays}일</>,
+    renderCell: () => <>{rounds}회차</>,
     filterable: false,
     disableColumnMenu: true,
     sortable: false,
@@ -78,14 +76,14 @@ const getColumns = (
 
 type Props = {
   rows: EquipmentListItemState[];
-  rentalDays: number;
+  rounds: number;
 };
-export const ReservationItemTable = ({ rows, rentalDays }: Props) => {
+export const ReservationItemTable = ({ rows, rounds }: Props) => {
   return (
     <GridTable<EquipmentListItemState>
       hideFooter
       rows={rows}
-      columns={getColumns(rentalDays)}
+      columns={getColumns(rounds)}
       height={isEmpty(rows) ? "150px" : undefined}
       emptyHeight="100px"
     />

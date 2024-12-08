@@ -11,7 +11,7 @@ import { Button } from "@/app/components/Button";
 import { useUserDetail } from "../hooks/useUserDetail";
 import { useReservationList } from "@/app/reservations/hooks/useReservationList";
 import { useEffect } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import styles from "../index.module.scss";
 import { formatDateTime } from "@/app/utils/timeUtils";
 import { formatLocaleString } from "@/app/utils/priceUtils";
@@ -20,6 +20,7 @@ import { ReservationStatusText } from "@/app/reservations/modules/ReservationSta
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { ReservationType } from "@/app/types/reservationType";
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
+import { formatPhoneNumber } from "@/app/utils/textUtils";
 
 const column: GridColDef<ReservationType>[] = [
   {
@@ -98,7 +99,11 @@ const UserDetailPage = () => {
             isEditable={false}
             fullWidth
             multiline
-            value={detail.phoneNumber || "-"}
+            value={
+              !isNil(detail.phoneNumber)
+                ? formatPhoneNumber(detail.phoneNumber)
+                : "-"
+            }
           />
         </div>
         <Margin top={20} />

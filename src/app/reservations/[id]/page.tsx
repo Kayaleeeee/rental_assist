@@ -31,9 +31,10 @@ import { ReservationStatusText } from "../modules/ReservationStatusText";
 import { PaymentStatusChangeModal } from "../modules/list/PaymentStatusChangeModal";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
 import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { ReservationItemTable } from "../modules/form/ReservationItemTable";
 import { ReservationGroupTable } from "@/app/reservations/modules/form/ReservationGroupTable";
+import { formatPhoneNumber } from "@/app/utils/textUtils";
 
 const defaultString = "-";
 
@@ -185,7 +186,14 @@ const ReservationDetailPage = () => {
               <PaymentStatusText status={reservationDetail.paymentStatus} />
             </div>
           </div>
-          <div className={formStyles.sectionWrapper}>
+          <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
+            <Label title={`회차 정보`} />
+
+            <div className={styles.roundRow}>
+              {reservationDetail.rounds} 회차
+            </div>
+          </div>
+          <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <div
               className={styles.clickableLabelWrapper}
               onClick={() => setIsOpenRentalDateModal(true)}
@@ -195,14 +203,14 @@ const ReservationDetailPage = () => {
             </div>
             <span
               style={{
-                display: "inline-flex",
+                display: "flex",
+                flexDirection: "column",
               }}
             >
               <EditableField
                 isEditable={false}
-                value={formatDateTime(reservationDetail.startDate)}
+                value={`${formatDateTime(reservationDetail.startDate)} ~ `}
               />
-              <div className={styles.separator}>~</div>
               <EditableField
                 isEditable={false}
                 value={formatDateTime(reservationDetail.endDate)}
@@ -224,7 +232,11 @@ const ReservationDetailPage = () => {
             <Label title="전화번호" />
             <EditableField
               isEditable={false}
-              value={reservationDetail.phoneNumber || defaultString}
+              value={
+                !isNil(reservationDetail.phoneNumber)
+                  ? formatPhoneNumber(reservationDetail.phoneNumber)
+                  : defaultString
+              }
             />
           </div>
         </div>
@@ -237,7 +249,7 @@ const ReservationDetailPage = () => {
           <div className={formStyles.sectionWrapper}>
             <Label title="대여 장비 목록" />
             <ReservationItemTable
-              rentalDays={rentalDays}
+              rounds={reservationDetail.rounds}
               rows={reservationDetail.equipmentList}
             />
           </div>
@@ -254,7 +266,7 @@ const ReservationDetailPage = () => {
                   return (
                     <ReservationGroupTable
                       key={item.setId}
-                      rentalDays={rentalDays}
+                      rounds={reservationDetail.rounds}
                       groupEquipment={item}
                     />
                   );

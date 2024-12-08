@@ -15,7 +15,7 @@ import {
 } from "@/app/types/mapper/mapEquipmentStateWithPrice";
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
-import { isEmpty } from "lodash";
+import { isEmpty, isEqual } from "lodash";
 import { useCallback, useMemo } from "react";
 
 export const useEquipmentCart = () => {
@@ -41,6 +41,68 @@ export const useEquipmentCart = () => {
     isChecked,
     setIsChecked,
   } = useCartStore();
+
+  const convertGroupEquipmentPrice = async ({
+    setList,
+    rounds,
+  }: {
+    setList: SetEquipmentStateType[];
+    rounds: number;
+  }) => {
+    if (isEmpty(setList)) return [];
+
+    try {
+      const idList = setList.map((item) => item.setId);
+      const priceByRounds = await requestGroupPriceByRounds({
+        setIds: idList,
+        rounds: [rounds],
+      });
+
+      const listWithPrice = mapEquipmentGroupStateWithPrice(
+        setList,
+        priceByRounds
+      );
+
+      return listWithPrice;
+    } catch (e) {
+      showToast({
+        message: "세트 가격 정보 조회에 실패했습니다.",
+        type: "error",
+      });
+      throw e;
+    }
+  };
+
+  const convertEquipmentListPrice = async ({
+    equipmentList,
+    rounds,
+  }: {
+    equipmentList: EquipmentListItemState[];
+    rounds: number;
+  }) => {
+    if (isEmpty(equipmentList)) return [];
+
+    try {
+      const idList = equipmentList.map((item) => item.equipmentId);
+      const priceList = await requestPriceByRounds({
+        equipmentIds: idList,
+        rounds: [rounds],
+      });
+
+      const listWithPrice = mapEquipmentStateWithPrice(
+        equipmentList,
+        priceList
+      );
+
+      return listWithPrice;
+    } catch (e) {
+      showToast({
+        message: "단품 가격 정보 조회에 실패했습니다.",
+        type: "error",
+      });
+      throw e;
+    }
+  };
 
   const handleCheckAvailability = useCallback(async () => {
     if (!dateRange.startDate || !dateRange.endDate) {
@@ -150,74 +212,10 @@ export const useEquipmentCart = () => {
     []
   );
 
-  const calculateEquipmentPrice = async (
-    equipmentList: EquipmentListItemState[],
-    rounds: number
-  ) => {
-    try {
-      const idList = equipmentList.map((item) => item.equipmentId);
-      const result = await requestPriceByRounds({
-        equipmentIds: idList,
-        rounds: [rounds],
-      });
-
-      return result;
-    } catch (e) {
-      showToast({
-        message: "단품 가격 정보 조회에 실패했습니다.",
-        type: "error",
-      });
-      throw e;
-    }
-  };
-
-  const calculateEquipmentGroupPrice = async (
-    setList: SetEquipmentStateType[],
-    rounds: number
-  ) => {
-    try {
-      const idList = setList.map((item) => item.setId);
-      const result = await requestGroupPriceByRounds({
-        setIds: idList,
-        rounds: [rounds],
-      });
-
-      return result;
-    } catch (e) {
-      showToast({
-        message: "세트 가격 정보 조회에 실패했습니다.",
-        type: "error",
-      });
-      throw e;
-    }
-  };
-
   const handleAddEquipmentGroup = useCallback(
     (equipmentList: SetEquipmentStateType[]) => {
       addEquipmentGroup(equipmentList);
       setIsChecked(false);
-    },
-    []
-  );
-
-  const handleAddEquipmentGroupWithPrice = useCallback(
-    async (setList: SetEquipmentStateType[], rounds: number) => {
-      try {
-        const priceByRounds = await calculateEquipmentGroupPrice(
-          setList,
-          rounds
-        );
-
-        const listWithPrice = mapEquipmentGroupStateWithPrice(
-          setList,
-          priceByRounds
-        );
-
-        addEquipmentGroup(listWithPrice);
-        setIsChecked(false);
-      } catch {
-        return;
-      }
     },
     []
   );
@@ -230,31 +228,9 @@ export const useEquipmentCart = () => {
     []
   );
 
-  const handleAddEquipmentListWithPrice = useCallback(
-    async (equipmentList: EquipmentListItemState[], rounds: number) => {
-      try {
-        const priceByRounds = await calculateEquipmentPrice(
-          equipmentList,
-          rounds
-        );
-
-        const listWithPrice = mapEquipmentStateWithPrice(
-          equipmentList,
-          priceByRounds
-        );
-
-        addEquipment(listWithPrice);
-        setIsChecked(false);
-      } catch {
-        return;
-      }
-    },
-    []
-  );
-
   const handleSetEquipmentGroup = useCallback(
-    (equipmentList: SetEquipmentStateType[]) => {
-      setEquipmentGroupList(equipmentList);
+    (setList: SetEquipmentStateType[]) => {
+      setEquipmentGroupList(setList);
       setIsChecked(false);
     },
     []
@@ -307,6 +283,49 @@ export const useEquipmentCart = () => {
     setIsChecked(false);
   };
 
+  const handleChangeItemPriceByRounds = useCallback(
+    async ({
+      equipmentItemList,
+      rounds,
+    }: {
+      equipmentItemList: EquipmentListItemState[];
+      rounds: number;
+    }) => {
+      const pricedEquipmentList = await convertEquipmentListPrice({
+        equipmentList: equipmentItemList,
+        rounds,
+      });
+
+      if (
+        pricedEquipmentList &&
+        !isEqual(pricedEquipmentList, equipmentItemList)
+      ) {
+        handleSetEquipmentList(pricedEquipmentList);
+      }
+    },
+    []
+  );
+
+  const handleChangeGroupPriceByRounds = useCallback(
+    async ({
+      groupEquipmentList,
+      rounds,
+    }: {
+      groupEquipmentList: SetEquipmentStateType[];
+      rounds: number;
+    }) => {
+      const pricedGroupList = await convertGroupEquipmentPrice({
+        setList: groupEquipmentList,
+        rounds,
+      });
+
+      if (pricedGroupList && !isEqual(pricedGroupList, groupEquipmentList)) {
+        handleSetEquipmentGroup(pricedGroupList);
+      }
+    },
+    []
+  );
+
   return {
     hasUnavailableItem,
     handleCheckAvailability,
@@ -314,7 +333,6 @@ export const useEquipmentCart = () => {
     handleChangeDate,
     resetCart,
     rentalDays,
-    calculateEquipmentPrice,
 
     //flag 변수
     isCartOpen,
@@ -329,7 +347,7 @@ export const useEquipmentCart = () => {
     handleChangeGroupEquipment,
     handleAddEquipmentGroup,
     handleSetEquipmentGroup,
-    handleAddEquipmentGroupWithPrice,
+    handleChangeGroupPriceByRounds,
 
     //단품 아이템
     equipmentItemList,
@@ -337,6 +355,6 @@ export const useEquipmentCart = () => {
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
     handleSetEquipmentList,
-    handleAddEquipmentListWithPrice,
+    handleChangeItemPriceByRounds,
   };
 };

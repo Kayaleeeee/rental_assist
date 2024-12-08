@@ -3,11 +3,11 @@
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
 import { TextField } from "@mui/material";
 import { Label } from "@/app/components/Form/Label";
-
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { EditableField } from "@/app/components/EditableField";
 import { useUserForm } from "../hooks/useUserForm";
+import { formatPhoneNumber } from "@/app/utils/textUtils";
 
 const UserRegisterPage = () => {
   const {
@@ -43,7 +43,7 @@ const UserRegisterPage = () => {
       <div className={formStyles.sectionWrapper}>
         <Label title="전화번호" />
         <EditableField
-          value={phoneNumber}
+          value={formatPhoneNumber(phoneNumber || "")}
           onChange={(e) => setPhoneNumber(e.target.value)}
         />
       </div>

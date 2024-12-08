@@ -31,14 +31,11 @@ const getColumns = (): GridColDef<EquipmentListItemState>[] => [
 ];
 
 type Props = {
-  rentalDays: number;
+  rounds: number;
   groupEquipment: SetEquipmentStateType;
 };
 
-export const ReservationGroupTable = ({
-  rentalDays,
-  groupEquipment,
-}: Props) => {
+export const ReservationGroupTable = ({ rounds, groupEquipment }: Props) => {
   return (
     <div className={styles.wrapper}>
       <div className={styles.groupInfo}>
@@ -55,9 +52,7 @@ export const ReservationGroupTable = ({
       />
       <div className={styles.footer}>
         <div className={styles.supplyPrice}>
-          {`단가: ${formatLocaleString(
-            groupEquipment.price
-          )} 원  * ${rentalDays}일`}
+          {`${rounds}회차 ${formatLocaleString(groupEquipment.price)} 원`}
         </div>
         {!isNil(groupEquipment.discountPrice) &&
           groupEquipment.discountPrice !== 0 && (

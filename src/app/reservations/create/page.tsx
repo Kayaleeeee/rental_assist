@@ -57,7 +57,6 @@ const ReservationCreatePage = () => {
 
   const {
     // hasUnavailableItem,
-
     handleChangeDate,
     dateRange,
     // handleCheckAvailability,
@@ -67,12 +66,14 @@ const ReservationCreatePage = () => {
     equipmentItemList,
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
-    handleAddEquipmentListWithPrice,
+    handleAddEquipmentList,
+    handleChangeItemPriceByRounds,
 
     equipmentGroupList,
     handleDeleteGroupEquipment,
     handleChangeGroupEquipment,
-    handleAddEquipmentGroupWithPrice,
+    handleAddEquipmentGroup,
+    handleChangeGroupPriceByRounds,
   } = useEquipmentCart();
 
   const { form, setForm, onChangeForm } = useReservationForm();
@@ -85,8 +86,25 @@ const ReservationCreatePage = () => {
 
   useEffect(() => {
     onChangeForm("rounds", rentalDays);
-    // change equipment price
   }, [rentalDays]);
+
+  useEffect(() => {
+    if (form.rounds < 1) return;
+
+    handleChangeItemPriceByRounds({
+      equipmentItemList,
+      rounds: form.rounds,
+    });
+  }, [form.rounds, equipmentItemList]);
+
+  useEffect(() => {
+    if (form.rounds < 1) return;
+
+    handleChangeGroupPriceByRounds({
+      groupEquipmentList: equipmentGroupList,
+      rounds: form.rounds,
+    });
+  }, [form.rounds, equipmentGroupList]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -153,7 +171,7 @@ const ReservationCreatePage = () => {
       );
 
       if (changingStatus.mode === "item") {
-        handleAddEquipmentListWithPrice(convertedList, form.rounds);
+        handleAddEquipmentList(convertedList);
         return;
       }
 
@@ -170,7 +188,7 @@ const ReservationCreatePage = () => {
         }
       }
     },
-    [changingStatus, equipmentGroupList, equipmentItemList, form.rounds]
+    [changingStatus, equipmentGroupList, equipmentItemList]
   );
 
   const { total: reservationTotalPrice, supply: reservationSupplyPrice } =
@@ -189,8 +207,13 @@ const ReservationCreatePage = () => {
     }, [equipmentGroupList, equipmentItemList]);
 
   const existIdList = useMemo(() => {
-    return equipmentItemList.map((item) => item.equipmentId);
-  }, [equipmentItemList]);
+    const equipmentIdList = equipmentItemList.map((item) => item.equipmentId);
+    const groupEquipmentItemIdList = equipmentGroupList
+      .flatMap((item) => item.equipmentList)
+      .map((item) => item.equipmentId);
+
+    return [...equipmentIdList, ...groupEquipmentItemIdList];
+  }, [equipmentItemList, equipmentGroupList]);
 
   const handleChangeRounds = useCallback((rounds: number) => {
     onChangeForm("rounds", rounds);
@@ -424,10 +447,7 @@ const ReservationCreatePage = () => {
         <GroupEquipmentSearchModal
           onCloseModal={() => setIsOpenGroupSearchModal(false)}
           onConfirm={(list) =>
-            handleAddEquipmentGroupWithPrice(
-              list.map(convertGroupEquipmentToState),
-              form.rounds
-            )
+            handleAddEquipmentGroup(list.map(convertGroupEquipmentToState))
           }
           disabledIdList={existIdList}
         />

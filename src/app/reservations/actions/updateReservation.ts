@@ -189,6 +189,7 @@ export const onUpdateReservation = async ({
               quoteId,
               price: item.price,
               quantity: item.quantity,
+              discountPrice: item.discountPrice,
               totalPrice: getEquipmentTotalPrice({
                 itemPrice: item.price,
                 quantity: item.quantity,
@@ -224,6 +225,7 @@ export const onUpdateReservation = async ({
         equipmentId: item.equipmentId,
         quantity: item.quantity,
         price: item.price,
+        discountPrice: item.discountPrice,
         totalPrice: getEquipmentTotalPrice({
           itemPrice: item.price,
           discountPrice: item.discountPrice,
@@ -243,6 +245,7 @@ export const onUpdateReservation = async ({
             quantity: item.quantity,
             price: item.price,
             quoteId,
+            discountPrice: item.discountPrice,
             totalPrice: getEquipmentTotalPrice({
               itemPrice: item.price,
               discountPrice: item.discountPrice,

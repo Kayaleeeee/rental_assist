@@ -21,7 +21,7 @@ export const updateQuoteItem = (
   id: QuoteItemType["id"],
   payload: QuoteItemPutPayload
 ) => {
-  return apiPut(`${apiUrl}/${id}`, payload);
+  return apiPatch(`${apiUrl}`, payload, { params: { id } });
 };
 
 export const deleteQuoteItemList = (idList: string) => {

@@ -7,6 +7,7 @@ import { useUserSearchList } from "../hooks/useUserSearchList";
 import { isEmpty } from "lodash";
 import { showToast } from "@/app/utils/toastUtils";
 import { useState } from "react";
+import { formatPhoneNumber } from "@/app/utils/textUtils";
 
 const HeaderName = (name: string) => {
   return (
@@ -36,7 +37,12 @@ const columns: GridColDef<UserType>[] = [
     renderHeader: () => HeaderName("이메일"),
     flex: 1,
   },
-  { field: "phoneNumber", flex: 1, renderHeader: () => HeaderName("전화번호") },
+  {
+    field: "phoneNumber",
+    flex: 1,
+    renderHeader: () => HeaderName("전화번호"),
+    renderCell: ({ row }) => <>{formatPhoneNumber(row.phoneNumber || "")}</>,
+  },
 ];
 
 type Props = {
