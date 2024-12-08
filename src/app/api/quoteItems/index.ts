@@ -5,7 +5,7 @@ import {
   QuoteSetPayload,
   QuoteSetType,
 } from "@/app/types/quoteType";
-import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "..";
+import { apiDelete, apiGet, apiPatch, apiPost } from "..";
 
 const apiUrl = "/quote_items";
 

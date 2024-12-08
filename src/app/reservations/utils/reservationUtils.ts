@@ -1,12 +1,11 @@
 import { QuoteItemType, QuotePostPayload } from "@/app/types/quoteType";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty } from "lodash";
-import { ReservationFormState } from "../hooks/useReservationForm";
+
 import {
   EquipmentListItemState,
   SetEquipmentStateType,
 } from "@/app/store/useCartStore";
-import { getEquipmentListRentalHistoryByDate } from "@/app/api/equipments";
 import {
   postEquipmentAvailability,
   postEquipmentAvailabilityOnUpdate,
@@ -15,6 +14,13 @@ import {
   EquipmentAvailabilityPostPayload,
   EquipmentAvailableItem,
 } from "@/app/types/reservationType";
+import { ReservationFormState } from "../hooks/useReservationForms";
+
+export const initialAvailability: {
+  checkedList: EquipmentAvailableItem[];
+} = {
+  checkedList: [],
+};
 
 //equipment list 총 가격
 export const getAllEquipmentTotalPrice = (list: EquipmentListItemState[]) => {
@@ -171,7 +177,7 @@ export const checkEquipmentAvailability = async ({
   isAvailable: boolean;
   checkedList: EquipmentAvailableItem[];
 }> => {
-  let equipmentList: EquipmentAvailabilityPostPayload["equipmentList"] = [];
+  const equipmentList: EquipmentAvailabilityPostPayload["equipmentList"] = [];
 
   equipmentItemList.forEach((item) =>
     equipmentList.push({
@@ -230,7 +236,7 @@ export const checkUpdateEquipmentAvailability = async ({
   isAvailable: boolean;
   checkedList: EquipmentAvailableItem[];
 }> => {
-  let equipmentList: EquipmentAvailabilityPostPayload["equipmentList"] = [];
+  const equipmentList: EquipmentAvailabilityPostPayload["equipmentList"] = [];
 
   equipmentItemList.forEach((item) =>
     equipmentList.push({

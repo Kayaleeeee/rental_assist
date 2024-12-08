@@ -9,12 +9,14 @@ import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
-import { QuotationItemEditor } from "@/app/reservations/modules/form/QuotationItemEditor";
-import { SetEquipmentAccordionEditor } from "@/app/equipments/sets/modules/SetEquipmentAccordionEditor";
 import { isEmpty } from "lodash";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { SetEquipmentType } from "@/app/types/equipmentType";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
+import { ReservationItemTableEditor } from "@/app/reservations/modules/form/ReservationItemTableEditor";
+import { EquipmentAvailableItem } from "@/app/types/reservationType";
+import { initialAvailability } from "@/app/reservations/utils/reservationUtils";
+import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 
 export const getAvailableStatus = (
   isChecked: boolean,
@@ -27,21 +29,21 @@ export const getAvailableStatus = (
 
 export const Cart = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
-  const [searchingSetId, setSearchingSetId] = useState<
-    SetEquipmentType["id"] | null
-  >(null);
+  const [searchingSetId] = useState<SetEquipmentType["id"] | null>(null);
+  const [availabilityState, setAvailabilityState] = useState<{
+    checkedList: EquipmentAvailableItem[];
+  }>(initialAvailability);
 
   const router = useRouter();
 
   const {
-    hasUnavailableItem,
     handleChangeDate,
     dateRange,
-    isChecked,
+
     rentalDays,
     setIsCartOpen,
     isCartOpen,
-    setIsChecked,
+    handleChangeEquipmentItem,
     handleChangeGroupEquipment,
     handleDeleteGroupEquipment,
     handleDeleteEquipmentItem,
@@ -52,7 +54,6 @@ export const Cart = () => {
 
   const handleCloseCart = () => {
     setIsCartOpen(false);
-    setIsChecked(false);
   };
 
   useEffect(() => {
@@ -67,12 +68,13 @@ export const Cart = () => {
     }
   }, [isCartOpen]);
 
-  const isOkToMakeReservation = !hasUnavailableItem && isChecked;
+  // check
+  const isOkToMakeReservation = false;
 
   const onClickButton = useCallback(() => {
     if (!isOkToMakeReservation) {
-      console.log("click ");
-      // handleCheckAvailability();
+      //availability check
+      setAvailabilityState(initialAvailability);
     } else {
       handleAddEquipmentList(equipmentItemList);
       handleCloseCart();
@@ -133,24 +135,13 @@ export const Cart = () => {
             <Margin bottom={20}>
               <Label title="단품 장비 리스트" />
               <div className={styles.equipmentListWrapper}>
-                {equipmentItemList.map((item) => {
-                  return (
-                    <QuotationItemEditor
-                      key={item.equipmentId}
-                      quoteState={item}
-                      rentalDays={rentalDays}
-                      onChangeField={() => {}}
-                      quantityOnly
-                      onDeleteEquipment={() =>
-                        handleDeleteEquipmentItem(item.equipmentId)
-                      }
-                      availableStatus={getAvailableStatus(
-                        isChecked,
-                        item.isAvailable
-                      )}
-                    />
-                  );
-                })}
+                <ReservationItemTableEditor
+                  rows={equipmentItemList}
+                  rounds={0}
+                  onDeleteEquipment={handleDeleteEquipmentItem}
+                  onChangeField={handleChangeEquipmentItem}
+                  availabilityCheckedList={availabilityState.checkedList}
+                />
               </div>
             </Margin>
           )}
@@ -161,16 +152,19 @@ export const Cart = () => {
               <div>
                 {equipmentGroupList.map((item) => {
                   return (
-                    <SetEquipmentAccordionEditor
+                    <ReservationGroupTableEditor
                       key={item.setId}
-                      equipmentSet={item}
-                      isChecked={isChecked}
-                      showPrice={false}
+                      groupEquipment={item}
+                      rounds={0}
+                      availabilityCheckedList={availabilityState.checkedList}
                       changeSetEquipment={handleChangeGroupEquipment}
-                      onClickAddEquipment={() => {
-                        setIsOpenSearchModal(true);
-                        setSearchingSetId(item.setId);
-                      }}
+                      onClickAddEquipment={
+                        () => {}
+                        // handleOpenEquipmentModal({
+                        //   mode: "group",
+                        //   groupId: item.setId,
+                        // })
+                      }
                       deleteSetEquipment={() =>
                         handleDeleteGroupEquipment(item.setId)
                       }

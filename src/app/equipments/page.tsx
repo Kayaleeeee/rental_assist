@@ -116,7 +116,7 @@ export default function EquipmentPage() {
           ...EquipmentCategoryList,
           {
             key: "full_set",
-            title: "풀세트 보기",
+            title: "풀세트",
           },
         ]}
         selectedCategory={(isFullSetSelected && "full_set") || selectedCategory}

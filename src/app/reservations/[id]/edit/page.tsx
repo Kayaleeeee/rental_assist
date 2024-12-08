@@ -16,7 +16,6 @@ import { UserSearchModal } from "../../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
 import { useUnmount } from "usehooks-ts";
-import { useReservationForm } from "../../hooks/useReservationForm";
 import { useParams, useRouter } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
 import { isEmpty, isNil } from "lodash";
@@ -24,7 +23,6 @@ import {
   EquipmentListItemState,
   SetEquipmentStateType,
 } from "@/app/store/useCartStore";
-import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { onUpdateReservation } from "../../actions/updateReservation";
 import {
   EquipmentAvailableItem,
@@ -46,13 +44,15 @@ import {
   getAllEquipmentGroupTotalPrice,
   getAllEquipmentSupplyPrice,
   getAllEquipmentTotalPrice,
+  initialAvailability,
 } from "../../utils/reservationUtils";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTableEditor";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { RoundChangeModal } from "../../modules/form/RoundChangeModal";
-import { initialAvailability } from "../../create/page";
+
+import { useReservationForms } from "../../hooks/useReservationForms";
 
 const ReservationEditPage = () => {
   const router = useRouter();
@@ -63,7 +63,6 @@ const ReservationEditPage = () => {
   const quoteItemListStateRef = useRef<EquipmentListItemState[]>([]);
   const setListStateRef = useRef<SetEquipmentStateType[]>([]);
 
-  const { form, setForm, onChangeForm } = useReservationForm();
   const { detail, isLoading } = useReservationDetail(reservationId);
   const [changingStatus, setChangingStatus] = useState<
     { mode: "item" } | { mode: "group"; groupId: SetEquipmentType["id"] } | null
@@ -75,6 +74,9 @@ const ReservationEditPage = () => {
   }>(initialAvailability);
 
   const {
+    form,
+    setForm,
+    onChangeForm,
     handleChangeDate,
     dateRange,
 
@@ -90,7 +92,7 @@ const ReservationEditPage = () => {
     handleAddEquipmentGroup,
     handleChangeGroupEquipment,
     handleSetEquipmentGroup,
-  } = useEquipmentCart();
+  } = useReservationForms();
 
   const initializeForm = useCallback((detail: ReservationDetailStateType) => {
     setForm({

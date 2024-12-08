@@ -5,7 +5,6 @@ import {
 import {
   EquipmentListItemState,
   SetEquipmentStateType,
-  useCartStore,
 } from "@/app/store/useCartStore";
 import {
   mapEquipmentGroupStateWithPrice,
@@ -14,28 +13,53 @@ import {
 import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty, isEqual } from "lodash";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-export const useEquipmentCart = () => {
-  const {
-    resetCart,
-    dateRange,
-    setDateRange,
-    isCartOpen,
-    setIsCartOpen,
+export type ReservationFormState = {
+  userId?: number;
+  guestName: string;
+  guestPhoneNumber: string;
+  discountPrice: number;
+  rounds: number;
+};
 
-    equipmentItemList,
-    setEquipmentItemList,
-    removeEquipment,
-    changeEquipmentItem,
-    addEquipment,
+export const useReservationForms = () => {
+  const [form, setForm] = useState<ReservationFormState>({
+    userId: undefined,
+    guestName: "",
+    guestPhoneNumber: "",
+    discountPrice: 0,
+    rounds: 0,
+  });
 
-    equipmentGroupList,
-    setEquipmentGroupList,
-    changeEquipmentGroup,
-    removeEquipmentGroup,
-    addEquipmentGroup,
-  } = useCartStore();
+  const [dateRange, setDateRange] = useState<{
+    startDate?: string;
+    endDate?: string;
+  }>({
+    startDate: undefined,
+    endDate: undefined,
+  });
+  const [equipmentItemList, setEquipmentItemList] = useState<
+    EquipmentListItemState[]
+  >([]);
+  const [equipmentGroupList, setEquipmentGroupList] = useState<
+    SetEquipmentStateType[]
+  >([]);
+
+  const rentalDays = useMemo(() => {
+    if (!dateRange.startDate || !dateRange.endDate) return 0;
+    return getDiffDays(dateRange.startDate, dateRange.endDate);
+  }, [dateRange]);
+
+  const onChangeForm = (
+    key: keyof ReservationFormState,
+    value: ReservationFormState[keyof ReservationFormState]
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   const convertGroupEquipmentPrice = async ({
     setList,
@@ -99,11 +123,6 @@ export const useEquipmentCart = () => {
     }
   };
 
-  const rentalDays = useMemo(() => {
-    if (!dateRange.startDate || !dateRange.endDate) return 0;
-    return getDiffDays(dateRange.startDate, dateRange.endDate);
-  }, [dateRange]);
-
   const handleChangeDate = useCallback(
     (dateRange: { startDate?: string; endDate?: string }) => {
       setDateRange(dateRange);
@@ -112,15 +131,15 @@ export const useEquipmentCart = () => {
   );
 
   const handleAddEquipmentGroup = useCallback(
-    (equipmentList: SetEquipmentStateType[]) => {
-      addEquipmentGroup(equipmentList);
+    (groupList: SetEquipmentStateType[]) => {
+      setEquipmentGroupList((prev) => [...prev, ...groupList]);
     },
     []
   );
 
   const handleAddEquipmentList = useCallback(
     (equipmentList: EquipmentListItemState[]) => {
-      addEquipment(equipmentList);
+      setEquipmentItemList((prev) => [...prev, ...equipmentList]);
     },
     []
   );
@@ -141,36 +160,54 @@ export const useEquipmentCart = () => {
 
   const handleDeleteEquipmentItem = useCallback(
     (itemId: EquipmentListItemState["equipmentId"]) => {
-      removeEquipment(itemId);
+      setEquipmentItemList((prev) =>
+        prev.filter((item) => item.equipmentId !== itemId)
+      );
     },
     []
   );
 
   const handleDeleteGroupEquipment = useCallback(
     (setId: SetEquipmentStateType["setId"]) => {
-      removeEquipmentGroup(setId);
+      setEquipmentGroupList((prev) =>
+        prev.filter((set) => set.setId !== setId)
+      );
     },
     []
   );
 
   const handleChangeGroupEquipment = (setEquipment: SetEquipmentStateType) => {
-    changeEquipmentGroup(setEquipment);
+    setEquipmentGroupList((prev) =>
+      prev.map((set) => (set.setId === setEquipment.setId ? setEquipment : set))
+    );
   };
 
   const handleChangeEquipmentItem = (equipmentItem: EquipmentListItemState) => {
-    changeEquipmentItem(equipmentItem);
+    setEquipmentItemList((prev) =>
+      prev.map((prevItem) =>
+        prevItem.equipmentId === equipmentItem.equipmentId
+          ? equipmentItem
+          : prevItem
+      )
+    );
   };
 
   const handleDeleteGroupEquipmentItem = (
     setEquipment: SetEquipmentStateType,
     equipmentItemId: EquipmentListItemState["equipmentId"]
   ) => {
-    changeEquipmentGroup({
-      ...setEquipment,
-      equipmentList: setEquipment.equipmentList.filter(
-        (item) => item.equipmentId !== equipmentItemId
-      ),
-    });
+    setEquipmentGroupList((prev) =>
+      prev.map((prevSet) =>
+        prevSet.setId === setEquipment.setId
+          ? {
+              ...prevSet,
+              equipmentList: prevSet.equipmentList.filter(
+                (item) => item.equipmentId !== equipmentItemId
+              ),
+            }
+          : prevSet
+      )
+    );
   };
 
   const handleChangeItemPriceByRounds = useCallback(
@@ -217,14 +254,12 @@ export const useEquipmentCart = () => {
   );
 
   return {
+    form,
+    setForm,
+    onChangeForm,
     dateRange,
     handleChangeDate,
-    resetCart,
     rentalDays,
-
-    //flag 변수
-    isCartOpen,
-    setIsCartOpen,
 
     //세트 아이템
     equipmentGroupList,

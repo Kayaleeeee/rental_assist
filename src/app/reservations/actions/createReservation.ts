@@ -6,7 +6,7 @@ import {
   getEquipmentTotalPrice,
   getValidReservationForm,
 } from "../utils/reservationUtils";
-import { ReservationFormState } from "../hooks/useReservationForm";
+
 import {
   EquipmentListItemState,
   SetEquipmentStateType,
@@ -15,6 +15,7 @@ import { createQuoteItemList, createQuoteSet } from "@/app/api/quoteItems";
 import { postReservation } from "@/app/api/reservation";
 import { isEmpty } from "lodash";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
+import { ReservationFormState } from "../hooks/useReservationForms";
 
 export const onCreateReservation = async ({
   form,

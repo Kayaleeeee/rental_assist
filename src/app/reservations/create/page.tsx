@@ -8,16 +8,13 @@ import { Label } from "@/app/components/Form/Label";
 import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 
 import { Margin } from "@/app/components/Margin";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { EquipmentSearchModal } from "../../equipments/modules/EquipmentSearchModal";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
-import { useUnmount } from "usehooks-ts";
-import { useReservationForm } from "../hooks/useReservationForm";
-import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { GroupEquipmentSearchModal } from "../modules/form/GroupEquipmentSearchModal";
 import {
   EquipmentListItemType,
@@ -32,6 +29,7 @@ import {
   getAllEquipmentGroupTotalPrice,
   getAllEquipmentSupplyPrice,
   getAllEquipmentTotalPrice,
+  initialAvailability,
 } from "../utils/reservationUtils";
 import {
   formatKoreanCurrency,
@@ -43,12 +41,7 @@ import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/Res
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { RoundChangeModal } from "../modules/form/RoundChangeModal";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
-
-export const initialAvailability: {
-  checkedList: EquipmentAvailableItem[];
-} = {
-  checkedList: [],
-};
+import { useReservationForms } from "../hooks/useReservationForms";
 
 const ReservationCreatePage = () => {
   const router = useRouter();
@@ -67,11 +60,13 @@ const ReservationCreatePage = () => {
   }>(initialAvailability);
 
   const {
+    form,
+    setForm,
+    onChangeForm,
     handleChangeDate,
     dateRange,
 
     rentalDays,
-    resetCart,
     equipmentItemList,
     handleDeleteEquipmentItem,
     handleChangeEquipmentItem,
@@ -83,11 +78,7 @@ const ReservationCreatePage = () => {
     handleChangeGroupEquipment,
     handleAddEquipmentGroup,
     handleChangeGroupPriceByRounds,
-  } = useEquipmentCart();
-
-  const { form, setForm, onChangeForm } = useReservationForm();
-
-  const isFirstRender = useRef(true);
+  } = useReservationForms();
 
   useEffect(() => {
     setIsDiscounted(form.discountPrice > 0);
@@ -114,15 +105,6 @@ const ReservationCreatePage = () => {
       rounds: form.rounds,
     });
   }, [form.rounds, equipmentGroupList]);
-
-  useUnmount(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    resetCart();
-  });
 
   const handleOpenEquipmentModal = (
     status:

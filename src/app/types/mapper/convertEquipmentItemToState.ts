@@ -9,7 +9,6 @@ export const convertEquipmentItemToState = (
   quantity: equipment.quantity,
   price: equipment.price,
   discountPrice: 0,
-  isAvailable: true,
 });
 
 export const convertEquipmentItemToStateWithOption = (
@@ -21,6 +20,5 @@ export const convertEquipmentItemToStateWithOption = (
   quantity: equipment.quantity,
   price: equipment.price,
   discountPrice: 0,
-  isAvailable: true,
   ...options,
 });

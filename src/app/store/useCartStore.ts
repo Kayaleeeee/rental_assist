@@ -10,7 +10,6 @@ export type EquipmentListItemState = {
   category?: EquipmentCategory;
   discountPrice?: number;
   id?: QuoteItemType["id"];
-  isAvailable?: boolean;
   reservationId?: number;
 };
 
