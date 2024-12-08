@@ -5,6 +5,7 @@ import {
 } from "@/app/store/useCartStore";
 import { ReservationFormState } from "../hooks/useReservationForm";
 import {
+  checkUpdateEquipmentAvailability,
   getEquipmentGroupTotalPrice,
   getEquipmentTotalPrice,
   getValidReservationForm,
@@ -19,6 +20,7 @@ import {
 } from "@/app/api/quoteItems";
 import { isEmpty, isEqual } from "lodash";
 import { QuoteItemPostPayload, QuoteType } from "@/app/types/quoteType";
+import { EquipmentAvailableItem } from "@/app/types/reservationType";
 
 const convertSetEquipmentListToQuoteItemPayload = (
   quoteId: QuoteType["id"],
@@ -53,7 +55,14 @@ export const onUpdateReservation = async ({
   dateRange: { startDate?: string; endDate?: string };
   equipmentItemList: EquipmentListItemState[];
   groupEquipmentList: SetEquipmentStateType[];
-}) => {
+}): Promise<
+  | {
+      isAvailable: false;
+      checkedList: EquipmentAvailableItem[];
+      reservationId: null;
+    }
+  | { reservationId: number }
+> => {
   try {
     const validForm = await getValidReservationForm({
       form,
@@ -63,6 +72,26 @@ export const onUpdateReservation = async ({
     });
 
     if (!validForm) throw new Error("form validation 실패");
+
+    const { isAvailable, checkedList } = await checkUpdateEquipmentAvailability(
+      {
+        dateRange: {
+          startDate: validForm.startDate,
+          endDate: validForm.endDate,
+        },
+        equipmentItemList,
+        groupEquipmentList,
+        quoteId,
+      }
+    );
+
+    if (!isAvailable) {
+      return {
+        reservationId: null,
+        isAvailable,
+        checkedList,
+      };
+    }
 
     //  Set 변경 사항 계산
     const {

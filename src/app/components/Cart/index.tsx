@@ -37,7 +37,6 @@ export const Cart = () => {
     hasUnavailableItem,
     handleChangeDate,
     dateRange,
-    handleCheckAvailability,
     isChecked,
     rentalDays,
     setIsCartOpen,
@@ -72,7 +71,8 @@ export const Cart = () => {
 
   const onClickButton = useCallback(() => {
     if (!isOkToMakeReservation) {
-      handleCheckAvailability();
+      console.log("click ");
+      // handleCheckAvailability();
     } else {
       handleAddEquipmentList(equipmentItemList);
       handleCloseCart();
@@ -81,7 +81,7 @@ export const Cart = () => {
   }, [
     isOkToMakeReservation,
     equipmentItemList,
-    handleCheckAvailability,
+
     handleAddEquipmentList,
     router,
     rentalDays,

@@ -73,6 +73,14 @@ a {
   text-decoration: none;
 }
 
+.row-unavailable {
+  background-color: #ffe4e4;
+}
+
+.row-unavailable:hover {
+  background-color: #ffc5c6;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     /* color-scheme: dark;/ */

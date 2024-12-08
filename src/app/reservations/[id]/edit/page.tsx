@@ -26,7 +26,10 @@ import {
 } from "@/app/store/useCartStore";
 import { useEquipmentCart } from "@/app/equipments/hooks/useEquipmentCart";
 import { onUpdateReservation } from "../../actions/updateReservation";
-import { ReservationDetailStateType } from "@/app/types/reservationType";
+import {
+  EquipmentAvailableItem,
+  ReservationDetailStateType,
+} from "@/app/types/reservationType";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 import {
   EquipmentListItemType,
@@ -49,6 +52,7 @@ import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/Res
 import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTableEditor";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { RoundChangeModal } from "../../modules/form/RoundChangeModal";
+import { initialAvailability } from "../../create/page";
 
 const ReservationEditPage = () => {
   const router = useRouter();
@@ -66,13 +70,14 @@ const ReservationEditPage = () => {
   >(null);
   const [isOpenGroupSearchModal, setIsOpenGroupSearchModal] = useState(false);
   const [isOpenRoundChangeModal, setIsOpenRoundChangeModal] = useState(false);
+  const [availabilityState, setAvailabilityState] = useState<{
+    checkedList: EquipmentAvailableItem[];
+  }>(initialAvailability);
 
   const {
-    // hasUnavailableItem,
     handleChangeDate,
     dateRange,
-    // handleCheckAvailability,
-    // isChecked,
+
     rentalDays,
     equipmentItemList,
     handleAddEquipmentList,
@@ -136,7 +141,7 @@ const ReservationEditPage = () => {
     if (!detail?.quoteId) return;
 
     try {
-      await onUpdateReservation({
+      const result = await onUpdateReservation({
         quoteId: detail.quoteId,
         reservationId,
         form,
@@ -146,6 +151,15 @@ const ReservationEditPage = () => {
         equipmentItemList,
         groupEquipmentList: equipmentGroupList,
       });
+
+      if ("checkedList" in result) {
+        showToast({
+          message: "예약 불가한 항목이 있습니다.",
+          type: "error",
+        });
+        setAvailabilityState({ checkedList: result.checkedList });
+        return;
+      }
 
       showToast({
         message: "예약이 수정되었습니다.",
@@ -355,6 +369,7 @@ const ReservationEditPage = () => {
               <ReservationItemTableEditor
                 rows={equipmentItemList}
                 rounds={form.rounds}
+                availabilityCheckedList={availabilityState.checkedList}
                 onDeleteEquipment={handleDeleteEquipmentItem}
                 onChangeField={handleChangeEquipmentItem}
               />
@@ -370,6 +385,7 @@ const ReservationEditPage = () => {
                       key={item.setId}
                       groupEquipment={item}
                       rounds={form.rounds}
+                      availabilityCheckedList={availabilityState.checkedList}
                       changeSetEquipment={handleChangeGroupEquipment}
                       onClickAddEquipment={() =>
                         handleOpenEquipmentModal({

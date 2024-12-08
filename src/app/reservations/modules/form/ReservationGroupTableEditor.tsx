@@ -8,7 +8,7 @@ import { formatLocaleString } from "@/app/utils/priceUtils";
 import { GridColDef } from "@mui/x-data-grid";
 import styles from "./reservationGroupTable.module.scss";
 import { getEquipmentGroupTotalPrice } from "@/app/reservations/utils/reservationUtils";
-import { isNil } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import {
   GROUP_QUOTE_ITEM_MENU,
   GROUP_QUOTE_MENU,
@@ -17,6 +17,8 @@ import {
 } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
 import { useMemo, useState } from "react";
 import { Margin } from "@/app/components/Margin";
+import { EquipmentAvailableItem } from "@/app/types/reservationType";
+import { UnavailableEquipmentList } from "./UnavailableEquipmentList";
 
 type Props = {
   rounds: number;
@@ -24,6 +26,7 @@ type Props = {
   onClickAddEquipment: () => void;
   deleteSetEquipment: () => void;
   changeSetEquipment: (set: SetEquipmentStateType) => void;
+  availabilityCheckedList: EquipmentAvailableItem[];
 };
 
 export const ReservationGroupTableEditor = ({
@@ -32,6 +35,7 @@ export const ReservationGroupTableEditor = ({
   onClickAddEquipment,
   deleteSetEquipment,
   changeSetEquipment,
+  availabilityCheckedList,
 }: Props) => {
   const [isOpenPriceChangingModal, setIsOpenPriceChangingModal] =
     useState(false);
@@ -101,6 +105,21 @@ export const ReservationGroupTableEditor = ({
     ];
   }, []);
 
+  const unavailableList = useMemo(() => {
+    const list: EquipmentListItemState[] = [];
+
+    groupEquipment.equipmentList.forEach((row, index) => {
+      const foundItem = availabilityCheckedList.find(
+        (item) => item.id === row.equipmentId
+      );
+
+      if (foundItem && !foundItem.isAvailable) {
+        list.push(groupEquipment.equipmentList[index]);
+      }
+    });
+
+    return list;
+  }, [groupEquipment, availabilityCheckedList]);
   return (
     <>
       <div className={styles.wrapper}>
@@ -135,6 +154,18 @@ export const ReservationGroupTableEditor = ({
             marginTop: 0,
             borderRadius: "none",
           }}
+          getRowClassName={({ row }) => {
+            if (isEmpty(availabilityCheckedList)) return "";
+
+            const selectedItem = availabilityCheckedList.find(
+              (item) => item.id === row.equipmentId
+            );
+
+            if (selectedItem && !selectedItem.isAvailable)
+              return "row-unavailable";
+
+            return "";
+          }}
         />
 
         <div className={styles.footer}>
@@ -161,6 +192,9 @@ export const ReservationGroupTableEditor = ({
           </div>
         </div>
       </div>
+      {!isEmpty(unavailableList) && (
+        <UnavailableEquipmentList unavailableList={unavailableList} />
+      )}
       {isOpenPriceChangingModal && (
         <PriceChangingModal
           currentTotalPrice={groupEquipment.price}

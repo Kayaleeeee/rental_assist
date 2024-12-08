@@ -42,6 +42,13 @@ import { ReservationItemTableEditor } from "../modules/form/ReservationItemTable
 import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { RoundChangeModal } from "../modules/form/RoundChangeModal";
+import { EquipmentAvailableItem } from "@/app/types/reservationType";
+
+export const initialAvailability: {
+  checkedList: EquipmentAvailableItem[];
+} = {
+  checkedList: [],
+};
 
 const ReservationCreatePage = () => {
   const router = useRouter();
@@ -55,12 +62,14 @@ const ReservationCreatePage = () => {
     { mode: "item" } | { mode: "group"; groupId: SetEquipmentType["id"] } | null
   >(null);
 
+  const [availabilityState, setAvailabilityState] = useState<{
+    checkedList: EquipmentAvailableItem[];
+  }>(initialAvailability);
+
   const {
-    // hasUnavailableItem,
     handleChangeDate,
     dateRange,
-    // handleCheckAvailability,
-    // isChecked,
+
     rentalDays,
     resetCart,
     equipmentItemList,
@@ -220,20 +229,35 @@ const ReservationCreatePage = () => {
   }, []);
 
   const handleCreateReservation = useCallback(async () => {
+    setAvailabilityState(initialAvailability);
+
     try {
-      await onCreateReservation({
+      const result = await onCreateReservation({
         form,
         dateRange,
         equipmentItemList,
         groupEquipmentList: equipmentGroupList,
       });
 
+      if (!result.reservationId && "checkedList" in result) {
+        showToast({
+          message: "예약 불가한 항목이 있습니다.",
+          type: "error",
+        });
+        setAvailabilityState({
+          checkedList: result.checkedList,
+        });
+        return;
+      }
+
       showToast({
         message: "예약이 생성되었습니다.",
         type: "success",
       });
+
       router.push("/reservations");
-    } catch {
+    } catch (e) {
+      console.log(e);
       showToast({
         message: "예약 생성에 오류가 발생했습니다.",
         type: "error",
@@ -243,7 +267,7 @@ const ReservationCreatePage = () => {
     form,
     dateRange,
     equipmentGroupList,
-    equipmentGroupList,
+    equipmentItemList,
     router,
     rentalDays,
   ]);
@@ -341,6 +365,7 @@ const ReservationCreatePage = () => {
                 rounds={form.rounds}
                 onDeleteEquipment={handleDeleteEquipmentItem}
                 onChangeField={handleChangeEquipmentItem}
+                availabilityCheckedList={availabilityState.checkedList}
               />
             </Margin>
             <Margin>
@@ -353,6 +378,7 @@ const ReservationCreatePage = () => {
                       key={item.setId}
                       groupEquipment={item}
                       rounds={form.rounds}
+                      availabilityCheckedList={availabilityState.checkedList}
                       changeSetEquipment={handleChangeGroupEquipment}
                       onClickAddEquipment={() =>
                         handleOpenEquipmentModal({

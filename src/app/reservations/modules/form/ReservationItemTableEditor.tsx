@@ -12,6 +12,8 @@ import {
   QuoteEquipmentMoreMenu,
 } from "./QuoteEquipmentMenu";
 import { useMemo, useState } from "react";
+import { EquipmentAvailableItem } from "@/app/types/reservationType";
+import { UnavailableEquipmentList } from "./UnavailableEquipmentList";
 
 type Props = {
   rows: EquipmentListItemState[];
@@ -20,12 +22,15 @@ type Props = {
     equipmentId: EquipmentListItemState["equipmentId"]
   ) => void;
   onChangeField: (item: EquipmentListItemState) => void;
+  availabilityCheckedList: EquipmentAvailableItem[];
 };
+
 export const ReservationItemTableEditor = ({
   rows,
   rounds,
   onDeleteEquipment,
   onChangeField,
+  availabilityCheckedList,
 }: Props) => {
   const [modalProps, setModalProps] = useState<
     | {
@@ -119,6 +124,22 @@ export const ReservationItemTableEditor = ({
     ];
   }, [rounds]);
 
+  const unavailableList = useMemo(() => {
+    const list: EquipmentListItemState[] = [];
+
+    rows.forEach((row, index) => {
+      const foundItem = availabilityCheckedList.find(
+        (item) => item.id === row.equipmentId
+      );
+
+      if (foundItem && !foundItem.isAvailable) {
+        list.push(rows[index]);
+      }
+    });
+
+    return list;
+  }, [rows, availabilityCheckedList]);
+
   return (
     <>
       <GridTable<EquipmentListItemState>
@@ -127,8 +148,23 @@ export const ReservationItemTableEditor = ({
         rows={rows}
         columns={columns}
         height={isEmpty(rows) ? "150px" : undefined}
+        getRowClassName={({ row }) => {
+          if (isEmpty(availabilityCheckedList)) return "";
+
+          const selectedItem = availabilityCheckedList.find(
+            (item) => item.id === row.equipmentId
+          );
+
+          if (selectedItem && !selectedItem.isAvailable)
+            return "row-unavailable";
+
+          return "";
+        }}
         emptyHeight="100px"
       />
+      {!isEmpty(unavailableList) && (
+        <UnavailableEquipmentList unavailableList={unavailableList} />
+      )}
       {!isNil(modalProps) && modalProps.mode === "price" && (
         <PriceChangingModal
           currentTotalPrice={

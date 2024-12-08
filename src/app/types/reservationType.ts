@@ -2,7 +2,7 @@ import {
   EquipmentListItemState,
   SetEquipmentStateType,
 } from "../store/useCartStore";
-import { SetEquipmentType } from "./equipmentType";
+import { EquipmentListItemType, SetEquipmentType } from "./equipmentType";
 import { ListParamsType } from "./listType";
 import { QuoteItemType, QuoteSetType } from "./quoteType";
 import { UserType } from "./userType";
@@ -96,3 +96,23 @@ export type ReservationPutPayload = {
   status?: ReservationStatus;
   paymentStatus?: PaymentStatus;
 };
+
+export type EquipmentAvailabilityPostPayload = {
+  paramStartDate: string;
+  paramEndDate: string;
+  equipmentList: {
+    id: EquipmentListItemType["id"];
+    quantity: EquipmentListItemType["quantity"];
+  }[];
+};
+
+export type EquipmentAvailableItem = {
+  id: EquipmentListItemType["id"];
+  isAvailable: boolean;
+  requestedQuantity: number;
+};
+
+export type UpdatedEquipmentAvailabilityPostPayload =
+  EquipmentAvailabilityPostPayload & {
+    paramQuoteId: QuoteItemType["id"];
+  };

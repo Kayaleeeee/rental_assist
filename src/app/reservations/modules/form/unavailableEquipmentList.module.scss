@@ -1,0 +1,30 @@
+.title {
+  font-size: 14px;
+}
+
+.unavailableList {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  gap: 8px;
+}
+
+.itemTitleWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.unavailableItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+
+  &:hover {
+    font-weight: 800;
+  }
+}

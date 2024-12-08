@@ -1,6 +1,7 @@
 import { createQuote, updateQuote } from "@/app/api/quote";
 import { QuoteItemPostPayload } from "@/app/types/quoteType";
 import {
+  checkEquipmentAvailability,
   getEquipmentGroupTotalPrice,
   getEquipmentTotalPrice,
   getValidReservationForm,
@@ -13,6 +14,7 @@ import {
 import { createQuoteItemList, createQuoteSet } from "@/app/api/quoteItems";
 import { postReservation } from "@/app/api/reservation";
 import { isEmpty } from "lodash";
+import { EquipmentAvailableItem } from "@/app/types/reservationType";
 
 export const onCreateReservation = async ({
   form,
@@ -24,7 +26,14 @@ export const onCreateReservation = async ({
   dateRange: { startDate?: string; endDate?: string };
   equipmentItemList: EquipmentListItemState[];
   groupEquipmentList: SetEquipmentStateType[];
-}) => {
+}): Promise<
+  | {
+      isAvailable: false;
+      checkedList: EquipmentAvailableItem[];
+      reservationId: null;
+    }
+  | { reservationId: number }
+> => {
   try {
     // 유효한 예약 데이터 확인
     const validForm = await getValidReservationForm({
@@ -35,6 +44,20 @@ export const onCreateReservation = async ({
     });
 
     if (!validForm) throw new Error("form validation 실패");
+
+    const { isAvailable, checkedList } = await checkEquipmentAvailability({
+      dateRange: { startDate: validForm.startDate, endDate: validForm.endDate },
+      equipmentItemList,
+      groupEquipmentList,
+    });
+
+    if (!isAvailable) {
+      return {
+        reservationId: null,
+        isAvailable,
+        checkedList,
+      };
+    }
 
     // quote 생성
     const quoteResult = await createQuote(validForm);
