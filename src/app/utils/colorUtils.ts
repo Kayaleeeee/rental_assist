@@ -1,26 +1,41 @@
 const colorList = [
-  "#162d24",
-  "#19392c",
-  "#1d4534",
-  "#20513d",
-  "#225e45",
-  "#246c4e",
-  "#257a57",
-  "#268860",
-  "#279768",
-  "#27a671",
-  "#27b67b",
-  "#26c684",
-  "#24d68d",
-  "#2bdf95",
-  "#35e49c",
-  "#40e9a3",
-  "#4aedaa",
-  "#56f1b1",
-  "#61f5b8",
-  "#6df8bf",
+  "#8DBDD8", // Peaceful Blue
+  "#A7BFE2", // Angel Blue
+  "#6CCFF6", // Bright Blue
+  "#28A2CB", // Turquoise Blue
+  "#0084CA", // Happy Blue
+  "#0067A5", // Royal Blue
+  "#32488F", // Blueberry
+  "#D1E0E9", // Ice Blue
+  "#9AD9DB", // Robins Blue
+  "#5DC0CE", // Happy Sky
+  "#7ED3C4", // Aqua Blue
+  "#A1CB83", // Fresh Green
+  "#7FB77E", // Pistachio
+  "#A8C4A0", // Celery Green
+  "#CBD4C2", // Seafoam
+  "#F8D3E0", // Pastel Pink
+  "#FFB2C1", // Cotton Candy
+  "#EBAAC1", // Dusty Rose
+  "#FA8993", // Sweet Pink
+  "#F79B99", // Rose
+  "#FA6E79", // Hot Pink
+  "#FFD6DC", // Pale Peach
+  "#FFCCB6", // Peach
+  "#F6AD9C", // Light Coral
+  "#E86A6E", // Honey Suckle
+  "#FFB347", // Happy Orange
+  "#F47C3C", // Tangerine
+  "#E94E3C", // Tango
+  "#D45D43", // Burnt Orange
+  "#FFF275", // Buttercup
+  "#FFD86E", // Vanilla
+  "#FBC26E", // Honey
+  "#F8D64E", // Bright Yellow
+  "#A6A5A1", // Soft Gray
+  "#DCC1AC", // Sand
+  "#C8A27C", // Camel
 ];
-
 export const getRandomHexColor = (id: number): string => {
   return colorList[id % colorList.length];
 };

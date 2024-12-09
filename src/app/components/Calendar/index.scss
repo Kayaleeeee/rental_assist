@@ -9,6 +9,12 @@
   justify-content: space-between;
 }
 
+.rbc-show-more {
+  color: var(--primary);
+  font-weight: 500;
+  margin-top: 3px;
+}
+
 .arrowButton {
   outline: none;
   border: none;
@@ -60,25 +66,18 @@
   align-items: center;
   justify-content: center;
   font-size: 12px;
+  font-weight: 700;
 }
 
 .weekCalendarWrapper {
   .rbc-time-view {
     border-radius: 24px;
   }
-  .rbc-row {
-    height: 40px;
-  }
 
   .rbc-header {
-    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .rbc-allday-cell {
-    height: 0;
   }
 
   .rbc-time-slot {
@@ -99,12 +98,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 13px;
     font-family: var(--default-font);
   }
 
   .rbc-timeslot-group {
     height: 20px;
+    font-size: 14px;
   }
 
   .rbc-time-view {
@@ -114,5 +114,54 @@
 
   .rbc-today {
     background: #fff;
+  }
+
+  .rbc-events-container {
+    .rbc-event-label {
+      font-size: 13px;
+    }
+
+    .rbc-event-content {
+      font-size: 15px;
+      margin-top: 2px;
+    }
+  }
+}
+
+.rbc-agenda-view {
+  font-family: var(--default-font);
+
+  .rbc-header {
+    height: 40px;
+    font-size: 14px;
+  }
+
+  table.rbc-agenda-table {
+    border-collapse: collapse;
+
+    thead > tr {
+      width: 100%;
+      flex: 1;
+    }
+  }
+
+  table.rbc-agenda-table tbody > tr > td {
+    border: 1px solid var(--grey-1);
+  }
+
+  .rbc-agenda-date-cell {
+    background-color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .rbc-agenda-time-cell {
+    background-color: #fff;
+    font-size: 15px;
+  }
+
+  .rbc-agenda-event-cell {
+    background: #fff;
+    font-size: 15px;
   }
 }

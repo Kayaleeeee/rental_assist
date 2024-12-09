@@ -49,15 +49,18 @@ export const MonthCalendar = ({
     setCurrentDate(dayjs(currentDate).add(1, "month"));
   }, [currentDate, MAX_DATE]);
 
-  const eventStyleGetter = (
-    event: CalendarEventType
-  ): { className?: string | undefined; style?: React.CSSProperties } => {
-    return {
-      style: {
-        backgroundColor: event.color,
-      },
-    };
-  };
+  const eventStyleGetter = useCallback(
+    (
+      event: CalendarEventType
+    ): { className?: string | undefined; style?: React.CSSProperties } => {
+      return {
+        style: {
+          backgroundColor: event.color,
+        },
+      };
+    },
+    []
+  );
 
   return (
     <div
