@@ -1,7 +1,6 @@
 import { getUserList } from "@/app/api/users";
 import { UserType } from "@/app/types/userType";
 import { showToast } from "@/app/utils/toastUtils";
-import { isEmpty } from "lodash";
 import { useCallback, useState } from "react";
 
 export const useUserSearchList = () => {
@@ -13,7 +12,7 @@ export const useUserSearchList = () => {
     if (!keyword || !searchKey) return {};
 
     return {
-      [searchKey]: keyword,
+      [searchKey]: `ilike.%${keyword}%`,
     };
   }, [keyword, searchKey]);
 
@@ -21,12 +20,6 @@ export const useUserSearchList = () => {
     try {
       const result = await getUserList(getSearchParams());
       setList(result);
-
-      if (isEmpty(result))
-        showToast({
-          message: "해당하는 고객이 없습니다.",
-          type: "info",
-        });
     } catch {
       showToast({
         message: "유저 목록을 불러오는데 실패했습니다.",

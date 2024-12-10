@@ -43,6 +43,7 @@ const getColumns = (
       ),
     flex: 1,
   },
+  { field: "quantity", width: 70, renderHeader: () => HeaderName("수량") },
   { field: "detail", flex: 1, renderHeader: () => HeaderName("상세설명") },
 ];
 

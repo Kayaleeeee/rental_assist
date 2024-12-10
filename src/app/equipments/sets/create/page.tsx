@@ -188,7 +188,9 @@ const EquipmentCreatePage = () => {
       {isOpenSearchModal && (
         <EquipmentSearchModal
           onCloseModal={() => setIsOpenSearchModal(false)}
-          onConfirm={setEquipmentList}
+          onConfirm={(equipmentList) =>
+            setEquipmentList((prev) => [...prev, ...equipmentList])
+          }
           disabledIdList={equipmentList.map((item) => item.id)}
         />
       )}

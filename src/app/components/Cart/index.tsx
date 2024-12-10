@@ -13,10 +13,14 @@ import { isEmpty } from "lodash";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { SetEquipmentType } from "@/app/types/equipmentType";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
-import { ReservationItemTableEditor } from "@/app/reservations/modules/form/ReservationItemTableEditor";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
-import { initialAvailability } from "@/app/reservations/utils/reservationUtils";
-import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
+import {
+  checkEquipmentAvailability,
+  initialAvailability,
+} from "@/app/reservations/utils/reservationUtils";
+import { CartGroupTableEditor } from "./CartGroupTableEditor";
+import { CartItemTableEditor } from "./CartItemTableEditor";
+import { showToast } from "@/app/utils/toastUtils";
 
 export const getAvailableStatus = (
   isChecked: boolean,
@@ -29,7 +33,9 @@ export const getAvailableStatus = (
 
 export const Cart = () => {
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
-  const [searchingSetId] = useState<SetEquipmentType["id"] | null>(null);
+  const [searchingSetId, setSearchingSetId] = useState<
+    SetEquipmentType["id"] | null
+  >(null);
   const [availabilityState, setAvailabilityState] = useState<{
     checkedList: EquipmentAvailableItem[];
   }>(initialAvailability);
@@ -68,25 +74,56 @@ export const Cart = () => {
     }
   }, [isCartOpen]);
 
-  // check
-  const isOkToMakeReservation = false;
+  const handleCheckEquipmentAvailability = useCallback(async () => {
+    return await checkEquipmentAvailability({
+      dateRange: {
+        startDate: dateRange.startDate!,
+        endDate: dateRange.endDate!,
+      },
+      equipmentItemList,
+      groupEquipmentList: equipmentGroupList,
+    });
+  }, [dateRange, equipmentGroupList, equipmentItemList]);
 
-  const onClickButton = useCallback(() => {
-    if (!isOkToMakeReservation) {
-      //availability check
-      setAvailabilityState(initialAvailability);
-    } else {
-      handleAddEquipmentList(equipmentItemList);
-      handleCloseCart();
-      router.push("/reservations/create");
+  const onClickButton = useCallback(async () => {
+    if (!dateRange.endDate || !dateRange.startDate) {
+      showToast({
+        message: "예약 날짜를 지정해주세요.",
+        type: "error",
+      });
+      return;
+    }
+
+    setAvailabilityState(initialAvailability);
+
+    try {
+      const { isAvailable, checkedList } =
+        await handleCheckEquipmentAvailability();
+
+      if (!isAvailable && !isEmpty(checkedList)) {
+        showToast({
+          message: "예약 불가한 항목이 있습니다.",
+          type: "error",
+        });
+
+        setAvailabilityState({
+          checkedList,
+        });
+        return;
+      }
+      showToast({
+        message: "해당 날짜에 모든 장비 예약 가능합니다.",
+        type: "success",
+      });
+    } catch (e) {
+      console.log(e);
     }
   }, [
-    isOkToMakeReservation,
-    equipmentItemList,
-
     handleAddEquipmentList,
+    handleCheckEquipmentAvailability,
     router,
     rentalDays,
+    dateRange,
   ]);
 
   const disabledEquipmentIdList = useMemo(() => {
@@ -132,12 +169,11 @@ export const Cart = () => {
           </div>
 
           {!isEmpty(equipmentItemList) && (
-            <Margin bottom={20}>
+            <Margin bottom={40}>
               <Label title="단품 장비 리스트" />
               <div className={styles.equipmentListWrapper}>
-                <ReservationItemTableEditor
+                <CartItemTableEditor
                   rows={equipmentItemList}
-                  rounds={0}
                   onDeleteEquipment={handleDeleteEquipmentItem}
                   onChangeField={handleChangeEquipmentItem}
                   availabilityCheckedList={availabilityState.checkedList}
@@ -149,22 +185,19 @@ export const Cart = () => {
           {!isEmpty(equipmentGroupList) && (
             <Margin>
               <Label title="풀세트 리스트" />
-              <div>
+              <Margin bottom={30} />
+              <div className={styles.equipmentListWrapper}>
                 {equipmentGroupList.map((item) => {
                   return (
-                    <ReservationGroupTableEditor
+                    <CartGroupTableEditor
                       key={item.setId}
                       groupEquipment={item}
-                      rounds={0}
                       availabilityCheckedList={availabilityState.checkedList}
                       changeSetEquipment={handleChangeGroupEquipment}
-                      onClickAddEquipment={
-                        () => {}
-                        // handleOpenEquipmentModal({
-                        //   mode: "group",
-                        //   groupId: item.setId,
-                        // })
-                      }
+                      onClickAddEquipment={() => {
+                        setIsOpenSearchModal(true);
+                        setSearchingSetId(item.setId);
+                      }}
                       deleteSetEquipment={() =>
                         handleDeleteGroupEquipment(item.setId)
                       }
@@ -184,9 +217,7 @@ export const Cart = () => {
               width: "100%",
             }}
           >
-            {isOkToMakeReservation
-              ? "이 리스트로 예약만들기"
-              : "예약 가능 여부 확인하기"}
+            예약 가능 여부 조회하기
           </Button>
         </section>
       </div>

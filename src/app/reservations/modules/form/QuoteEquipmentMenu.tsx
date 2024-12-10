@@ -13,9 +13,19 @@ export const QUOTE_ITEM_MENU = [
   { key: "quantity", title: "수량 변경" },
 ];
 
+export const CART_ITEM_MENU = [
+  { key: "delete", title: "삭제하기" },
+  { key: "quantity", title: "수량 변경" },
+];
+
 export const GROUP_QUOTE_MENU = [
   { key: "delete", title: "삭제하기" },
   { key: "price", title: "가격 변경" },
+  { key: "item", title: "장비 추가하기" },
+];
+
+export const CART_GROUP_MENU = [
+  { key: "delete", title: "삭제하기" },
   { key: "item", title: "장비 추가하기" },
 ];
 

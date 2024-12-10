@@ -48,7 +48,10 @@ export default function EquipmentPage() {
     if (isEmpty(selectedEquipmentList)) return;
 
     handleAddEquipmentList(
-      selectedEquipmentList.map(convertEquipmentItemToState)
+      selectedEquipmentList.map((item) => ({
+        ...convertEquipmentItemToState(item),
+        quantity: 1,
+      }))
     );
 
     showToast({
