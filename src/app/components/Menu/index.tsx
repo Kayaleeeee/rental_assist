@@ -6,6 +6,7 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBulletedOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
+import SubdirectoryArrowRightOutlinedIcon from "@mui/icons-material/SubdirectoryArrowRightOutlined";
 import React, { useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { isEmpty } from "lodash";
@@ -31,6 +32,18 @@ const menuList = [
     path: "/equipments",
     title: "장비 리스트",
     renderIcon: () => <FormatListBulletedOutlinedIcon />,
+    children: [
+      {
+        path: "/equipments",
+        title: "단품 장비",
+        renderIcon: () => <SubdirectoryArrowRightOutlinedIcon />,
+      },
+      {
+        path: "/equipments/sets",
+        title: "풀세트",
+        renderIcon: () => <SubdirectoryArrowRightOutlinedIcon />,
+      },
+    ],
   },
   {
     path: "/users",
@@ -58,13 +71,22 @@ export const Menu = () => {
   }) => {
     const isSelected = !isSub && currentPath?.includes(path);
 
+    const className = () => {
+      if (isSub) return styles.subItem;
+      if (isSelected) return styles.selectedItem;
+      return styles.item;
+    };
+
     return (
       <div key={title}>
         <Link
-          className={isSelected ? styles.selectedItem : styles.item}
+          className={className()}
           href={path}
+          style={{
+            padding: !isEmpty(children) ? "16px 16px 8px 16px" : undefined,
+          }}
         >
-          <div className={styles.icon}>{renderIcon?.()}</div>
+          {renderIcon && <div className={styles.icon}>{renderIcon()}</div>}
           {title}
         </Link>
         {!isEmpty(children) &&
