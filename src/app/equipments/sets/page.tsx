@@ -1,0 +1,80 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { Button } from "@components/Button";
+
+import { Margin } from "@components/Margin";
+import { useCallback, useState } from "react";
+import { isEmpty } from "lodash";
+import styles from "./page.module.scss";
+import formStyles from "@components/Form/index.module.scss";
+import { SetEquipmentType } from "@/app/types/equipmentType";
+import { useEquipmentCart } from "../hooks/useEquipmentCart";
+import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
+import { showToast } from "@/app/utils/toastUtils";
+import { GroupEquipmentList } from "./modules/GroupEquipmentList";
+
+export default function SetEquipmentPage() {
+  const router = useRouter();
+  const [selectedEquipmentSetList, setSelectedEquipmentSetList] = useState<
+    SetEquipmentType[]
+  >([]);
+
+  const { handleAddEquipmentList, handleAddEquipmentGroup } =
+    useEquipmentCart();
+
+  const handleAddToCart = useCallback(async () => {
+    if (isEmpty(selectedEquipmentSetList)) return;
+
+    handleAddEquipmentGroup(
+      selectedEquipmentSetList.map(convertGroupEquipmentToState)
+    );
+
+    showToast({
+      message: "장바구니에 추가되었습니다.",
+      type: "info",
+    });
+
+    setSelectedEquipmentSetList([]);
+  }, [handleAddEquipmentList, selectedEquipmentSetList]);
+
+  return (
+    <div className={styles.relativeWrapper}>
+      <div className={styles.headerTitleButtonWrapper}>
+        <h3></h3>
+        <div className={formStyles.rightAlignButtonWrapper}>
+          <Button
+            style={{ width: "150px" }}
+            size="Medium"
+            onClick={() => router.push("/equipments/sets/create")}
+          >
+            풀세트 만들기
+          </Button>
+        </div>
+      </div>
+
+      <Margin top={40} />
+
+      <GroupEquipmentList
+        selectedEquipmentSetList={selectedEquipmentSetList}
+        setSelectedEquipmentSetList={setSelectedEquipmentSetList}
+      />
+
+      <Margin top={120} />
+
+      {!isEmpty(selectedEquipmentSetList) && (
+        <div className={styles.fixedFooter}>
+          <Button
+            size="Medium"
+            style={{
+              width: "250px",
+            }}
+            onClick={handleAddToCart}
+          >
+            장바구니 추가
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}

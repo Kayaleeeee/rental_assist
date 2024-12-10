@@ -4,7 +4,7 @@ import {
 } from "@/app/types/equipmentType";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import styles from "./setEquipmentAccordion.module.scss";
+import styles from "./groupEquipmentAccordion.module.scss";
 import { Margin } from "@/app/components/Margin";
 import { Button } from "@/app/components/Button";
 import Link from "next/link";
@@ -25,7 +25,7 @@ type Props = {
   hideDetailButton?: boolean;
 };
 
-export const SetEquipmentAccordion = ({
+export const GroupEquipmentAccordion = ({
   title,
   hideDetailButton = false,
   equipmentList = [],

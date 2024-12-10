@@ -1,14 +1,14 @@
 import { Margin } from "@/app/components/Margin";
 import { SearchBar } from "@/app/components/SearchBar";
-import styles from "./setEquipmentList.module.scss";
+import styles from "./groupEquipmentList.module.scss";
 import {
   SetEquipmentType,
   EquipmentListItemType,
 } from "@/app/types/equipmentType";
 
 import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
-import { useSetEquipmentList } from "../hooks/useSetEquipmentList";
-import { SetEquipmentAccordion } from "./SetEquipmentAccordion";
+import { useGroupEquipmentList } from "../hooks/useGroupEquipmentList";
+import { GroupEquipmentAccordion } from "./GroupEquipmentAccordion";
 import { isEqual } from "lodash";
 
 type Props = {
@@ -18,7 +18,7 @@ type Props = {
   disabledEquipmentIdList?: EquipmentListItemType["id"][];
 };
 
-export const SetEquipmentList = ({
+export const GroupEquipmentList = ({
   selectedEquipmentSetList,
   setSelectedEquipmentSetList,
   disabledSetIdList = [],
@@ -33,7 +33,7 @@ export const SetEquipmentList = ({
     selectedSearchKey,
     onSearch,
     fetchList,
-  } = useSetEquipmentList();
+  } = useGroupEquipmentList();
 
   const toggleEquipmentSet = useCallback((equipmentSet: SetEquipmentType) => {
     setSelectedEquipmentSetList((prev) => {
@@ -135,7 +135,7 @@ export const SetEquipmentList = ({
             isEqual(selectedEquipmentItemList, item.equipmentList);
 
           return (
-            <SetEquipmentAccordion
+            <GroupEquipmentAccordion
               key={item.id}
               disabledGroup={disabledSetIdList.includes(item.id)}
               disabledEquipmentIdList={disabledEquipmentIdList}

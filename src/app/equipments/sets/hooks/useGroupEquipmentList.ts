@@ -8,7 +8,7 @@ import { useCallback, useMemo, useState } from "react";
 
 const searchMenu = [{ key: "title", title: "장비명" }];
 
-export const useSetEquipmentList = () => {
+export const useGroupEquipmentList = () => {
   const [selectedSearchKey, setSelectedSearchKey] = useState<string>(
     searchMenu[0].key
   );

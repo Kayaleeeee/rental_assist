@@ -16,7 +16,7 @@ import { isEmpty } from "lodash";
 import { EquipmentListTable } from "./modules/EquipmentListTable";
 import styles from "./page.module.scss";
 import formStyles from "@components/Form/index.module.scss";
-import { SetEquipmentList } from "./sets/modules/SetEquipmentList";
+import { GroupEquipmentList } from "./sets/modules/GroupEquipmentList";
 import { showToast } from "../utils/toastUtils";
 import { useEquipmentCart } from "./hooks/useEquipmentCart";
 import { convertEquipmentItemToState } from "../types/mapper/convertEquipmentItemToState";
@@ -150,7 +150,7 @@ export default function EquipmentPage() {
       )}
 
       {isFullSetSelected && (
-        <SetEquipmentList
+        <GroupEquipmentList
           selectedEquipmentSetList={selectedEquipmentSetList}
           setSelectedEquipmentSetList={setSelectedEquipmentSetList}
         />

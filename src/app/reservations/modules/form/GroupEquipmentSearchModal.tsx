@@ -1,6 +1,6 @@
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
-import { SetEquipmentList } from "@/app/equipments/sets/modules/SetEquipmentList";
+import { GroupEquipmentList } from "@/app/equipments/sets/modules/GroupEquipmentList";
 import { SetEquipmentType } from "@/app/types/equipmentType";
 import { useState } from "react";
 
@@ -67,7 +67,7 @@ Props) => {
           overflow: "scroll",
         }}
       >
-        <SetEquipmentList
+        <GroupEquipmentList
           selectedEquipmentSetList={selectedGroupList}
           setSelectedEquipmentSetList={setSelectedGroupList}
         />
