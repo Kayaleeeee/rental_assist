@@ -59,3 +59,16 @@
   align-items: center;
   justify-content: center;
 }
+
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.logoutItem {
+  @extend .item;
+  margin-bottom: 4px;
+  gap: 8px;
+}

@@ -4,12 +4,15 @@ import styles from "./index.module.scss";
 import Link from "next/link";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBulletedOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { isEmpty } from "lodash";
 import { Margin } from "../Margin";
 import { CartMenu } from "./CartMenu";
+import { useAuthStore } from "@/app/store/useAuthStore";
+import { showToast } from "@/app/utils/toastUtils";
 
 type MenuItem = {
   path: string;
@@ -38,6 +41,11 @@ const menuList = [
 
 export const Menu = () => {
   const currentPath = usePathname();
+  const { user, getUser, logout } = useAuthStore();
+
+  useEffect(() => {
+    getUser();
+  }, []);
 
   const renderMenu = ({
     isSub,
@@ -68,6 +76,16 @@ export const Menu = () => {
     );
   };
 
+  const handleLogout = useCallback(() => {
+    try {
+      logout();
+      showToast({ message: "로그아웃 되었습니다.", type: "info" });
+      window.location.reload();
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
+
   return (
     <div className={styles.wrapper}>
       <Link href={"/"}>
@@ -75,11 +93,21 @@ export const Menu = () => {
       </Link>
 
       <div className={styles.line} />
-      <Margin top={10} />
-      {menuList.map((item) => {
-        return renderMenu(item);
-      })}
-      <CartMenu />
+      <div className={styles.listWrapper}>
+        <div>
+          <Margin top={10} />
+          {menuList.map((item) => {
+            return renderMenu(item);
+          })}
+          <CartMenu />
+        </div>
+        {user && (
+          <div className={styles.logoutItem} onClick={handleLogout}>
+            <LogoutOutlinedIcon />
+            로그아웃
+          </div>
+        )}
+      </div>
     </div>
   );
 };

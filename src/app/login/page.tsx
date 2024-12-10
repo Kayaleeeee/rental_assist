@@ -11,14 +11,17 @@ import { Margin } from "@components/Margin";
 import Link from "next/link";
 import styles from "./page.module.scss";
 import { showToast } from "../utils/toastUtils";
+import { useAuthStore } from "../store/useAuthStore";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const { fetchUser } = useAuthStore();
 
   const handleLogin = async () => {
     try {
       await login({ email, password });
+      fetchUser();
       showToast({ message: "로그인 성공", type: "success" });
     } catch {
       showToast({ message: "로그인에 실패했습니다", type: "error" });

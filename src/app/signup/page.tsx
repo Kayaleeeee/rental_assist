@@ -25,7 +25,7 @@ const SignUpPage = () => {
   }, [confirmPassword, password]);
 
   const handleSignUp = async () => {
-    if (isPasswordMatch) {
+    if (!isPasswordMatch) {
       setErrorMessage("비밀번호가 일치하지 않습니다.");
       return;
     }

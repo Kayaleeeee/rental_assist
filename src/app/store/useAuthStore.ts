@@ -8,6 +8,7 @@ interface AuthState {
   loading: boolean;
   fetchUser: () => Promise<void>;
   getUser: () => Promise<AdminUserType | undefined>;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -53,5 +54,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+  logout: async () => {
+    const supabase = createClient();
+
+    await supabase.auth.signOut();
+    set({ user: undefined });
   },
 }));
