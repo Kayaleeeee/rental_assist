@@ -48,12 +48,16 @@ body {
 
 .mainWrapper {
   width: 100%;
+  max-height: 100vh;
   display: inline-flex;
 }
 
 .childrenWrapper {
   padding: 24px;
   flex: 1;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: scroll;
 }
 
 body {
