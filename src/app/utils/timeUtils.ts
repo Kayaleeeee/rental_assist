@@ -12,6 +12,10 @@ export const formatDateTime = (dateTime: string) => {
   return dayjs(dateTime).locale("ko").format("YYYY-MM-DD HH:mm");
 };
 
+export const formatDateTimeWithLocale = (dateTime: string) => {
+  return dayjs(dateTime).locale("ko").format("YYYY-MM-DD LT");
+};
+
 export const isDateRangeOverlap = (
   { startDate, endDate }: { startDate: string; endDate: string },
   { newStartDate, newEndDate }: { newStartDate: string; newEndDate: string }

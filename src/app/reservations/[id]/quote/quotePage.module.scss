@@ -1,0 +1,103 @@
+.contractTitle {
+  text-align: center;
+  font-size: 1.5em;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+.contractTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.contractTable th,
+.contractTable td {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 8px;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+.contractHeader {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.highlight {
+  background-color: #fff9c4;
+}
+
+.checkboxCell {
+  width: 20px;
+  text-align: center;
+}
+
+.marginTop {
+  margin-top: 20px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  margin-top: 40px;
+}
+
+.greenBackground {
+  background-color: #d9f5d6;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.redBackground {
+  background-color: #f9d6d6;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.moneyCell {
+  text-align: right;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.agreementSection {
+  margin-top: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.agreementHeader {
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-decoration: underline;
+}
+
+.ulWrapper {
+  padding: 0 16px;
+}
+
+.equipmentTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 20px;
+}
+
+.equipmentTable th,
+.equipmentTable td {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 8px;
+  vertical-align: middle;
+}
+
+.equipmentTable th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.nestedItem {
+  background-color: #f9f9f9; /* 세트 장비 내 단품 장비를 구분 */
+}

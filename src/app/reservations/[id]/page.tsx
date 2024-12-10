@@ -142,7 +142,18 @@ const ReservationDetailPage = () => {
             <div className={styles.headerButtonWrapper}>
               <Button
                 size="Small"
-                style={{ width: "150px" }}
+                variant="outlined"
+                style={{ width: "100px" }}
+                onClick={() =>
+                  router.push(`/reservations/${reservationId}/quote`)
+                }
+              >
+                견적서 확인
+              </Button>
+              <Margin right={4} />
+              <Button
+                size="Small"
+                style={{ width: "120px" }}
                 onClick={() =>
                   router.push(`/reservations/${reservationId}/edit`)
                 }
