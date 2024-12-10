@@ -45,14 +45,10 @@ type CartState = {
 
   isCartOpen: boolean;
   setIsCartOpen: (isOpen: boolean) => void;
-
-  isChecked: boolean;
-  setIsChecked: (isChecked: boolean) => void;
 };
 
 const initialState = {
   isCartOpen: false,
-  isChecked: false,
   equipmentItemList: [],
   equipmentGroupList: [],
   dateRange: { startDate: undefined, endDate: undefined },
@@ -77,8 +73,6 @@ export const useCartStore = create<CartState>((set, get) => ({
         (equipment) => equipment.equipmentId !== equipmentId
       ),
     }),
-
-  setIsChecked: (isChecked) => set({ isChecked }),
 
   setEquipmentGroupList: (list) => set({ equipmentGroupList: list }),
   addEquipmentGroup: (setEquipment) =>

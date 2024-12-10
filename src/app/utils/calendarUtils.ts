@@ -4,8 +4,8 @@ import { CalendarEventType } from "../components/Calendar/MonthCalendar";
 // 하루 단위로 이벤트를 분리
 export const splitEventByDay = (event: CalendarEventType) => {
   const results: CalendarEventType[] = [];
-  let start = dayjs(event.start);
-  let end = dayjs(event.end);
+  const start = dayjs(event.start);
+  const end = dayjs(event.end);
 
   // 하루 단위로 이벤트 분리
   let currentDate = start.startOf("day");
