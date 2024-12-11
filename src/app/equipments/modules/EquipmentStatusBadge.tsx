@@ -11,8 +11,7 @@ export const EquipmentStatusBadge = ({ isDisabled, width }: Props) => {
     <div
       style={{
         padding: "4px 8px",
-        borderRadius: "4px",
-        color: "white",
+        borderRadius: "6px",
         fontSize: "12px",
         fontWeight: 800,
         width,
@@ -20,7 +19,8 @@ export const EquipmentStatusBadge = ({ isDisabled, width }: Props) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: color,
+        border: `1px solid ${color}`,
+        color,
         fontFamily: "var(--default-font)",
         textAlign: "center",
       }}

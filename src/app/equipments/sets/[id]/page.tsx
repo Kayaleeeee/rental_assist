@@ -25,6 +25,7 @@ import { GroupEquipmentListTable } from "../modules/GroupEquipmentListTable";
 import { PriceListTable } from "../../modules/PriceSettingModal/PriceSettingModal";
 import { EquipmentGroupPriceItem } from "@/app/types/equipmentPriceType";
 import { useGroupEquipmentPriceList } from "../../[id]/hooks/useGroupEquipmentPriceList";
+import { EquipmentStatusBadge } from "../../modules/EquipmentStatusBadge";
 
 const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
   const eventList: CalendarEventType[] = [];
@@ -135,6 +136,11 @@ const SetEquipmentDetailPage = () => {
       <FormWrapper width="100%" maxWidth="100%">
         <div className={styles.flexibleInline}>
           <div className={styles.detailWrapper}>
+            <EquipmentStatusBadge
+              isDisabled={setEquipmentDetail.disabled || false}
+              width="80px"
+            />
+            <Margin top={20} />
             <div className={styles.sectionWrapper}>
               <Label title="장비명" />
               <EditableField

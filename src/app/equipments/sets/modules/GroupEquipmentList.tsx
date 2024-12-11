@@ -96,6 +96,22 @@ export const GroupEquipmentList = ({
     []
   );
 
+  const getDisabledGroupEquipmentItemList = useCallback(
+    (item: SetEquipmentType) => {
+      const list = [...disabledEquipmentIdList];
+
+      if (!item.disabled) return list;
+
+      item.equipmentList.forEach((equipment) => {
+        if (list.includes(equipment.id)) return;
+        list.push(equipment.id);
+      });
+
+      return list;
+    },
+    [disabledEquipmentIdList]
+  );
+
   useEffect(() => {
     fetchList();
   }, []);
@@ -137,8 +153,11 @@ export const GroupEquipmentList = ({
           return (
             <GroupEquipmentAccordion
               key={item.id}
-              disabledGroup={disabledSetIdList.includes(item.id)}
-              disabledEquipmentIdList={disabledEquipmentIdList}
+              isDisabled={item.disabled}
+              disabledGroup={
+                disabledSetIdList.includes(item.id) || item.disabled
+              }
+              disabledEquipmentIdList={getDisabledGroupEquipmentItemList(item)}
               setId={item.id}
               title={item.title}
               price={item.price}

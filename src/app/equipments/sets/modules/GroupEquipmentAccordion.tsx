@@ -10,6 +10,7 @@ import { Button } from "@/app/components/Button";
 import Link from "next/link";
 import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
 import { GroupEquipmentListTable } from "./GroupEquipmentListTable";
+import { EquipmentStatusBadge } from "../../modules/EquipmentStatusBadge";
 
 type Props = {
   title: string;
@@ -23,6 +24,7 @@ type Props = {
   toggleSelectAll: () => void;
   toggleEquipmentItem: (item: EquipmentListItemType) => void;
   hideDetailButton?: boolean;
+  isDisabled?: boolean;
 };
 
 export const GroupEquipmentAccordion = ({
@@ -36,6 +38,7 @@ export const GroupEquipmentAccordion = ({
   setId,
   disabledGroup = false,
   disabledEquipmentIdList = [],
+  isDisabled = false,
 }: Props) => {
   return (
     <Accordion>
@@ -51,7 +54,16 @@ export const GroupEquipmentAccordion = ({
             disabled={disabledGroup}
             checked={isAllSelected}
           />
-          <div>{title}</div>
+          <div
+            style={{
+              flex: 1,
+            }}
+          >
+            {title}
+          </div>
+          <Margin left={8} right={10}>
+            <EquipmentStatusBadge isDisabled={isDisabled} />
+          </Margin>
         </div>
       </AccordionSummary>
       <AccordionDetails>

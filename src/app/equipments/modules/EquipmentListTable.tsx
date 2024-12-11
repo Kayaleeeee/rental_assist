@@ -122,8 +122,8 @@ export const EquipmentListTable = ({
             ) as EquipmentListItemType[];
 
             // 현재 페이지에서 선택된 항목
-            const currentPageSelected = valueList.filter((item) =>
-              selected.includes(item.id)
+            const currentPageSelected = valueList.filter(
+              (item) => selected.includes(item.id) && !item.disabled
             );
 
             // 이전 상태와 병합
