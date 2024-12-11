@@ -12,6 +12,7 @@ import Link from "next/link";
 import styles from "./page.module.scss";
 import { showToast } from "../utils/toastUtils";
 import { useAuthStore } from "../store/useAuthStore";
+import { isEmpty } from "lodash";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
@@ -19,6 +20,14 @@ const LoginPage = () => {
   const { fetchUser } = useAuthStore();
 
   const handleLogin = async () => {
+    if (isEmpty(email) || isEmpty(password)) {
+      showToast({
+        message: "이메일과 비밀번호를 입력해주세요",
+        type: "error",
+      });
+      return;
+    }
+
     try {
       await login({ email, password });
       fetchUser();
