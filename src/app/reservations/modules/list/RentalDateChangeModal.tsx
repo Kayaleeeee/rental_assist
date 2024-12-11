@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { updateQuote } from "@/app/api/quote";
 import { ReservationDetailResponse } from "@/app/types/reservationType";
 import { showToast } from "@/app/utils/toastUtils";
+import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
 
 type Props = {
   dateRange: { startDate: string; endDate: string };
@@ -22,12 +23,21 @@ export const RentalDateChangeModal = ({
   onChangeDate,
   quoteId,
 }: Props) => {
+  const [endAtCurrentTime, setEndAtCurrentTime] = useState<boolean>(false);
+
   const [changedDateRange, setChangedDateRange] = useState<{
     startDate: string;
     endDate: string;
   }>(dateRange);
 
   const onConfirmChange = useCallback(async () => {
+    if (dayjs(changedDateRange.endDate).isBefore(changedDateRange.startDate)) {
+      showToast({
+        message: "반납일자는 대여시작 이후여야 합니다.",
+        type: "error",
+      });
+      return;
+    }
     if (!confirm("대여 일자를 변경하시겠어요?")) return;
 
     try {
@@ -43,6 +53,24 @@ export const RentalDateChangeModal = ({
     }
     onChangeDate(changedDateRange);
   }, [changedDateRange]);
+
+  const handleCheckEndAtCurrentTime = useCallback(() => {
+    const now = dayjs().toISOString();
+
+    if (endAtCurrentTime) {
+      setChangedDateRange((prev) => ({
+        ...prev,
+        endDate: dateRange.endDate,
+      }));
+      setEndAtCurrentTime(false);
+    } else {
+      setChangedDateRange((prev) => ({
+        ...prev,
+        endDate: now,
+      }));
+      setEndAtCurrentTime(true);
+    }
+  }, [endAtCurrentTime, dateRange]);
 
   return (
     <Modal
@@ -62,30 +90,49 @@ export const RentalDateChangeModal = ({
         },
       ]}
     >
-      <h4>대여 일자 변경</h4>
-      <Margin top={24} />
-      <Label title="대여 시작일" />
-      <DateTimeSelector
-        value={dateRange.startDate}
-        onChange={(value) => {
-          if (!value) return;
-          setChangedDateRange((prev) => ({ ...prev, startDate: value }));
+      <div
+        style={{
+          width: "350px",
         }}
-      />
-      <Margin bottom={10} />
+      >
+        <h4>대여 일자 변경</h4>
+        <Margin top={24} />
+        <Label title="대여 시작일" />
+        <DateTimeSelector
+          value={changedDateRange.startDate}
+          onChange={(value) => {
+            if (!value) return;
+            setChangedDateRange((prev) => ({ ...prev, startDate: value }));
+          }}
+        />
+        <Margin bottom={20} />
 
-      <Label title="반납일" />
-      <DateTimeSelector
-        disabled={!dateRange.startDate}
-        minDateTime={dayjs(dateRange.startDate)}
-        value={dateRange.endDate}
-        onChange={(value) => {
-          if (!value) return;
+        <Label title="반납일" />
+        <DateTimeSelector
+          disabled={!changedDateRange.startDate || endAtCurrentTime}
+          minDateTime={dayjs(changedDateRange.startDate)}
+          value={changedDateRange.endDate}
+          onChange={(value) => {
+            if (!value) return;
 
-          setChangedDateRange((prev) => ({ ...prev, endDate: value }));
-        }}
-      />
-      <Margin bottom={30} />
+            setChangedDateRange((prev) => ({ ...prev, endDate: value }));
+          }}
+        />
+        <Margin bottom={10} />
+
+        <div
+          style={{
+            flex: "inline-flex",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+          onClick={handleCheckEndAtCurrentTime}
+        >
+          <CustomCheckbox checked={endAtCurrentTime} />
+          현재 시간으로 반납 설정
+        </div>
+        <Margin bottom={30} />
+      </div>
     </Modal>
   );
 };

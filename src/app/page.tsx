@@ -53,46 +53,7 @@ export default function Home() {
     fetchReservationList(params);
   }, [dateRange]);
 
-  const eventList = useMemo(() => {
-    return convertedEventList(list)
-      .concat({
-        id: 123,
-        title: "test",
-        start: dayjs().hour(10).minute(0).second(0).toDate(), // 오늘 오전 10시
-        end: dayjs().hour(13).minute(0).second(0).toDate(),
-        color: getRandomHexColor(5),
-      })
-      .concat([
-        {
-          id: 1234,
-          title: "test2",
-          start: dayjs().hour(10).minute(0).second(0).toDate(), // 오늘 오전 10시
-          end: dayjs().hour(13).minute(0).second(0).toDate(),
-          color: getRandomHexColor(4),
-        },
-        {
-          id: 1236,
-          title: "test2",
-          start: dayjs().hour(10).minute(0).second(0).toDate(), // 오늘 오전 10시
-          end: dayjs().hour(16).minute(0).second(0).toDate(),
-          color: getRandomHexColor(5),
-        },
-        {
-          id: 1238,
-          title: "test2",
-          start: dayjs().hour(10).minute(0).second(0).toDate(), // 오늘 오전 10시
-          end: dayjs().hour(13).minute(0).second(0).toDate(),
-          color: getRandomHexColor(6),
-        },
-        {
-          id: 1237,
-          title: "test2",
-          start: dayjs().hour(10).minute(0).second(0).toDate(), // 오늘 오전 10시
-          end: dayjs().hour(16).minute(0).second(0).toDate(),
-          color: getRandomHexColor(7),
-        },
-      ]);
-  }, [list]);
+  const eventList = useMemo(() => convertedEventList(list), [list]);
 
   useOnMount(() => {
     setDateRangeByMode("month");

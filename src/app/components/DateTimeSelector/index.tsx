@@ -1,6 +1,10 @@
 "use client";
 
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import {
+  DateOrTimeView,
+  DateTimePicker,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -11,6 +15,8 @@ type Props = {
   disabled?: boolean;
   minDateTime?: Dayjs;
   maxDateTime?: Dayjs;
+  size?: "small" | "medium";
+  views?: DateOrTimeView[];
 };
 
 export const DateTimeSelector = ({
@@ -20,6 +26,8 @@ export const DateTimeSelector = ({
   disabled = false,
   maxDateTime,
   minDateTime,
+  size = "medium",
+  views,
 }: Props) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -29,6 +37,7 @@ export const DateTimeSelector = ({
         disabled={disabled}
         minDateTime={minDateTime}
         maxDateTime={maxDateTime}
+        views={views}
         onChange={(value) => {
           const dateTime = value?.toISOString() || null;
 
@@ -36,6 +45,11 @@ export const DateTimeSelector = ({
         }}
         sx={{
           width: "100%",
+        }}
+        slotProps={{
+          textField: {
+            size,
+          },
         }}
       />
     </LocalizationProvider>

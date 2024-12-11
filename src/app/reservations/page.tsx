@@ -7,19 +7,22 @@ import { HeaderName } from "../components/DataTable/HeaderName";
 import { PaymentStatusText } from "./modules/PaymentStatusText";
 import { ReservationStatusText } from "./modules/ReservationStatusText";
 import { Margin } from "../components/Margin";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatLocaleString } from "../utils/priceUtils";
-
 import { CategoryList } from "../components/Category/CategoryList";
 import { formatDateTime } from "../utils/timeUtils";
 import { useRouter } from "next/navigation";
 import { SearchBar } from "../components/SearchBar";
 import { GridTable } from "../components/Table/GridTable";
-
+import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
 import formStyle from "@components/Form/index.module.scss";
 import { Button } from "../components/Button";
+import { DateTimeSelector } from "../components/DateTimeSelector";
+import styles from "./reservationPage.module.scss";
+import dayjs from "dayjs";
+import { isEmpty } from "lodash";
 
-const getColumns = (): GridColDef<ReservationType>[] => [
+const columns: GridColDef<ReservationType>[] = [
   {
     field: "id",
     width: 80,
@@ -64,6 +67,7 @@ const getColumns = (): GridColDef<ReservationType>[] => [
 
 export default function ReservationListPage() {
   const router = useRouter();
+  const [showFilters, setShowFilters] = useState<boolean>(false);
   const {
     list,
     categoryList,
@@ -76,22 +80,31 @@ export default function ReservationListPage() {
     keyword,
     selectedSearchKey,
     searchMenu,
+    dateRange,
+    setDateRange,
   } = useReservationList();
+
+  const onSearch = useCallback(() => {
+    const params = getSearchParams();
+    fetchReservationList(params);
+  }, [getSearchParams]);
 
   useEffect(() => {
     const params = getSearchParams();
     fetchReservationList(params);
   }, []);
 
-  const onSearch = () => {
-    const params = getSearchParams();
-    fetchReservationList(params);
-  };
-
-  const columns = getColumns();
+  const hasFiltered = useMemo(() => {
+    return !isEmpty(keyword) || (dateRange.startDate && dateRange.endDate);
+  }, [dateRange, keyword]);
 
   return (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <div className={formStyle.rightAlignButtonWrapper}>
         <Button
           style={{ width: "200px" }}
@@ -102,27 +115,89 @@ export default function ReservationListPage() {
         </Button>
       </div>
       <Margin top={45} />
-      <CategoryList
-        categoryList={categoryList}
-        selectedCategory={selectedCategory}
-        onChangeCategory={onChangeCategory}
-      />
-      <Margin
-        top={24}
-        bottom={24}
+      <div
         style={{
-          maxWidth: "800px",
+          display: "inline-flex",
+          alignItems: "centers",
         }}
       >
-        <SearchBar
-          menuList={searchMenu}
-          keyword={keyword}
-          selectedKey={selectedSearchKey}
-          onChangeKeyword={onChangeKeyword}
-          onChangeSearchKey={onChangeSearchKey}
-          onSearch={onSearch}
+        <CategoryList
+          categoryList={categoryList}
+          selectedCategory={selectedCategory}
+          onChangeCategory={onChangeCategory}
         />
-      </Margin>
+        <div
+          className={styles.filterIconWrapper}
+          onClick={() => setShowFilters((prev) => !prev)}
+        >
+          <TuneOutlinedIcon
+            sx={{
+              color: hasFiltered ? undefined : "var(--grey)",
+            }}
+          />
+        </div>
+      </div>
+      <Margin top={20} />
+
+      {showFilters && (
+        <div className={styles.filterWrapper}>
+          <div className={styles.dateRangeSearchWrapper}>
+            <DateTimeSelector
+              label="대여 시작일"
+              value={dateRange.startDate}
+              size="small"
+              views={["year", "month", "day"]}
+              onChange={(value) => {
+                if (!value) return;
+                setDateRange((prev) => ({ ...prev, startDate: value }));
+              }}
+            />
+            <div className={styles.separator}>~</div>
+            <DateTimeSelector
+              label="반납일"
+              disabled={!dateRange.startDate}
+              value={dateRange.endDate}
+              minDateTime={dayjs(dateRange.startDate)}
+              size="small"
+              views={["year", "month", "day"]}
+              onChange={(value) => {
+                if (!value) return;
+                setDateRange((prev) => ({ ...prev, endDate: value }));
+              }}
+            />
+          </div>
+          <Margin
+            top={20}
+            bottom={16}
+            style={{
+              maxWidth: "600px",
+            }}
+          >
+            <SearchBar
+              menuList={searchMenu}
+              keyword={keyword}
+              selectedKey={selectedSearchKey}
+              onChangeKeyword={onChangeKeyword}
+              onChangeSearchKey={onChangeSearchKey}
+              onSearch={onSearch}
+              hideButton
+            />
+          </Margin>
+
+          <Button
+            variant="outlined"
+            size="Small"
+            style={{
+              width: "150px",
+              placeSelf: "flex-end",
+            }}
+            onClick={onSearch}
+          >
+            검색
+          </Button>
+        </div>
+      )}
+
       <GridTable<ReservationType>
         columns={columns}
         rows={list}

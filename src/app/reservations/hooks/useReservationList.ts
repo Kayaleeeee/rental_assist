@@ -63,37 +63,40 @@ export const useReservationList = () => {
     endDate: undefined,
   });
 
-  const getSearchParams = (params = {}): ReservationSearchParams => {
-    const defaultParams = {
-      ...pageModel,
-      order: "id.desc",
-    };
+  const getSearchParams = useCallback(
+    (params = {}): ReservationSearchParams => {
+      const defaultParams = {
+        ...pageModel,
+        order: "id.desc",
+      };
 
-    const dateParams =
-      dateRange.startDate && dateRange.endDate
-        ? {
-            startDate: `lte.${dateRange.endDate}`,
-            endDate: `gte.${dateRange.startDate}`,
-          }
-        : {};
-    const categoryParams =
-      selectedCategory === categoryList[0].key
-        ? {}
-        : { status: selectedCategory };
+      const dateParams =
+        dateRange.startDate && dateRange.endDate
+          ? {
+              startDate: `lte.${dateRange.endDate}`,
+              endDate: `gte.${dateRange.startDate}`,
+            }
+          : {};
+      const categoryParams =
+        selectedCategory === categoryList[0].key
+          ? {}
+          : { status: selectedCategory };
 
-    const keywordParams =
-      keyword && selectedSearchKey
-        ? { [selectedSearchKey]: `ilike.%${keyword}%` }
-        : {};
+      const keywordParams =
+        keyword && selectedSearchKey
+          ? { [selectedSearchKey]: `ilike.%${keyword}%` }
+          : {};
 
-    return {
-      ...defaultParams,
-      ...categoryParams,
-      ...keywordParams,
-      ...dateParams,
-      ...params,
-    };
-  };
+      return {
+        ...defaultParams,
+        ...categoryParams,
+        ...keywordParams,
+        ...dateParams,
+        ...params,
+      };
+    },
+    [dateRange, selectedCategory, pageModel, keyword, selectedSearchKey]
+  );
 
   const fetchReservationList = useCallback(
     async (params?: ReservationSearchParams) => {

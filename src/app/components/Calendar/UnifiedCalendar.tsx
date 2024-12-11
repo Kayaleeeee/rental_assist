@@ -17,7 +17,7 @@ export interface CalendarEventType extends Event {
 }
 
 export type CalendarProps = {
-  size?: number;
+  size?: number | string;
   view: View;
   setView: (view: View) => void;
 
@@ -45,7 +45,6 @@ export const UnifiedCalendar = ({
   view,
   setView,
 }: CalendarProps) => {
-  //   const [view, setView] = useState<View>(defaultView); // 현재 뷰 상태
   const [displayEvents, setDisplayEvents] = useState<CalendarEventType[]>([]);
 
   const today = useMemo(() => dayjs(), []);
@@ -147,10 +146,15 @@ export const UnifiedCalendar = ({
       <div
         className={className}
         style={{
-          width: `${size}px`,
+          width: size,
         }}
       >
-        <div className="header">
+        <div
+          className="header"
+          style={{
+            width: size,
+          }}
+        >
           <button className="arrowButton" onClick={goToPrev}>
             <ArrowBackOutlinedIcon />
           </button>
@@ -171,8 +175,8 @@ export const UnifiedCalendar = ({
           eventPropGetter={eventStyleGetter}
           onDrillDown={handleDrillDown}
           style={{
-            width: `${size}px`,
-            height: view === "month" ? `${size * 0.8}px` : undefined,
+            width: size,
+            aspectRatio: view === "month" ? 1.5 : undefined,
           }}
         />
       </div>

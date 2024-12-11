@@ -85,3 +85,27 @@
   gap: 8px;
   cursor: pointer;
 }
+
+.dateRangeSearchWrapper {
+  display: inline-flex;
+  flex: 1;
+  max-width: 600px;
+}
+
+.filterIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.filterWrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border: 1px solid var(--grey-1);
+  border-radius: 16px;
+  margin-top: 10px;
+  max-width: 600px;
+}
