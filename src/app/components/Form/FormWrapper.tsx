@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { HTMLAttributes, PropsWithChildren } from "react";
 import styles from "./index.module.scss";
 import { FormLoader } from "./FormLoader";
 
@@ -7,7 +7,7 @@ type Props = PropsWithChildren<{
   width?: string;
   maxWidth?: string;
   isLoading?: boolean;
-}>;
+}> & { divProps?: HTMLAttributes<HTMLDivElement> };
 
 export const FormWrapper = ({ isLoading = false, ...props }: Props) => {
   return (
@@ -16,7 +16,9 @@ export const FormWrapper = ({ isLoading = false, ...props }: Props) => {
       style={{
         width: props.width,
         maxWidth: props.maxWidth,
+        ...props.divProps?.style,
       }}
+      {...props.divProps}
     >
       {props.title && <h1 className={styles.title}>{props.title}</h1>}
       {isLoading ? <FormLoader /> : <div>{props.children}</div>}

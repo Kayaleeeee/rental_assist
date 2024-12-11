@@ -32,8 +32,8 @@ export const Button = (props: Props) => {
   }, [props.size]);
 
   const loaderMode = useMemo(() => {
-    if (props.variant === "filled") return "dark";
-    return "light";
+    if (props.variant === "filled") return "light";
+    return "dark";
   }, [props.variant]);
 
   return (

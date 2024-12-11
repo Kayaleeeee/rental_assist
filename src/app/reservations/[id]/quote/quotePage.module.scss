@@ -1,3 +1,12 @@
+.pdfDownloadButtonWrapper {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  max-width: 1024px;
+  margin-bottom: 40px;
+}
+
 .contractTitle {
   text-align: center;
   font-size: 1.5em;
