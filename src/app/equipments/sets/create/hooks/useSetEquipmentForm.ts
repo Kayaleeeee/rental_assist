@@ -9,7 +9,7 @@ import {
   SetEquipmentType,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
-import { isEmpty, isNil } from "lodash";
+import { isEmpty } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
