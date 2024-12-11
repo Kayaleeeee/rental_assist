@@ -22,6 +22,8 @@ import { EquipmentPriceItem } from "@/app/types/equipmentPriceType";
 import { updatePriceList } from "../../actions/updatePriceList";
 import { showToast } from "@/app/utils/toastUtils";
 import { ListButton } from "@/app/components/Button/ListButton";
+import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
+import { EQUIPMENT_AVAILABILITY_MENU_LIST } from "../../utils/equipmentUtils";
 
 const EditEquipmentPage = () => {
   const { id } = useParams();
@@ -45,6 +47,8 @@ const EditEquipmentPage = () => {
     setMemo,
     quantity,
     setQuantity,
+    disabled,
+    setDisabled,
   } = useEquipmentForm();
   const { fetchPriceList } = useEquipmentPriceList();
 
@@ -66,6 +70,7 @@ const EditEquipmentPage = () => {
     setTitle(equipmentDetail.title);
     setDetail(equipmentDetail.detail);
     setQuantity(equipmentDetail.quantity);
+    setDisabled(equipmentDetail.disabled || false);
     onChangeCategory(equipmentDetail.category);
   }, [equipmentDetail]);
 
@@ -100,6 +105,28 @@ const EditEquipmentPage = () => {
       />
       <Margin top={20} />
       <FormWrapper title="장비 수정" isLoading={isLoading}>
+        <div className={formStyles.sectionWrapper}>
+          <Label title="장비 사용가능 여부" />
+          <div className={styles.availabilityMenuWrapper}>
+            {EQUIPMENT_AVAILABILITY_MENU_LIST.map((item) => {
+              return (
+                <div
+                  className={styles.availabilityMenu}
+                  key={item.key}
+                  onClick={() => setDisabled(item.key === "unavailable")}
+                >
+                  <CustomCheckbox
+                    checked={
+                      (disabled && item.key === "unavailable") ||
+                      (!disabled && item.key === "available")
+                    }
+                  />
+                  {item.title}
+                </div>
+              );
+            })}
+          </div>
+        </div>
         <div className={formStyles.sectionWrapper}>
           <Label title="카테고리" />
           <Select<string>

@@ -24,6 +24,7 @@ export const useEquipmentForm = () => {
   const [detail, setDetail] = useState<string>("");
   const [memo, setMemo] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const onChangeCategory = (key: string) => {
     const selectedCategoryIndex = categoryMenu.findIndex(
@@ -102,6 +103,7 @@ export const useEquipmentForm = () => {
         detail,
         memo,
         quantity,
+        disabled,
       };
 
       try {
@@ -119,7 +121,17 @@ export const useEquipmentForm = () => {
         });
       }
     },
-    [category, quantity, title, price, detail, router, memo, getIsValidForm]
+    [
+      category,
+      quantity,
+      title,
+      price,
+      detail,
+      router,
+      memo,
+      disabled,
+      getIsValidForm,
+    ]
   );
 
   return {
@@ -138,5 +150,7 @@ export const useEquipmentForm = () => {
     setMemo,
     setQuantity,
     quantity,
+    disabled,
+    setDisabled,
   };
 };

@@ -118,6 +118,7 @@ export type SetEquipmentType = {
   totalPrice: number;
   equipmentList: EquipmentListItemType[];
   memo?: string;
+  disabled?: boolean;
 };
 
 export type SetEquipmentListItemType = {
@@ -132,6 +133,7 @@ export type SetEquipmentPayload = {
   detail: string;
   price?: number;
   memo?: string;
+  disabled?: boolean;
 };
 
 export type SetEquipmentItemType = {

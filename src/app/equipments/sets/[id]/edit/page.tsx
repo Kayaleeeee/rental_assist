@@ -3,7 +3,7 @@
 import { FormWrapper } from "@/app/components/Form/FormWrapper";
 import { TextField } from "@mui/material";
 import { Label } from "@/app/components/Form/Label";
-import styles from "../setDetailPage.module.scss";
+import styles from "./setEditPage.module.scss";
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@/app/components/Button";
 import { EditableField } from "@/app/components/EditableField";
@@ -27,6 +27,8 @@ import { useGroupEquipmentPriceList } from "@/app/equipments/[id]/hooks/useGroup
 import { updateGroupPriceList } from "@/app/equipments/actions/updateGroupPriceList";
 import { showToast } from "@/app/utils/toastUtils";
 import { getGroupEquipmentListColumns } from "../../modules/getGroupEquipmentListColumns";
+import { EQUIPMENT_AVAILABILITY_MENU_LIST } from "@/app/equipments/utils/equipmentUtils";
+import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
 
 const EquipmentEditPage = () => {
   const { id } = useParams();
@@ -53,6 +55,8 @@ const EquipmentEditPage = () => {
     onEditSetEquipment,
     equipmentList,
     setEquipmentList,
+    disabled,
+    setDisabled,
   } = useSetEquipmentForm();
 
   const { detail: setEquipmentDetail, isLoading } = useSetEquipmentDetail(
@@ -119,6 +123,28 @@ const EquipmentEditPage = () => {
   return (
     <div>
       <FormWrapper title="풀세트 등록" isLoading={isLoading}>
+        <div className={formStyles.sectionWrapper}>
+          <Label title="장비 사용가능 여부" />
+          <div className={styles.availabilityMenuWrapper}>
+            {EQUIPMENT_AVAILABILITY_MENU_LIST.map((item) => {
+              return (
+                <div
+                  className={styles.availabilityMenu}
+                  key={item.key}
+                  onClick={() => setDisabled(item.key === "unavailable")}
+                >
+                  <CustomCheckbox
+                    checked={
+                      (disabled && item.key === "unavailable") ||
+                      (!disabled && item.key === "available")
+                    }
+                  />
+                  {item.title}
+                </div>
+              );
+            })}
+          </div>
+        </div>
         <div className={formStyles.sectionWrapper}>
           <Label title="세트명" />
           <EditableField

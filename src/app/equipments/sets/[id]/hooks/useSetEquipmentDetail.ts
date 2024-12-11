@@ -11,7 +11,7 @@ export const useSetEquipmentDetail = (id: number) => {
 
     setIsLoading(true);
     getSetEquipmentDetail(id)
-      .then((res) => setDetail(res[0]))
+      .then(setDetail)
       .catch(() => setDetail(null))
       .finally(() => {
         setIsLoading(false);

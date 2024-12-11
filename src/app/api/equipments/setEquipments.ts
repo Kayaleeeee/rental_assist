@@ -79,7 +79,13 @@ export const postSetEquipment = async (payload: SetEquipmentPayload) => {
 };
 
 export const getSetEquipmentDetail = async (id: SetEquipmentType["id"]) => {
-  return apiGet<SetEquipmentType[]>("equipment_set_list", { id });
+  const result = await apiGet<SetEquipmentType[]>("equipment_set_list", { id });
+
+  if (isEmpty(result)) {
+    throw new Error("No data found");
+  } else {
+    return result[0];
+  }
 };
 
 export const editSetEquipment = (

@@ -19,7 +19,7 @@ export const useSetEquipmentForm = () => {
   const [price, setPrice] = useState<number>(0);
   const [detail, setDetail] = useState<string>("");
   const [memo, setMemo] = useState<string>("");
-
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [equipmentList, setEquipmentList] = useState<EquipmentListItemType[]>(
     []
   );
@@ -28,14 +28,6 @@ export const useSetEquipmentForm = () => {
     if (isEmpty(title)) {
       showToast({
         message: "세트명을 입력해주세요.",
-        type: "error",
-      });
-      return false;
-    }
-
-    if (isNil(price)) {
-      showToast({
-        message: "렌탈 가격을 입력해주세요.",
         type: "error",
       });
       return false;
@@ -64,6 +56,7 @@ export const useSetEquipmentForm = () => {
           price,
           detail,
           memo,
+          disabled,
         });
 
         const setEquipmentIdList: SetEquipmentItemPostPayload[] =
@@ -89,7 +82,7 @@ export const useSetEquipmentForm = () => {
         });
       }
     },
-    [router, validateForm, equipmentList]
+    [router, validateForm, equipmentList, disabled]
   );
 
   return {
@@ -104,5 +97,7 @@ export const useSetEquipmentForm = () => {
     onEditSetEquipment,
     equipmentList,
     setEquipmentList,
+    disabled,
+    setDisabled,
   };
 };
