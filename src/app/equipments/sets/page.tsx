@@ -13,6 +13,7 @@ import { useEquipmentCart } from "../hooks/useEquipmentCart";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 import { showToast } from "@/app/utils/toastUtils";
 import { GroupEquipmentList } from "./modules/GroupEquipmentList";
+import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 
 export default function SetEquipmentPage() {
   const router = useRouter();
@@ -20,15 +21,37 @@ export default function SetEquipmentPage() {
     SetEquipmentType[]
   >([]);
 
-  const { handleAddEquipmentList, handleAddEquipmentGroup } =
-    useEquipmentCart();
+  const { equipmentGroupList, handleSetEquipmentGroup } = useEquipmentCart();
 
   const handleAddToCart = useCallback(async () => {
     if (isEmpty(selectedEquipmentSetList)) return;
 
-    handleAddEquipmentGroup(
-      selectedEquipmentSetList.map(convertGroupEquipmentToState)
-    );
+    const combinedGroupList = [...equipmentGroupList];
+
+    selectedEquipmentSetList.forEach((selectedGroup) => {
+      const existedIndex = combinedGroupList.findIndex(
+        (group) => group.setId === selectedGroup.id
+      );
+
+      if (existedIndex === -1) {
+        combinedGroupList.push(convertGroupEquipmentToState(selectedGroup));
+      } else {
+        const notIncludedEquipmentList = selectedGroup.equipmentList.filter(
+          (item) => {
+            return !combinedGroupList[existedIndex].equipmentList.some(
+              (groupItem) => groupItem.equipmentId === item.id
+            );
+          }
+        );
+
+        combinedGroupList[existedIndex].equipmentList = [
+          ...combinedGroupList[existedIndex].equipmentList,
+          ...notIncludedEquipmentList.map(convertEquipmentItemToState),
+        ];
+      }
+    });
+
+    handleSetEquipmentGroup(combinedGroupList);
 
     showToast({
       message: "장바구니에 추가되었습니다.",
@@ -36,7 +59,12 @@ export default function SetEquipmentPage() {
     });
 
     setSelectedEquipmentSetList([]);
-  }, [handleAddEquipmentList, selectedEquipmentSetList]);
+  }, [
+    handleSetEquipmentGroup,
+    selectedEquipmentSetList,
+    equipmentGroupList,
+    equipmentGroupList,
+  ]);
 
   return (
     <div className={styles.relativeWrapper}>
