@@ -4,13 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 
 export const useUserDetail = (id?: UserType["id"]) => {
   const [detail, setDetail] = useState<UserType>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchUserDetail = useCallback(async (id: UserType["id"]) => {
+    setIsLoading(true);
     try {
       const result = await getUserDetail(id);
       setDetail(result);
     } catch {
       setDetail(undefined);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -20,5 +24,5 @@ export const useUserDetail = (id?: UserType["id"]) => {
     fetchUserDetail(id);
   }, [id]);
 
-  return { detail };
+  return { detail, isLoading };
 };

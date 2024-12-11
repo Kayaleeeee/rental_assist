@@ -21,6 +21,7 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { ReservationType } from "@/app/types/reservationType";
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { formatPhoneNumber } from "@/app/utils/textUtils";
+import { UserStatusBadge } from "../modules/UserStatusBadge";
 
 const column: GridColDef<ReservationType>[] = [
   {
@@ -87,6 +88,11 @@ const UserDetailPage = () => {
         }}
       />
       <FormWrapper title="회원 정보 상세">
+        <UserStatusBadge
+          isBlackList={detail.isBlackList || false}
+          width="100px"
+        />
+        <Margin top={20} />
         <div className={formStyles.sectionWrapper}>
           <Label title="이름" />
           <EditableField isEditable={false} value={detail.name} />

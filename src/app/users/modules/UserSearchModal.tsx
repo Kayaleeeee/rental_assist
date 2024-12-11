@@ -8,6 +8,7 @@ import { isEmpty } from "lodash";
 import { showToast } from "@/app/utils/toastUtils";
 import { useState } from "react";
 import { formatPhoneNumber } from "@/app/utils/textUtils";
+import { UserStatusBadge } from "./UserStatusBadge";
 
 const HeaderName = (name: string) => {
   return (
@@ -32,6 +33,7 @@ const columns: GridColDef<UserType>[] = [
     renderHeader: () => HeaderName("이름"),
     flex: 1,
   },
+
   {
     field: "email",
     renderHeader: () => HeaderName("이메일"),
@@ -42,6 +44,21 @@ const columns: GridColDef<UserType>[] = [
     flex: 1,
     renderHeader: () => HeaderName("전화번호"),
     renderCell: ({ row }) => <>{formatPhoneNumber(row.phoneNumber || "")}</>,
+  },
+  {
+    field: "status",
+    renderHeader: () => HeaderName("회원 상태"),
+    width: 100,
+    renderCell: ({ row }) => {
+      return (
+        <div className="centered-cell">
+          <UserStatusBadge
+            isBlackList={row.isBlackList || false}
+            width="70px"
+          />
+        </div>
+      );
+    },
   },
 ];
 

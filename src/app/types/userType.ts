@@ -8,6 +8,8 @@ export type UserType = {
   company?: string;
   email?: string;
   phoneNumber?: string;
+  isBlackList?: boolean;
+  memo?: string;
 };
 
 export type UserPostPayload = Omit<UserType, "id">;

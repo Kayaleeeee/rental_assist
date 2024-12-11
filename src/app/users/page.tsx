@@ -8,12 +8,28 @@ import { UserType } from "../types/userType";
 import { HeaderName } from "../components/DataTable/HeaderName";
 import { useUserList } from "./hooks/useUserList";
 import { formatPhoneNumber } from "../utils/textUtils";
+import { UserStatusBadge } from "./modules/UserStatusBadge";
 
 const columns: GridColDef<UserType>[] = [
   {
     field: "id",
     width: 80,
     renderHeader: () => HeaderName("ID"),
+  },
+  {
+    field: "status",
+    renderHeader: () => HeaderName("회원 상태"),
+    width: 100,
+    renderCell: ({ row }) => {
+      return (
+        <div className="centered-cell">
+          <UserStatusBadge
+            isBlackList={row.isBlackList || false}
+            width="70px"
+          />
+        </div>
+      );
+    },
   },
   {
     field: "name",

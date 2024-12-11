@@ -3,7 +3,7 @@ import {
   UserPostPayload,
   UserType,
 } from "@/app/types/userType";
-import { apiGet, apiPost } from "..";
+import { apiGet, apiPatch, apiPost } from "..";
 import { isEmpty } from "lodash";
 
 const apiUrl = "/users";
@@ -21,4 +21,11 @@ export const getUserDetail = async (id: UserType["id"]) => {
 
   if (isEmpty(result)) throw new Error("No data found");
   return result[0];
+};
+
+export const patchUser = async (
+  id: UserType["id"],
+  payload: UserPostPayload
+) => {
+  return apiPatch<UserType[]>(apiUrl, payload, { params: { id } });
 };

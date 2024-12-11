@@ -9,6 +9,7 @@
   --green: #27b67b;
   --green-1: #eaf5ef;
   --default-font: "NotoSansKR", sans-serif;
+  --blue-1: #009cd8;
 }
 
 @media (prefers-color-scheme: dark) {
