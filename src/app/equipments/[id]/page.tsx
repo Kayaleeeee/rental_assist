@@ -15,10 +15,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { Margin } from "@/app/components/Margin";
-import {
-  CalendarEventType,
-  MonthCalendar,
-} from "@/app/components/Calendar/MonthCalendar";
+import { CalendarEventType } from "@/app/components/Calendar/MonthCalendar";
 import { useEquipmentRentalDates } from "../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
 import { deleteEquipment } from "@/app/api/equipments";
@@ -29,6 +26,9 @@ import { useEquipmentPriceList } from "./hooks/useEquipmentPriceList";
 import { EquipmentPriceItem } from "@/app/types/equipmentPriceType";
 import { isEmpty } from "lodash";
 import { EquipmentStatusBadge } from "../modules/EquipmentStatusBadge";
+import { View } from "react-big-calendar";
+import { UnifiedCalendar } from "@/app/components/Calendar/UnifiedCalendar";
+import { getRandomHexColor } from "@/app/utils/colorUtils";
 
 const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
   const eventList: CalendarEventType[] = [];
@@ -40,8 +40,9 @@ const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
       eventList.push({
         start: dayjs(date.startDate).toDate(),
         end: dayjs(date.endDate).toDate(),
-        title: item.userName,
+        title: `${item.userName} [no. ${item.reservationId}]`,
         id: item.reservationId,
+        color: getRandomHexColor(item.userId),
       });
     });
   });
@@ -59,6 +60,7 @@ const EquipmentDetailPage = () => {
   const [priceList, setPriceList] = useState<EquipmentPriceItem[]>([]);
   const originalPriceList = useRef<EquipmentPriceItem[]>([]);
   const [currentDate, setCurrentDate] = useState(dayjs());
+  const [view, setView] = useState<View>("month");
 
   const { fetchSingleEquipmentRentalHistory } = useEquipmentRentalDates();
   const { fetchPriceList } = useEquipmentPriceList();
@@ -195,8 +197,10 @@ const EquipmentDetailPage = () => {
           </div>
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />
-            <MonthCalendar
-              size={"90%"}
+            <UnifiedCalendar
+              size={"100%"}
+              view={view}
+              setView={setView}
               currentDate={currentDate}
               setCurrentDate={setCurrentDate}
               eventDateList={eventDateList}

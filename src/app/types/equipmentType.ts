@@ -100,6 +100,7 @@ export type EquipmentItemWithRentedDates = {
   rentedDates: { startDate: string; endDate: string }[];
   reservationId: ReservationType["id"];
   userName: UserType["name"];
+  userId: UserType["id"];
 };
 
 export type EquipmentItemWithRentalDatesParams = {
