@@ -14,6 +14,7 @@ import styles from "./equipmentListTable.module.scss";
 import { Margin } from "@/app/components/Margin";
 import { isEqual } from "lodash";
 import { useCallback } from "react";
+import { EquipmentStatusBadge } from "./EquipmentStatusBadge";
 
 const getColumns = (
   isRowClickable: boolean
@@ -44,6 +45,18 @@ const getColumns = (
     flex: 1,
   },
   { field: "quantity", width: 70, renderHeader: () => HeaderName("수량") },
+  {
+    field: "status",
+    width: 80,
+    renderHeader: () => HeaderName("장비 상태"),
+    align: "center",
+    renderCell: ({ row }) => (
+      <div className="centered-cell">
+        <EquipmentStatusBadge isDisabled={row.disabled || false} width="60px" />
+      </div>
+    ),
+  },
+
   { field: "detail", flex: 1, renderHeader: () => HeaderName("상세설명") },
 ];
 

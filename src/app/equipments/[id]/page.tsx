@@ -28,6 +28,7 @@ import { PriceListTable } from "../modules/PriceSettingModal/PriceSettingModal";
 import { useEquipmentPriceList } from "./hooks/useEquipmentPriceList";
 import { EquipmentPriceItem } from "@/app/types/equipmentPriceType";
 import { isEmpty } from "lodash";
+import { EquipmentStatusBadge } from "../modules/EquipmentStatusBadge";
 
 const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
   const eventList: CalendarEventType[] = [];
@@ -132,6 +133,11 @@ const EquipmentDetailPage = () => {
       <FormWrapper width="100%" maxWidth="100%">
         <div className={styles.flexibleInline}>
           <div className={styles.detailWrapper}>
+            <EquipmentStatusBadge
+              isDisabled={equipmentDetail.disabled}
+              width="80px"
+            />
+            <Margin top={20} />
             <div className={styles.sectionWrapper}>
               <Label title="카테고리" />
               <EditableField isEditable={false} value={selectedCategory} />
@@ -190,7 +196,7 @@ const EquipmentDetailPage = () => {
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />
             <MonthCalendar
-              size={500}
+              size={"90%"}
               currentDate={currentDate}
               setCurrentDate={setCurrentDate}
               eventDateList={eventDateList}

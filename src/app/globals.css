@@ -90,3 +90,10 @@ a {
     /* color-scheme: dark;/ */
   }
 }
+
+.centered-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}

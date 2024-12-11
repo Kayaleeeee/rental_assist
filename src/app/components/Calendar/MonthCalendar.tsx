@@ -15,7 +15,7 @@ export interface CalendarEventType extends Event {
 }
 
 export type CalendarProps = {
-  size?: number;
+  size?: number | string;
   eventDateList?: CalendarEventType[];
   onClickEvent?: (event: CalendarEventType) => void;
   currentDate: Dayjs;
@@ -63,13 +63,13 @@ export const MonthCalendar = ({
   );
 
   return (
-    <div
-      className="wrapper"
-      style={{
-        width: `${size}px`,
-      }}
-    >
-      <div className="header">
+    <div className="wrapper">
+      <div
+        className="header"
+        style={{
+          width: size,
+        }}
+      >
         <button className="arrowButton" onClick={goToPrevMonth}>
           <ArrowBackOutlinedIcon />
         </button>
@@ -93,8 +93,8 @@ export const MonthCalendar = ({
         endAccessor="end"
         eventPropGetter={eventStyleGetter}
         style={{
-          width: `${size}px`,
-          height: `${size * 0.8}px`,
+          width: size,
+          aspectRatio: 1.5,
         }}
       />
     </div>
