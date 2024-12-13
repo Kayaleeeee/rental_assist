@@ -1,0 +1,13 @@
+.sumUpWrapper {
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  font-size: 14px;
+  gap: 12px;
+}
+
+.paymentSumUpRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
