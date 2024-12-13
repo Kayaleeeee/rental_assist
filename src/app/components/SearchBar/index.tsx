@@ -9,15 +9,17 @@ type Props<T> = {
   onChangeSearchKey: (searchKey: T) => void;
   onChangeKeyword: (keyword: string) => void;
   onSearch: () => void;
+  hideButton?: boolean;
 };
 
 export const SearchBar = <T extends string>({
   selectedKey,
   menuList,
-  // keyword,
+  keyword,
   onSearch,
   onChangeSearchKey,
   onChangeKeyword,
+  hideButton = false,
 }: Props<T>) => {
   return (
     <div className={styles.wrapper}>
@@ -44,24 +46,25 @@ export const SearchBar = <T extends string>({
       <TextField
         fullWidth
         className={styles.textInput}
-        onBlur={(e) => onChangeKeyword(e.target.value)}
+        value={keyword}
+        onChange={(e) => onChangeKeyword(e.target.value)}
         size="small"
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            onSearch();
-          }
+          if (e.key === "Enter") onSearch();
         }}
       />
-      <Button
-        size="Small"
-        style={{
-          height: "40px",
-          width: "100px",
-        }}
-        onClick={onSearch}
-      >
-        검색
-      </Button>
+      {!hideButton && (
+        <Button
+          size="Small"
+          style={{
+            height: "40px",
+            width: "100px",
+          }}
+          onClick={onSearch}
+        >
+          검색
+        </Button>
+      )}
     </div>
   );
 };

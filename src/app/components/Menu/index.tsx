@@ -7,6 +7,7 @@ import FormatListBulletedOutlinedIcon from "@mui/icons-material/FormatListBullet
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SubdirectoryArrowRightOutlinedIcon from "@mui/icons-material/SubdirectoryArrowRightOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import React, { useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { isEmpty } from "lodash";
@@ -27,6 +28,11 @@ const menuList = [
     path: "/reservations",
     title: "예약 리스트",
     renderIcon: () => <CalendarMonthOutlinedIcon />,
+  },
+  {
+    path: "/payments",
+    title: "정산 리스트",
+    renderIcon: () => <ReceiptLongOutlinedIcon />,
   },
   {
     path: "/equipments",
