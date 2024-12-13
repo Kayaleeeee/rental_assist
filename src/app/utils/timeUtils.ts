@@ -8,8 +8,10 @@ export const getDiffDays = (startTime: string, endTime: string) => {
   return Math.abs(diffDays);
 };
 
-export const formatDateTime = (dateTime: string) => {
-  return dayjs(dateTime).locale("ko").format("YYYY-MM-DD HH:mm");
+export const formatDateTime = (dateTime: string, format?: string) => {
+  return dayjs(dateTime)
+    .locale("ko")
+    .format(format || "YYYY-MM-DD HH:mm");
 };
 
 export const formatDateTimeWithLocale = (dateTime: string) => {

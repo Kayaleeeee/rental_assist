@@ -1,28 +1,37 @@
 import { ReactElement } from "react";
 import styles from "./category.module.scss";
 
-interface CategoryMenu {
-  key: string;
+interface CategoryMenu<T extends React.Key> {
+  key: T;
   title: string | ReactElement;
 }
 
-type Props = {
-  categoryList: CategoryMenu[];
-  selectedCategory?: string;
-  onChangeCategory: (key: CategoryMenu["key"]) => void;
+type Props<T extends React.Key> = {
+  categoryList: CategoryMenu<T>[];
+  selectedCategory?: T;
+  onChangeCategory: (key: T) => void;
+  type?: "shadow" | "borderless";
+  gap?: string;
 };
 
-export const CategoryList = ({
-  categoryList,
+export const CategoryList = <T extends React.Key>({
+  categoryList = [],
   selectedCategory,
   onChangeCategory,
-}: Props) => {
+  type = "shadow",
+  gap,
+}: Props<T>) => {
   return (
-    <div className={styles.wrapper}>
-      {categoryList.map((item) => {
+    <div
+      className={type === "shadow" ? styles.wrapper : styles.borderlessWrapper}
+      style={{
+        gap,
+      }}
+    >
+      {categoryList.map((item, index) => {
         return (
           <div
-            key={item.key}
+            key={item.key || index}
             onClick={() => onChangeCategory(item.key)}
             className={
               selectedCategory === item.key
