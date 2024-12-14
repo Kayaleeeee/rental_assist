@@ -30,18 +30,24 @@ export const isDateRangeOverlap = (
   return start1.isBefore(end2) && start2.isBefore(end1);
 };
 
-export const getPaddingDateRange = (
-  currentTime: Dayjs,
-  paddingNumber: number,
-  paddingUnit: "day" | "month" | "year"
-) => {
+export const getPaddingDateRange = ({
+  currentTime,
+  timeDiffUnit,
+  paddingNumber,
+  paddingUnit,
+}: {
+  currentTime: Dayjs;
+  timeDiffUnit: "day" | "month" | "year" | "week";
+  paddingNumber: number;
+  paddingUnit: "day" | "month" | "year" | "week";
+}) => {
   return {
     startDate: currentTime
-      .startOf("month")
+      .startOf(timeDiffUnit)
       .subtract(paddingNumber, paddingUnit)
       .format("YYYY-MM-DD"),
     endDate: currentTime
-      .endOf("month")
+      .endOf(timeDiffUnit)
       .add(paddingNumber, paddingUnit)
       .format("YYYY-MM-DD"),
   };

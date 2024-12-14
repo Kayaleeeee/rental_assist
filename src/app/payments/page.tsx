@@ -106,7 +106,7 @@ export default function PaymentsListPage() {
         selectedCategory={selectedPaymentCategory}
         onChangeCategory={onChangeStatusCategory}
       />
-      <Margin top={15} />
+      <Margin top={20} />
 
       <CategoryList<number>
         type="borderless"
@@ -126,7 +126,7 @@ export default function PaymentsListPage() {
           return (
             <div key={key} className={styles.paymentSumUpRow}>
               <PaymentStatusText status={key as PaymentStatus} />
-              <div> {formatLocaleString(value)}원</div>
+              <div> {formatLocaleString(value)} 원</div>
             </div>
           );
         })}

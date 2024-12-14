@@ -24,16 +24,17 @@
 .borderlessWrapper {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+
   flex-wrap: wrap;
 
   .categoryItem {
     cursor: pointer;
     display: flex;
-    padding: 8px 24px;
+    padding: 8px 48px;
     background: #fff;
     font-weight: 600;
     font-size: 14px;
+    border-bottom: 2px solid var(--grey-1);
   }
 
   .activeCategoryItem {

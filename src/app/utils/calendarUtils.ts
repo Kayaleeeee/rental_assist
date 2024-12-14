@@ -1,5 +1,6 @@
 import dayjs, { Dayjs } from "dayjs";
 import { CalendarEventType } from "../components/Calendar/MonthCalendar";
+import { formatDateTimeWithLocale } from "./timeUtils";
 
 // 하루 단위로 이벤트를 분리
 export const splitEventByDay = (event: CalendarEventType) => {
@@ -9,12 +10,17 @@ export const splitEventByDay = (event: CalendarEventType) => {
 
   // 하루 단위로 이벤트 분리
   let currentDate = start.startOf("day");
+
+  const eventTitle = `${event.title} ${formatDateTimeWithLocale(
+    start.toISOString()
+  )} - ${formatDateTimeWithLocale(end.toISOString())}`;
+
   while (currentDate.isBefore(end, "day")) {
     // 하루 종일 이벤트
     results.push({
       ...event,
-      id: event.id * 1000 + results.length, // 고유 ID
-      title: `${event.title} 대여 중`,
+      id: event.id,
+      title: eventTitle,
       start: currentDate.toDate(), // 하루의 시작
       end: currentDate.endOf("day").toDate(), // 하루의 끝
       allDay: true,
@@ -26,8 +32,8 @@ export const splitEventByDay = (event: CalendarEventType) => {
   if (currentDate.isSame(end, "day")) {
     results.push({
       ...event,
-      id: event.id * 1000 + results.length, // 고유 ID
-
+      title: eventTitle,
+      id: event.id,
       start: currentDate.toDate(), // 마지막 날의 시작
       end: end.toDate(), // 실제 종료 시간
       allDay: false,

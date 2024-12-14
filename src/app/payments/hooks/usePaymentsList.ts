@@ -34,6 +34,10 @@ const paymentStatusCategoryList = [
 
 const periodCategoryList = [
   {
+    key: 1,
+    title: "1개월",
+  },
+  {
     key: 3,
     title: "3개월",
   },
@@ -75,7 +79,7 @@ export const usePaymentList = () => {
 
   const getDateRangeByPeriod = useCallback((period: number) => {
     const today = dayjs();
-    const dateByPeriod = today.subtract(period, "months").startOf("month");
+    const dateByPeriod = today.subtract(period - 1, "months").startOf("month");
 
     return {
       startDate: dateByPeriod.toISOString(),
