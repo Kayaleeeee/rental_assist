@@ -106,7 +106,12 @@ const EquipmentDetailPage = () => {
   useEffect(() => {
     if (!equipmentId || !currentDate) return;
 
-    const { startDate, endDate } = getPaddingDateRange(currentDate, 15, "day");
+    const { startDate, endDate } = getPaddingDateRange({
+      currentTime: currentDate,
+      timeDiffUnit: "month",
+      paddingNumber: 15,
+      paddingUnit: "day",
+    });
 
     fetchSingleEquipmentRentalHistory({
       equipmentId,

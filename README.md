@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rental Assist
 
-## Getting Started
+Rental Assist는 수동으로 진행되던 장비 렌탈 예약 및 관리를 시스템화하여 더 효율적이고 편리하게 만들기 위해 개발된 웹 서비스입니다. 이 프로젝트는 장비 대여와 관련된 모든 과정을 중앙에서 관리하고, 사용자 경험을 개선하는 것을 목표로 하고 있습니다.
 
-First, run the development server:
+## 주요 기능
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **장비 목록 관리**
+
+  - 대여 가능한 장비의 목록을 생성, 수정, 삭제.
+  - 장비의 상태(대여 가능, 대여 중 등) 업데이트.
+
+- **렌탈 예약 관리**
+
+  - 사용자가 장비를 예약할 수 있는 기능.
+  - 예약 현황 확인 및 예약 변경/취소 가능.
+
+- **견적서 생성 및 자동화**
+
+  - 견적서 문의가 들어오면 예약 가능한지 여부를 자동으로 표시.
+  - 예약 정보를 기반으로 PDF 견적서를 생성하고 고객에게 전송.
+
+- **대여 기록 관리**
+
+  - 대여 및 반납 내역을 저장하여 기록 관리.
+  - 특정 사용자의 대여 히스토리 조회.
+
+- **유저 관리**
+  - 유저 정보 저장.
+  - 유저 별 예약 히스토리 관리.
+
+## 기술 스택
+
+### 백엔드 및 데이터베이스
+
+- **Supabase**: 서버 및 데이터베이스를 관리하기 위해 사용.
+  - PostgreSQL을 기반으로 한 데이터 저장소.
+  - 인증 및 권한 관리 기능 포함.
+
+### 프론트엔드
+
+- **Next.js**: 사용자 인터페이스를 개발하기 위해 사용.
+  - React 기반이면서, 백엔드 로직 작성이 필요한 경우 별도의 백엔드 서비스를 만들지 않고 통합적으로 개발 가능.
+
+### 기타 도구
+
+- **dayjs**: 날짜 및 시간 관리.
+- **Vercel**: 프론트엔드 배포 플랫폼으로 사용.
+
+## 설치 및 실행 방법
+
+### 로컬 환경에서 실행하기
+
+1. **레포지토리 클론**:
+
+   ```bash
+   git clone https://github.com/your-repository/rental-assist.git
+   cd rental-assist
+   ```
+
+2. **환경 변수 설정**:
+
+   - 프로젝트 루트에 `.env.local` 파일을 생성하고 아래 내용을 추가:
+     ```env
+     NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+     NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+     ```
+
+3. **패키지 설치**:
+
+   ```bash
+   npm install
+   ```
+
+4. **개발 서버 실행**:
+   ```bash
+   npm run dev
+   ```
+   - 브라우저에서 `http://localhost:3000`으로 접속.
+
+### 배포
+
+- **Vercel**을 사용하여 배포.
+- GitHub와 Vercel을 연동하여 자동 배포 설정 가능.
+
+## 프로젝트 구조
+
+```
+/rental-assist
+├── components/       # UI 컴포넌트 모음
+├── pages/            # Next.js 페이지 라우팅
+├── styles/           # 스타일 파일
+├── utils/            # 유틸리티 함수 및 헬퍼
+├── hooks/            # 커스텀 훅
+└── supabase/         # Supabase 클라이언트 설정
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 문의
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+프로젝트와 관련하여 문의 사항이 있으시면 아래로 연락해 주세요.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Email: gayeon71057@gmail.cpm

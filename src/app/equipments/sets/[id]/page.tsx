@@ -17,15 +17,15 @@ import { useEquipmentRentalDates } from "../../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
 import { getPaddingDateRange } from "@/app/utils/timeUtils";
 import { EquipmentItemWithRentedDates } from "@/app/types/equipmentType";
-import {
-  CalendarEventType,
-  MonthCalendar,
-} from "@/app/components/Calendar/MonthCalendar";
+import { CalendarEventType } from "@/app/components/Calendar/MonthCalendar";
 import { GroupEquipmentListTable } from "../modules/GroupEquipmentListTable";
 import { PriceListTable } from "../../modules/PriceSettingModal/PriceSettingModal";
 import { EquipmentGroupPriceItem } from "@/app/types/equipmentPriceType";
 import { useGroupEquipmentPriceList } from "../../[id]/hooks/useGroupEquipmentPriceList";
 import { EquipmentStatusBadge } from "../../modules/EquipmentStatusBadge";
+import { getRandomHexColor } from "@/app/utils/colorUtils";
+import { UnifiedCalendar } from "@/app/components/Calendar/UnifiedCalendar";
+import { View } from "react-big-calendar";
 
 const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
   const eventList: CalendarEventType[] = [];
@@ -37,8 +37,9 @@ const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
       eventList.push({
         start: dayjs(date.startDate).toDate(),
         end: dayjs(date.endDate).toDate(),
-        title: `${item.title} [${item.userName}]`,
+        title: `${item.title} [no. ${item.userName}]`,
         id: item.reservationId,
+        color: getRandomHexColor(item.userId),
       });
     });
   });
@@ -50,6 +51,8 @@ const SetEquipmentDetailPage = () => {
   const params = useParams();
   const setId = Number(params.id);
   const [currentDate, setCurrentDate] = useState(dayjs());
+  const [view, setView] = useState<View>("month");
+
   const { detail: setEquipmentDetail } = useSetEquipmentDetail(setId);
   const [priceList, setPriceList] = useState<EquipmentGroupPriceItem[]>([]);
   const originalPriceList = useRef<EquipmentGroupPriceItem[]>([]);
@@ -77,11 +80,12 @@ const SetEquipmentDetailPage = () => {
 
   const fetchEquipmentRentalDateList = useCallback(
     async (idList: number[]) => {
-      const { startDate, endDate } = getPaddingDateRange(
-        currentDate,
-        15,
-        "day"
-      );
+      const { startDate, endDate } = getPaddingDateRange({
+        currentTime: currentDate,
+        timeDiffUnit: "month",
+        paddingNumber: 15,
+        paddingUnit: "day",
+      });
 
       const result = await fetchMultipleEquipmentRentalHistory({
         idList,
@@ -198,8 +202,10 @@ const SetEquipmentDetailPage = () => {
           </div>
           <div className={styles.reservationCalendarWrapper}>
             <Label title="예약 현황" />
-            <MonthCalendar
-              size={500}
+            <UnifiedCalendar
+              size={"100%"}
+              view={view}
+              setView={setView}
               currentDate={currentDate}
               setCurrentDate={setCurrentDate}
               eventDateList={eventDateList}

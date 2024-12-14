@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 import { useUnmount } from "usehooks-ts";
 import { useParams, useRouter } from "next/navigation";
 import { useReservationDetail } from "../../hooks/useReservationDetail";
-import { isEmpty, isNil } from "lodash";
+import { isNil } from "lodash";
 import {
   EquipmentListItemState,
   SetEquipmentStateType,
@@ -34,7 +34,6 @@ import {
   SetEquipmentType,
 } from "@/app/types/equipmentType";
 import { GroupEquipmentSearchModal } from "../../modules/form/GroupEquipmentSearchModal";
-
 import {
   formatKoreanCurrency,
   formatLocaleString,
@@ -51,8 +50,8 @@ import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/Res
 import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTableEditor";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { RoundChangeModal } from "../../modules/form/RoundChangeModal";
-
 import { useReservationForms } from "../../hooks/useReservationForms";
+import { DiscountModal } from "../../modules/DiscountModal";
 
 const ReservationEditPage = () => {
   const router = useRouter();
@@ -69,6 +68,8 @@ const ReservationEditPage = () => {
   >(null);
   const [isOpenGroupSearchModal, setIsOpenGroupSearchModal] = useState(false);
   const [isOpenRoundChangeModal, setIsOpenRoundChangeModal] = useState(false);
+  const [isOpenDiscountModal, setIsOpenDiscountModal] = useState(false);
+
   const [availabilityState, setAvailabilityState] = useState<{
     checkedList: EquipmentAvailableItem[];
   }>(initialAvailability);
@@ -262,20 +263,26 @@ const ReservationEditPage = () => {
     onChangeForm("rounds", rounds);
   }, []);
 
-  const { total: reservationTotalPrice, supply: reservationSupplyPrice } =
-    useMemo(() => {
-      const listTotalPrice = getAllEquipmentTotalPrice(equipmentItemList);
-      const groupTotalPrice =
-        getAllEquipmentGroupTotalPrice(equipmentGroupList);
+  const {
+    total: reservationTotalPrice,
+    supply: reservationSupplyPrice,
+    itemDiscount,
+  } = useMemo(() => {
+    const listTotalPrice = getAllEquipmentTotalPrice(equipmentItemList);
+    const groupTotalPrice = getAllEquipmentGroupTotalPrice(equipmentGroupList);
 
-      const listSupply = getAllEquipmentSupplyPrice(equipmentItemList);
-      const groupSupply = getAllEquipmentGroupSupplyPrice(equipmentGroupList);
+    const listSupply = getAllEquipmentSupplyPrice(equipmentItemList);
+    const groupSupply = getAllEquipmentGroupSupplyPrice(equipmentGroupList);
 
-      return {
-        total: listTotalPrice + groupTotalPrice,
-        supply: listSupply + groupSupply,
-      };
-    }, [equipmentGroupList, equipmentItemList]);
+    const listDiscount = listTotalPrice - listSupply;
+    const groupDiscount = groupTotalPrice - groupSupply;
+
+    return {
+      itemDiscount: listDiscount + groupDiscount,
+      total: listTotalPrice + groupTotalPrice - form.discountPrice,
+      supply: listSupply + groupSupply,
+    };
+  }, [equipmentGroupList, equipmentItemList, form.discountPrice]);
 
   return (
     <div>
@@ -413,22 +420,47 @@ const ReservationEditPage = () => {
           </div>
         )}
 
-        {!isEmpty(equipmentItemList) && (
-          <div className={styles.priceSection}>
-            <div className={styles.discountPriceWrapper}>
-              <Label title="정가" />
-              <div>{formatLocaleString(reservationSupplyPrice)}원</div>
-            </div>
-            <div className={styles.totalPriceWrapper}>
-              <div className={styles.totalPrice}>
-                총 {formatLocaleString(reservationTotalPrice)}원
-              </div>
-              <Margin left={4}>
-                ({formatKoreanCurrency(reservationTotalPrice)})
-              </Margin>
+        <div className={styles.priceSection}>
+          <div className={styles.priceRowWrapper}>
+            <b className={styles.label}>정가</b>
+            <div className={styles.value}>
+              {formatLocaleString(reservationSupplyPrice)}원
             </div>
           </div>
-        )}
+          {itemDiscount !== 0 && (
+            <Margin top={8}>
+              <div className={styles.priceRowWrapper}>
+                <b className={styles.label}>항목 할인 금액</b>
+                <div className={styles.value}>
+                  {formatLocaleString(itemDiscount)}원
+                </div>
+              </div>
+            </Margin>
+          )}
+          <Margin top={8} />
+          <div className={styles.priceRowWrapper}>
+            <b
+              className={styles.label}
+              style={{ cursor: "pointer", textDecoration: "underline" }}
+              onClick={() => setIsOpenDiscountModal(true)}
+            >
+              견적서 할인
+            </b>
+
+            <div className={styles.value}>
+              -{formatLocaleString(form.discountPrice)}원
+            </div>
+          </div>
+          <Margin top={8} />
+          <div className={styles.priceRowWrapper}>
+            <b className={styles.label}>총 금액</b>
+            <div className={styles.value}>
+              <b>{formatLocaleString(reservationTotalPrice)}원</b>
+            </div>
+          </div>
+          ({formatKoreanCurrency(reservationTotalPrice)})
+        </div>
+
         <div className={styles.buttonWrapper}>
           <Button
             size="Medium"
@@ -466,6 +498,16 @@ const ReservationEditPage = () => {
           currentValue={form.rounds}
           onConfirm={handleChangeRounds}
           onClose={() => setIsOpenRoundChangeModal(false)}
+        />
+      )}
+      {isOpenDiscountModal && (
+        <DiscountModal
+          supplyPrice={reservationSupplyPrice + itemDiscount}
+          discountPrice={form.discountPrice}
+          onClose={() => setIsOpenDiscountModal(false)}
+          onConfirm={(discountPrice) =>
+            onChangeForm("discountPrice", discountPrice)
+          }
         />
       )}
     </div>

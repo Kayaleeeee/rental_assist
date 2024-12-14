@@ -69,11 +69,12 @@
   font-weight: 700;
 }
 
-.weekCalendarWrapper {
-  .rbc-time-view {
-    border-radius: 24px;
-  }
+.rbc-time-view {
+  border-radius: 24px;
+  overflow: hidden;
+}
 
+.weekCalendarWrapper {
   .rbc-header {
     display: flex;
     align-items: center;
@@ -105,11 +106,6 @@
   .rbc-timeslot-group {
     height: 20px;
     font-size: 14px;
-  }
-
-  .rbc-time-view {
-    border-radius: 24px;
-    overflow: hidden;
   }
 
   .rbc-today {

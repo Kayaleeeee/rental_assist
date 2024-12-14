@@ -149,7 +149,8 @@ export const getValidReservationForm = ({
 
   const totalPrice =
     getAllEquipmentTotalPrice(equipmentItemList) +
-    getAllEquipmentGroupTotalPrice(groupEquipmentList);
+    getAllEquipmentGroupTotalPrice(groupEquipmentList) -
+    form.discountPrice;
 
   const supplyPrice =
     getAllEquipmentSupplyPrice(equipmentItemList) +
@@ -159,7 +160,7 @@ export const getValidReservationForm = ({
     ...form,
     supplyPrice,
     totalPrice,
-    discountPrice: supplyPrice - totalPrice,
+    discountPrice: form.discountPrice,
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
   };
