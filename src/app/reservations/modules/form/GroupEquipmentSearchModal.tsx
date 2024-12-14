@@ -7,36 +7,17 @@ import { useState } from "react";
 type Props = {
   onCloseModal: () => void;
   onConfirm: (list: SetEquipmentType[]) => void;
-  disabledIdList: number[];
+  disabledIdList: SetEquipmentType["id"][];
 };
 
 export const GroupEquipmentSearchModal = ({
   onCloseModal,
   onConfirm,
-}: // disabledIdList,
-Props) => {
+  disabledIdList,
+}: Props) => {
   const [selectedGroupList, setSelectedGroupList] = useState<
     SetEquipmentType[]
   >([]);
-
-  // useEffect(() => {
-  //   fetchList(searchParams);
-  // }, [searchParams]);
-
-  // const toggleEquipmentList = useCallback(
-  //   (itemList: EquipmentListItemType[]) => {
-  //     if (itemList.some((item) => disabledIdList.includes(item.id))) {
-  //       showToast({
-  //         message: "이미 추가된 장비는 중복으로 추가할 수 없습니다.",
-  //         type: "error",
-  //       });
-  //       return;
-  //     }
-
-  //     setSelectedGroupList(itemList);
-  //   },
-  //   [disabledIdList]
-  // );
 
   return (
     <Modal
@@ -70,6 +51,7 @@ Props) => {
         <GroupEquipmentList
           selectedEquipmentSetList={selectedGroupList}
           setSelectedEquipmentSetList={setSelectedGroupList}
+          disabledSetIdList={disabledIdList}
         />
         <Margin bottom={50} />
       </div>

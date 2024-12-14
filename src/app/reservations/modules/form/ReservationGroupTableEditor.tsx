@@ -103,7 +103,7 @@ export const ReservationGroupTableEditor = ({
         sortable: false,
       },
     ];
-  }, []);
+  }, [groupEquipment]);
 
   const unavailableList = useMemo(() => {
     const list: EquipmentListItemState[] = [];

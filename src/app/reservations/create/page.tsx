@@ -453,7 +453,7 @@ const ReservationCreatePage = () => {
           onConfirm={(list) =>
             handleAddEquipmentGroup(list.map(convertGroupEquipmentToState))
           }
-          disabledIdList={existIdList}
+          disabledIdList={equipmentGroupList.map((group) => group.setId)}
         />
       )}
       {isOpenUserModal && (
