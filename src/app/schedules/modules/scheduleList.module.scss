@@ -1,6 +1,7 @@
 .wrapper {
   display: flex;
   flex-direction: column;
+  min-width: 400px;
 }
 
 .itemWrapper {
@@ -31,4 +32,25 @@
 .dateWrapper {
   min-width: 150px;
   margin-right: 4px;
+}
+
+.typeBadge {
+  display: flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-right: 4px;
+  font-weight: 600;
+}
+
+.startBadge {
+  @extend .typeBadge;
+  border: 1px solid black;
+}
+
+.endBadge {
+  @extend .typeBadge;
+  background: black;
+  color: #fff;
 }

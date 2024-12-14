@@ -33,22 +33,26 @@ export default function Home() {
   const { list, fetchReservationList, setDateRange, getSearchParams } =
     useReservationList();
 
+  const paddingDay = () => {
+    if (view === "month") return 15;
+    if (view === "week") return 1;
+    if (view === "day") return 1;
+    return 0;
+  };
+
+  const { startDate, endDate } = useMemo(
+    () =>
+      getPaddingDateRange({
+        currentTime: currentDate,
+        timeDiffUnit: view as "month" | "day" | "week",
+        paddingNumber: paddingDay(),
+        paddingUnit: "day",
+      }),
+    [currentDate, view]
+  );
+
   useEffect(() => {
     if (!currentDate) return;
-
-    const paddingDay = () => {
-      if (view === "month") return 15;
-      if (view === "week") return 1;
-      if (view === "day") return 0;
-      return 0;
-    };
-
-    const { startDate, endDate } = getPaddingDateRange({
-      currentTime: currentDate,
-      timeDiffUnit: view as "month" | "day" | "week",
-      paddingNumber: paddingDay(),
-      paddingUnit: "day",
-    });
 
     setDateRange({
       startDate,
@@ -62,12 +66,23 @@ export default function Home() {
     });
 
     fetchReservationList(params);
-  }, [currentDate, view]);
+  }, [currentDate, view, startDate, endDate]);
 
   const eventList = useMemo(() => convertedEventList(list), [list]);
-  const scheduleList = useMemo(() => convertScheduleList(list), [list]);
 
-  console.log(scheduleList);
+  const scheduleList = useMemo(() => {
+    const dateRange = getPaddingDateRange({
+      currentTime: currentDate,
+      timeDiffUnit: view as "month" | "day" | "week",
+      paddingNumber: 0,
+      paddingUnit: "day",
+    });
+
+    return convertScheduleList(list, {
+      start: dateRange.startDate,
+      end: dateRange.endDate,
+    });
+  }, [list, currentDate, view]);
 
   return (
     <div>

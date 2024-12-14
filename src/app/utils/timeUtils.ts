@@ -1,4 +1,9 @@
 import dayjs, { Dayjs } from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 export const getDiffDays = (startTime: string, endTime: string) => {
   const diffHours = Math.abs(dayjs(startTime).diff(dayjs(endTime), "hour"));
@@ -45,10 +50,24 @@ export const getPaddingDateRange = ({
     startDate: currentTime
       .startOf(timeDiffUnit)
       .subtract(paddingNumber, paddingUnit)
-      .format("YYYY-MM-DD"),
+      .format("YYYY-MM-DD HH:mm:ss"),
     endDate: currentTime
       .endOf(timeDiffUnit)
       .add(paddingNumber, paddingUnit)
-      .format("YYYY-MM-DD"),
+      .format("YYYY-MM-DD HH:mm:ss"),
   };
+};
+
+export const getIsBetween = (
+  target: string,
+  dateRange: { start: string; end: string }
+) => {
+  const targetDate = dayjs(target);
+  const startDate = dayjs(dateRange.start);
+  const endDate = dayjs(dateRange.end);
+
+  const isSameAndBefore = targetDate.isSameOrBefore(endDate, "second");
+  const isSameAndAfter = targetDate.isSameOrAfter(startDate, "second");
+
+  return isSameAndBefore && isSameAndAfter;
 };

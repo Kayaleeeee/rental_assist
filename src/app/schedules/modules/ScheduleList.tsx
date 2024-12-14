@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import styles from "./sheduleList.module.scss";
+import styles from "./scheduleList.module.scss";
 import { ScheduleItemType } from "@/app/types/ScheduleType";
 import { CategoryList } from "@/app/components/Category/CategoryList";
 import { formatDateTimeWithLocale } from "@/app/utils/timeUtils";
@@ -55,7 +55,13 @@ export const ScheduleList = ({ startList, endList }: Props) => {
                     : undefined,
                 }}
               />
-              <div>{item.type === "start" ? "대여" : "반납"}</div>
+              <div
+                className={
+                  item.type === "start" ? styles.startBadge : styles.endBadge
+                }
+              >
+                {item.type === "start" ? "대여" : "반납"}
+              </div>
               <div className={styles.dateWrapper}>
                 {formatDateTimeWithLocale(item.date)}
               </div>
