@@ -64,12 +64,26 @@
   justify-content: flex-end;
   align-items: flex-end;
   border-top: 1px solid var(--grey-1);
+  padding-top: 12px;
 }
 
-.discountPriceWrapper {
+.priceRowWrapper {
   display: inline-flex;
-  align-items: center;
-  gap: 20px;
+  align-items: flex-start;
+  font-size: 15px;
+
+  .label {
+    display: inline-flex;
+    justify-content: flex-end;
+    min-width: 40px;
+  }
+
+  .value {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 150px;
+  }
 }
 
 .inlineFlexStartWrapper {
