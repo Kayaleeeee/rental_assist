@@ -6,7 +6,7 @@ import { Label } from "@components/Form/Label";
 import { EditableField } from "@components/EditableField";
 import { useMemo, useState } from "react";
 import { Button } from "@components/Button";
-import { signup } from "@actions/auth/login";
+import { signup } from "@/app/login/actions/auth/login";
 import { Margin } from "@components/Margin";
 import Link from "next/link";
 import styles from "./page.module.scss";

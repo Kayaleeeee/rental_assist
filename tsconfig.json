@@ -22,7 +22,6 @@
       "@components/*": ["./src/app/components/*"],
       "@types/*": ["./src/app/types/*"],
       "@utils/*": ["./src/app/utils/*"],
-      "@actions/*": ["./src/app/actions/*"],
       "@stores/*": ["./src/app/store/*"],
       "@hooks/*": ["./src/app/hooks/*"]
     }
