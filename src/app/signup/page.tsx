@@ -33,8 +33,9 @@ const SignUpPage = () => {
     try {
       await signup({ email, password });
       showToast({
-        message: "회원가입이 완료되었습니다.",
-        type: "success",
+        message:
+          "이메일을 전송했습니다. \n이메일 확인이 끝나야 가입이 완료됩니다.",
+        type: "info",
       });
     } catch (e) {
       const errorMessage = (e as CustomError).message || "알 수 없는 에러 발생";

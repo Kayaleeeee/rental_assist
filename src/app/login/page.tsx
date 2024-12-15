@@ -32,8 +32,16 @@ const LoginPage = () => {
       await login({ email, password });
       fetchUser();
       showToast({ message: "로그인 성공", type: "success" });
-    } catch {
-      showToast({ message: "로그인에 실패했습니다", type: "error" });
+    } catch (e) {
+      let errorMessage = (e as Error).message;
+
+      if ((e as Error).message === "Email not confirmed") {
+        errorMessage = "전송된 이메일을 확인해주세요.";
+      } else {
+        errorMessage = "로그인에 실패했습니다";
+      }
+
+      showToast({ message: errorMessage, type: "error" });
     }
   };
 

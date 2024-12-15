@@ -9,7 +9,7 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SubdirectoryArrowRightOutlinedIcon from "@mui/icons-material/SubdirectoryArrowRightOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import React, { useCallback, useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { isEmpty } from "lodash";
 import { Margin } from "../Margin";
 import { CartMenu } from "./CartMenu";
@@ -59,6 +59,7 @@ const menuList = [
 ];
 
 export const Menu = () => {
+  const router = useRouter();
   const currentPath = usePathname();
   const { user, getUser, logout } = useAuthStore();
 
@@ -108,7 +109,7 @@ export const Menu = () => {
     try {
       logout();
       showToast({ message: "로그아웃 되었습니다.", type: "info" });
-      window.location.reload();
+      router.replace("/login");
     } catch (e) {
       console.log(e);
     }
