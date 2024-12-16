@@ -70,7 +70,7 @@ const EquipmentCreatePage = () => {
       await createGroupEquipment({ form: payload, equipmentList, priceList });
       showToast({ message: "장비가 등록되었습니다.", type: "success" });
 
-      router.push("/equipments");
+      router.push("/equipments/sets");
     } catch {
       showToast({ message: "장비등록에 실패했습니다", type: "error" });
     }
