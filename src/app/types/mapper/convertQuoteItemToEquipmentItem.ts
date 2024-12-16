@@ -8,7 +8,7 @@ export const convertQuoteItemToEquipmentItem = (
     id: item.equipmentId,
     title: item.equipmentName,
     quantity: item.quantity,
-    category: EquipmentCategory.others,
+    category: EquipmentCategory.other,
     price: item.price,
   };
 };

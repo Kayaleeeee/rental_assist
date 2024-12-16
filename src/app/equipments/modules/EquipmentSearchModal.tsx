@@ -42,15 +42,16 @@ export const EquipmentSearchModal = ({
     onChangeSearchKey,
     onSearch,
     fetchList,
-    setPageModel,
     pageModel,
-    searchParams,
     totalElements,
+    getSearchParams,
+    onChangePage,
   } = useEquipmentList();
 
   useEffect(() => {
+    const searchParams = getSearchParams();
     fetchList(searchParams);
-  }, [searchParams]);
+  }, []);
 
   const toggleEquipmentList = useCallback(
     (itemList: EquipmentListItemType[]) => {
@@ -132,7 +133,7 @@ export const EquipmentSearchModal = ({
           onChangeSearchKey={onChangeSearchKey}
           onSearch={onSearch}
           onSelectCell={toggleEquipmentList}
-          setPageModel={setPageModel}
+          setPageModel={onChangePage}
           pageModel={pageModel}
           totalElements={totalElements}
           height={"50vh"}

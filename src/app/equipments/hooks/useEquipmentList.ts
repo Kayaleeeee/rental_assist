@@ -5,13 +5,13 @@ import {
   EquipmentListParams,
 } from "@/app/types/equipmentType";
 import { DEFAULT_LIMIT, PageModelType } from "@/app/types/listType";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 const searchMenu = [{ key: "title", title: "장비명" }];
 
 export const useEquipmentList = () => {
   const [selectedCategory, setSelectedCategory] = useState<
-    EquipmentCategory | "full_set" | undefined
+    EquipmentCategory | undefined
   >(undefined);
   const [selectedSearchKey, setSelectedSearchKey] = useState<string>(
     searchMenu[0].key
@@ -24,40 +24,8 @@ export const useEquipmentList = () => {
     limit: DEFAULT_LIMIT,
   });
 
-  const fetchList = useCallback(async (params?: EquipmentListParams) => {
-    try {
-      const result = await getEquipmentList(params);
-      setList(result.data || []);
-      setTotalElements(result.totalElements || 0);
-    } catch {
-      setList([]);
-      setPageModel({
-        offset: 0,
-        limit: DEFAULT_LIMIT,
-      });
-    }
-  }, []);
-
-  const toggleEquipmentCategory = (
-    categoryKey: EquipmentCategory | undefined
-  ) => {
-    if (selectedCategory === categoryKey) {
-      setSelectedCategory(undefined);
-    } else {
-      setSelectedCategory(categoryKey);
-    }
-  };
-
-  const onChangeKeyword = (keyword: string) => {
-    setKeyword(keyword);
-  };
-
-  const onChangeSearchKey = (key: string) => {
-    setSelectedSearchKey(key);
-  };
-
-  const searchParams = useMemo(
-    (params = {}) => {
+  const getSearchParams = useCallback(
+    (params?: Partial<EquipmentListParams>) => {
       const defaultParams = {
         ...pageModel,
         order: "id",
@@ -80,9 +48,53 @@ export const useEquipmentList = () => {
     [selectedCategory, selectedSearchKey, keyword, pageModel]
   );
 
+  const fetchList = useCallback(async (params?: EquipmentListParams) => {
+    try {
+      const result = await getEquipmentList(params);
+      setList(result.data || []);
+      setTotalElements(result.totalElements || 0);
+    } catch {
+      setList([]);
+      setPageModel({
+        offset: 0,
+        limit: DEFAULT_LIMIT,
+      });
+    }
+  }, []);
+
+  const toggleEquipmentCategory = useCallback(
+    (categoryKey: EquipmentCategory | undefined) => {
+      if (selectedCategory === categoryKey) {
+        setSelectedCategory(undefined);
+        fetchList(getSearchParams({ category: undefined }));
+      } else {
+        setSelectedCategory(categoryKey);
+        fetchList(getSearchParams({ category: categoryKey }));
+      }
+    },
+    [getSearchParams, fetchList]
+  );
+
+  const onChangeKeyword = (keyword: string) => {
+    setKeyword(keyword);
+  };
+
+  const onChangeSearchKey = (key: string) => {
+    setSelectedSearchKey(key);
+  };
+
+  const onChangePage = useCallback(
+    (pageModel: PageModelType) => {
+      setPageModel(pageModel);
+      fetchList(getSearchParams(pageModel));
+    },
+    [fetchList, getSearchParams]
+  );
+
   const onSearch = useCallback(() => {
+    const searchParams = getSearchParams();
     fetchList(searchParams);
-  }, [searchParams, fetchList]);
+  }, [getSearchParams, fetchList]);
 
   return {
     list,
@@ -95,9 +107,9 @@ export const useEquipmentList = () => {
     onChangeSearchKey,
     onSearch,
     fetchList,
-    setPageModel,
+    getSearchParams,
+    onChangePage,
     pageModel,
-    searchParams,
     totalElements,
   };
 };

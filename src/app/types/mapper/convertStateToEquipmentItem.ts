@@ -8,7 +8,7 @@ export const convertStateToEquipmentItem = (
     id: item.equipmentId,
     title: item.title,
     price: item.price,
-    category: item.category || EquipmentCategory.others,
+    category: item.category || EquipmentCategory.other,
     detail: "",
     quantity: item.quantity,
   };
