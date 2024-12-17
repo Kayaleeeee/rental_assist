@@ -1,7 +1,7 @@
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
 import styles from "./priceSettingModal.module.scss";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/app/components/Button";
 import { EditableField } from "@/app/components/EditableField";
 import { isEmpty } from "lodash";
@@ -14,7 +14,8 @@ import {
   EquipmentPriceItem,
   EquipmentGroupPriceItem,
 } from "@/app/types/equipmentPriceType";
-import { formatLocaleString } from "@/app/utils/priceUtils";
+import { calculatePrices, formatLocaleString } from "@/app/utils/priceUtils";
+import { showToast } from "@/app/utils/toastUtils";
 
 export type PriceItemStateType = {
   id?: number;
@@ -34,8 +35,6 @@ const defaultPriceItem = {
   day: 1,
   price: 0,
 };
-
-const buttonList = [{ day: 1 }, { day: 10 }, { day: 30 }];
 
 const convertPriceStateToPriceList = (list: PriceItemStateType[]) => {
   return list.map((item, index) => ({ ...item, day: index + 1 }));
@@ -79,9 +78,46 @@ export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
   };
 
   const handleConfirmList = (list: PriceItemStateType[]) => {
+    if (isEmpty(list)) {
+      showToast({
+        message: "가격을 입력해주세요.",
+        type: "error",
+      });
+      return;
+    }
+
     const convertedList = convertPriceStateToPriceList(list);
     onConfirm(convertedList);
   };
+
+  const handleFillOut30Days = useCallback(() => {
+    if (isEmpty(priceListState) || priceListState[0].price < 1) {
+      showToast({ message: "기본 가격을 입력해주세요", type: "error" });
+      return;
+    }
+
+    const priceList: PriceItemStateType[] = calculatePrices(
+      priceListState[0].price,
+      30
+    );
+
+    setPriceListState(priceList);
+  }, [priceListState]);
+
+  const handleDeleteAllPrice = useCallback(() => {
+    if (!confirm("전체 가격을 삭제하시겠습니까?")) return;
+
+    setPriceListState([defaultPriceItem]);
+  }, []);
+
+  const buttonList = useMemo(
+    () => [
+      { title: "30일 가격 만들기", onClick: handleFillOut30Days },
+      { day: 10, title: "1일 추가", onClick: () => handleAddCell(1) },
+      { day: 30, title: "전체 삭제", onClick: handleDeleteAllPrice },
+    ],
+    [handleFillOut30Days, handleAddCell]
+  );
 
   return (
     <Modal
@@ -105,15 +141,15 @@ export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
       <div>
         <h3 className={styles.modalTitle}>가격 설정</h3>
         <div className={styles.buttonListWrapper}>
-          {buttonList.map(({ day }) => {
+          {buttonList.map(({ onClick, title }) => {
             return (
               <Button
-                key={day}
+                key={title}
                 variant="outlined"
                 size="Small"
-                onClick={() => handleAddCell(day)}
+                onClick={onClick}
               >
-                {day}일 추가
+                {title}
               </Button>
             );
           })}
