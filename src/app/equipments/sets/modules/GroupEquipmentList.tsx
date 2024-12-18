@@ -9,7 +9,7 @@ import {
 import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import { useGroupEquipmentList } from "../hooks/useGroupEquipmentList";
 import { GroupEquipmentAccordion } from "./GroupEquipmentAccordion";
-import { isEqual } from "lodash";
+import { isEmpty, isEqual } from "lodash";
 
 type Props = {
   selectedEquipmentSetList: SetEquipmentType[];
@@ -135,56 +135,62 @@ export const GroupEquipmentList = ({
         />
       </Margin>
 
-      <div className={styles.equipmentListWrapper}>
-        {list.map((item) => {
-          const selectedSetIndex = selectedEquipmentSetList.findIndex(
-            (set) => set.id === item.id
-          );
-          const isIncludedSet = selectedSetIndex !== -1;
+      {isEmpty(list) ? (
+        <div className={styles.emptyListWrapper}>등록된 세트가 없습니다.</div>
+      ) : (
+        <div className={styles.equipmentListWrapper}>
+          {list.map((item) => {
+            const selectedSetIndex = selectedEquipmentSetList.findIndex(
+              (set) => set.id === item.id
+            );
+            const isIncludedSet = selectedSetIndex !== -1;
 
-          const selectedEquipmentItemList = isIncludedSet
-            ? selectedEquipmentSetList[selectedSetIndex].equipmentList
-            : [];
+            const selectedEquipmentItemList = isIncludedSet
+              ? selectedEquipmentSetList[selectedSetIndex].equipmentList
+              : [];
 
-          const isAllSelected =
-            isIncludedSet &&
-            isEqual(selectedEquipmentItemList, item.equipmentList);
+            const isAllSelected =
+              isIncludedSet &&
+              isEqual(selectedEquipmentItemList, item.equipmentList);
 
-          return (
-            <GroupEquipmentAccordion
-              key={item.id}
-              isDisabled={item.disabled}
-              disabledGroup={
-                disabledSetIdList.includes(item.id) || item.disabled
-              }
-              disabledEquipmentIdList={getDisabledGroupEquipmentItemList(item)}
-              setId={item.id}
-              title={item.title}
-              price={item.price}
-              hideDetailButton={false}
-              equipmentList={item.equipmentList || []}
-              selectedEquipmentList={selectedEquipmentItemList}
-              isAllSelected={isAllSelected}
-              toggleSelectAll={() => toggleEquipmentSet(item)}
-              toggleEquipmentItem={(equipment: EquipmentListItemType) => {
-                const targetSet = isIncludedSet
-                  ? selectedEquipmentSetList[selectedSetIndex]
-                  : { ...item, equipmentList: [] };
-
-                const isIncludedEquipment = targetSet.equipmentList.some(
-                  (selectedEquipment) => selectedEquipment.id === equipment.id
-                );
-
-                if (isIncludedEquipment) {
-                  removeEquipmentFromSet(equipment, targetSet);
-                } else {
-                  addEquipmentToSet(equipment, targetSet);
+            return (
+              <GroupEquipmentAccordion
+                key={item.id}
+                isDisabled={item.disabled}
+                disabledGroup={
+                  disabledSetIdList.includes(item.id) || item.disabled
                 }
-              }}
-            />
-          );
-        })}
-      </div>
+                disabledEquipmentIdList={getDisabledGroupEquipmentItemList(
+                  item
+                )}
+                setId={item.id}
+                title={item.title}
+                price={item.price}
+                hideDetailButton={false}
+                equipmentList={item.equipmentList || []}
+                selectedEquipmentList={selectedEquipmentItemList}
+                isAllSelected={isAllSelected}
+                toggleSelectAll={() => toggleEquipmentSet(item)}
+                toggleEquipmentItem={(equipment: EquipmentListItemType) => {
+                  const targetSet = isIncludedSet
+                    ? selectedEquipmentSetList[selectedSetIndex]
+                    : { ...item, equipmentList: [] };
+
+                  const isIncludedEquipment = targetSet.equipmentList.some(
+                    (selectedEquipment) => selectedEquipment.id === equipment.id
+                  );
+
+                  if (isIncludedEquipment) {
+                    removeEquipmentFromSet(equipment, targetSet);
+                  } else {
+                    addEquipmentToSet(equipment, targetSet);
+                  }
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
     </>
   );
 };
