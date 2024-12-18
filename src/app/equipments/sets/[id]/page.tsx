@@ -15,7 +15,10 @@ import { useSetEquipmentDetail } from "./hooks/useSetEquipmentDetail";
 import { isEmpty } from "lodash";
 import { useEquipmentRentalDates } from "../../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
-import { getPaddingDateRange } from "@/app/utils/timeUtils";
+import {
+  formatDateTimeWithLocale,
+  getPaddingDateRange,
+} from "@/app/utils/timeUtils";
 import { EquipmentItemWithRentedDates } from "@/app/types/equipmentType";
 import { CalendarEventType } from "@/app/components/Calendar/MonthCalendar";
 import { GroupEquipmentListTable } from "../modules/GroupEquipmentListTable";
@@ -37,7 +40,11 @@ const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
       eventList.push({
         start: dayjs(date.startDate).toDate(),
         end: dayjs(date.endDate).toDate(),
-        title: `${item.title} [no. ${item.userName}]`,
+        title: `[${item.reservationId}] ${
+          item.userName
+        } ${formatDateTimeWithLocale(
+          date.startDate
+        )} - ${formatDateTimeWithLocale(date.endDate)}`,
         id: item.reservationId,
         color: getRandomHexColor(item.userId),
       });

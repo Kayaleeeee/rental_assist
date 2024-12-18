@@ -20,7 +20,10 @@ import { useEquipmentRentalDates } from "../hooks/useEquipmentRentalDates";
 import dayjs from "dayjs";
 import { deleteEquipment } from "@/app/api/equipments";
 import { showToast } from "@/app/utils/toastUtils";
-import { getPaddingDateRange } from "@/app/utils/timeUtils";
+import {
+  formatDateTimeWithLocale,
+  getPaddingDateRange,
+} from "@/app/utils/timeUtils";
 import { PriceListTable } from "../modules/PriceSettingModal/PriceSettingModal";
 import { useEquipmentPriceList } from "./hooks/useEquipmentPriceList";
 import { EquipmentPriceItem } from "@/app/types/equipmentPriceType";
@@ -40,7 +43,11 @@ const convertToEventList = (rentalInfo: EquipmentItemWithRentedDates[]) => {
       eventList.push({
         start: dayjs(date.startDate).toDate(),
         end: dayjs(date.endDate).toDate(),
-        title: `${item.userName} [no. ${item.reservationId}]`,
+        title: `[${item.reservationId}] ${
+          item.userName
+        } ${formatDateTimeWithLocale(
+          date.startDate
+        )} - ${formatDateTimeWithLocale(date.endDate)}`,
         id: item.reservationId,
         color: getRandomHexColor(item.userId),
       });
