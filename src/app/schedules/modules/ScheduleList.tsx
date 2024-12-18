@@ -5,6 +5,7 @@ import { CategoryList } from "@/app/components/Category/CategoryList";
 import { formatDateTimeWithLocale } from "@/app/utils/timeUtils";
 import { Margin } from "@/app/components/Margin";
 import { getRandomHexColor } from "@/app/utils/colorUtils";
+import { isEmpty } from "lodash";
 
 type Props = {
   startList: ScheduleItemType[];
@@ -43,34 +44,40 @@ export const ScheduleList = ({ startList, endList }: Props) => {
         onChangeCategory={setSelectedCategory}
       />
       <Margin top={20} />
-      <div className={styles.listWrapper}>
-        {list.map((item) => {
-          return (
-            <div key={item.id} className={styles.itemWrapper}>
-              <div
-                className={styles.colorDot}
-                style={{
-                  background: item.userId
-                    ? getRandomHexColor(item.userId)
-                    : undefined,
-                }}
-              />
-              <div
-                className={
-                  item.type === "start" ? styles.startBadge : styles.endBadge
-                }
-              >
-                {item.type === "start" ? "대여" : "반납"}
-              </div>
-              <div className={styles.dateWrapper}>
-                {formatDateTimeWithLocale(item.date)}
-              </div>
 
-              <div>{item.title}</div>
-            </div>
-          );
-        })}
-      </div>
+      {isEmpty(list) ? (
+        <div className={styles.emptyWrapper}>
+          {selectedCategory === "start" ? "대여" : "반납"} 일정이 없습니다.
+        </div>
+      ) : (
+        <div className={styles.listWrapper}>
+          {list.map((item) => {
+            return (
+              <div key={item.id} className={styles.itemWrapper}>
+                <div
+                  className={styles.colorDot}
+                  style={{
+                    background: item.userId
+                      ? getRandomHexColor(item.userId)
+                      : undefined,
+                  }}
+                />
+                <div
+                  className={
+                    item.type === "start" ? styles.startBadge : styles.endBadge
+                  }
+                >
+                  {item.type === "start" ? "대여" : "반납"}
+                </div>
+                <div className={styles.dateWrapper}>
+                  {formatDateTimeWithLocale(item.date)}
+                </div>
+                <div>{item.title}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
