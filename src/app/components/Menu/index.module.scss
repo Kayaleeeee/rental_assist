@@ -109,7 +109,8 @@
   padding-top: 10px;
 
   @include media-query("md") {
-    height: 300px;
+    min-height: 300px;
+    height: fit-content;
     position: absolute;
     top: 50px;
     left: 0;

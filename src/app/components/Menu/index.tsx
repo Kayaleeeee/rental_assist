@@ -15,6 +15,7 @@ import { CartMenu } from "./CartMenu";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { showToast } from "@/app/utils/toastUtils";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+import { useScreenSize } from "@/app/hooks/useScreenSize";
 
 type MenuItem = {
   path: string;
@@ -62,26 +63,16 @@ export const Menu = () => {
   const router = useRouter();
   const currentPath = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false);
   const { user, getUser, logout } = useAuthStore();
+  const { screenMode } = useScreenSize();
 
   useEffect(() => {
     getUser();
   }, []);
 
   useEffect(() => {
-    const handleResize = () => {
-      const isMobile = window.innerWidth <= 768;
-      setIsMobile(isMobile);
-      if (!isMobile) setIsMobileMenuOpen(false);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+    if (screenMode !== "mobile") setIsMobileMenuOpen(false);
+  }, [screenMode]);
 
   const renderMenu = ({
     isSub,
@@ -104,6 +95,7 @@ export const Menu = () => {
       <div key={title}>
         <Link
           className={className()}
+          onClick={() => setIsMobileMenuOpen(false)}
           href={path}
           style={{
             padding: !isEmpty(children) ? "16px 16px 8px 16px" : undefined,
@@ -136,7 +128,11 @@ export const Menu = () => {
   }, []);
 
   return (
-    <div className={isMobile ? styles.mobileMenuWrapper : styles.wrapper}>
+    <div
+      className={
+        screenMode === "mobile" ? styles.mobileMenuWrapper : styles.wrapper
+      }
+    >
       <Link className={styles.mainTitle} href={"/"}>
         <h1>{`RENTAL\nASSIST`}</h1>
 
@@ -153,7 +149,7 @@ export const Menu = () => {
 
       <div
         className={
-          isMobile && !isMobileMenuOpen
+          screenMode === "mobile" && !isMobileMenuOpen
             ? styles.hiddenListWrapper
             : styles.listWrapper
         }
