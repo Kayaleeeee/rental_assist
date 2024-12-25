@@ -1,3 +1,5 @@
+@import "./styles/mediaQuery.scss";
+
 :root {
   --background: #fffff;
   --foreground: #171717;
@@ -37,20 +39,15 @@ body {
   z-index: 1;
 }
 
-.mainTitle {
-  color: black;
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 24px 8px;
-  height: 70px;
-  text-align: center;
-  white-space: pre-wrap;
-}
-
 .mainWrapper {
   width: 100%;
   max-height: 100vh;
   display: inline-flex;
+
+  @include media-query("md") {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .childrenWrapper {

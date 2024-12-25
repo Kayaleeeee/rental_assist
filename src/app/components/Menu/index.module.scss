@@ -1,3 +1,5 @@
+@import "./../../styles/mediaQuery.scss";
+
 @mixin commonWrapper {
   display: flex;
   flex-direction: column;
@@ -5,11 +7,47 @@
   min-height: calc(100vh - 70px);
   height: 100%;
   border-right: 1px solid var(--grey-1);
+  position: relative;
 }
 
 .wrapper {
   @include commonWrapper();
   width: 200px;
+
+  @include media-query("md") {
+    width: 100%;
+    height: 50px;
+    min-height: 50px;
+    display: flex;
+    background: white;
+  }
+}
+
+.mobileMenuWrapper {
+  @extend .wrapper;
+  min-height: fit-content;
+}
+
+.mainTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 24px;
+
+  text-align: center;
+  white-space: pre-wrap;
+  border-bottom: 1px solid var(--grey-1);
+
+  @include media-query("md") {
+    font-size: 0.8rem;
+    height: 50px;
+    margin: 0px;
+    white-space: wrap;
+    border-color: black;
+  }
 }
 
 .hiddenMenuWrapper {
@@ -25,8 +63,14 @@
   font-size: 14px;
   height: 50px;
   cursor: pointer;
+
   &:hover {
     font-weight: 700;
+  }
+
+  @include media-query("md") {
+    border-bottom: 1px solid black;
+    width: 100%;
   }
 }
 
@@ -49,11 +93,6 @@
   align-items: center;
 }
 
-.line {
-  display: inline-flex;
-  border-bottom: 1px solid var(--grey-1);
-}
-
 .cartCountBadge {
   font-size: 12px;
   font-weight: 700;
@@ -67,10 +106,39 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+  padding-top: 10px;
+
+  @include media-query("md") {
+    height: 300px;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    background: white;
+    z-index: 100;
+    padding-top: 0;
+  }
+}
+
+.hiddenListWrapper {
+  display: none;
 }
 
 .logoutItem {
   @extend .item;
   margin-bottom: 4px;
   gap: 8px;
+}
+
+.mobileMenu {
+  display: none;
+
+  @include media-query("md") {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+    position: absolute;
+    right: 16px;
+  }
 }

@@ -8,13 +8,13 @@ import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SubdirectoryArrowRightOutlinedIcon from "@mui/icons-material/SubdirectoryArrowRightOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { isEmpty } from "lodash";
-import { Margin } from "../Margin";
 import { CartMenu } from "./CartMenu";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { showToast } from "@/app/utils/toastUtils";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
 type MenuItem = {
   path: string;
@@ -61,10 +61,26 @@ const menuList = [
 export const Menu = () => {
   const router = useRouter();
   const currentPath = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
   const { user, getUser, logout } = useAuthStore();
 
   useEffect(() => {
     getUser();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 768;
+      setIsMobile(isMobile);
+      if (!isMobile) setIsMobileMenuOpen(false);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const renderMenu = ({
@@ -115,16 +131,34 @@ export const Menu = () => {
     }
   }, []);
 
+  const handleClickMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
+
   return (
-    <div className={styles.wrapper}>
-      <Link href={"/"}>
-        <h1 className="mainTitle">{`RENTAL\nASSIST`}</h1>
+    <div className={isMobile ? styles.mobileMenuWrapper : styles.wrapper}>
+      <Link className={styles.mainTitle} href={"/"}>
+        <h1>{`RENTAL\nASSIST`}</h1>
+
+        <div
+          className={styles.mobileMenu}
+          onClick={(e) => {
+            e.preventDefault();
+            handleClickMobileMenu();
+          }}
+        >
+          <MenuOutlinedIcon />
+        </div>
       </Link>
 
-      <div className={styles.line} />
-      <div className={styles.listWrapper}>
+      <div
+        className={
+          isMobile && !isMobileMenuOpen
+            ? styles.hiddenListWrapper
+            : styles.listWrapper
+        }
+      >
         <div>
-          <Margin top={10} />
           {menuList.map((item) => {
             return renderMenu(item);
           })}
