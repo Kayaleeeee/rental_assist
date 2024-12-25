@@ -1,3 +1,5 @@
+@import "../../styles/mediaQuery.scss";
+
 .overlay {
   position: fixed;
   top: 0;
@@ -24,6 +26,22 @@
   z-index: 100;
   padding: 24px;
   overflow: scroll;
+
+  @include media-query("md") {
+    width: 100%;
+  }
+}
+
+.header {
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  display: inline-flex;
+
+  .closeIconWrapper {
+    width: 30px;
+    cursor: pointer;
+  }
 }
 
 .dateWrapper {

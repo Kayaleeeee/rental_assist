@@ -21,6 +21,7 @@ import {
 import { CartGroupTableEditor } from "./CartGroupTableEditor";
 import { CartItemTableEditor } from "./CartItemTableEditor";
 import { showToast } from "@/app/utils/toastUtils";
+import CloseIcon from "@mui/icons-material/Close";
 
 export const getAvailableStatus = (
   isChecked: boolean,
@@ -143,7 +144,16 @@ export const Cart = () => {
       <div className={styles.overlay} onClick={handleCloseCart} />
       <div className={styles.cartContainer}>
         <section className={styles.main}>
-          <h3>장비 장바구니</h3>
+          <div className={styles.header}>
+            <h3>장비 장바구니</h3>
+            <div className={styles.closeIconWrapper} onClick={handleCloseCart}>
+              <CloseIcon
+                sx={{
+                  fontSize: "30px",
+                }}
+              />
+            </div>
+          </div>
           <Margin bottom={16} />
           <div className={styles.dateWrapper}>
             <Label title="대여 시작일" />
