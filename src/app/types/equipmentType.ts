@@ -54,6 +54,16 @@ export enum EquipmentCategory {
   audio = "audio",
   battery = "battery",
   other = "other",
+  tripod = "tripod",
+  gimbal = "gimbal",
+  grip = "grip",
+  lens_adaptor = "lens_adaptor",
+  wireless_focus = "wireless_focus",
+  wireless_transmitter = "wireless_transmitter",
+  monitor = "monitor",
+  frame = "frame",
+  sound = "sound",
+  matte_box = "matte_box",
 }
 
 export const EquipmentCategoryList: {
@@ -85,8 +95,28 @@ export const EquipmentCategoryList: {
       return { key, title: "오디오" };
     case EquipmentCategory.battery:
       return { key, title: "배터리" };
+    case EquipmentCategory.tripod:
+      return { key, title: "트라이팟" };
+    case EquipmentCategory.gimbal:
+      return { key, title: "짐벌" };
+    case EquipmentCategory.grip:
+      return { key, title: "그립" };
+    case EquipmentCategory.lens_adaptor:
+      return { key, title: "렌즈 어댑터" };
+    case EquipmentCategory.wireless_focus:
+      return { key, title: "무선 포커스" };
+    case EquipmentCategory.wireless_transmitter:
+      return { key, title: "무선 송수신기" };
+    case EquipmentCategory.monitor:
+      return { key, title: "모니터" };
+    case EquipmentCategory.frame:
+      return { key, title: "프레임" };
+    case EquipmentCategory.sound:
+      return { key, title: "사운드" };
+    case EquipmentCategory.matte_box:
+      return { key, title: "매트박스" };
     default:
-      return { key, title: "알 수 없음" };
+      return { key, title: "ETC" };
   }
 });
 
