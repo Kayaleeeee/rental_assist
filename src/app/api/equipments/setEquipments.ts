@@ -1,12 +1,15 @@
 import {
   EquipmentListParams,
+  EquipmentWithAvailabilitySearchParams,
   SetEquipmentItemPostPayload,
   SetEquipmentListItemType,
   SetEquipmentListParams,
   SetEquipmentPayload,
   SetEquipmentType,
+  SetEquipmentWithAvailabilitySearchParams,
+  SetEquipmentWithAvailabilityType,
 } from "@/app/types/equipmentType";
-import { DEFAULT_LIMIT } from "@/app/types/listType";
+import { DEFAULT_LIMIT, ListReturnType } from "@/app/types/listType";
 import { createClient } from "@/app/utils/supabase/client";
 import { apiDelete, apiGet, apiPatch, apiPost } from "..";
 import { isEmpty } from "lodash";
@@ -115,4 +118,27 @@ export const deleteSetEquipmentItemList = async (idList: string) => {
 
 export const getSetEquipmentItemList = (params?: SetEquipmentListParams) => {
   return apiGet<SetEquipmentListItemType[]>("equipment_set_items", { params });
+};
+
+export const getSetEquipmentListWithAvailability = async (
+  params: SetEquipmentWithAvailabilitySearchParams
+) => {
+  const convertParams = () => {
+    if (!params.startDate || !params.endDate) return {};
+
+    return {
+      paramsStartDate: params.startDate,
+      paramsEndDate: params.endDate,
+      limitRows: params.limit || DEFAULT_LIMIT,
+      offsetRows: params.offset || 0,
+      titleSearch: params.title || null,
+      excludeReservationId: params.excludeReservationId || null,
+    };
+  };
+
+  const result = await apiPost<
+    ListReturnType<SetEquipmentWithAvailabilityType>
+  >(`/rpc/equipment_sets_with_availability`, convertParams());
+
+  return result;
 };

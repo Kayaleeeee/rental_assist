@@ -182,3 +182,21 @@ export type SetEquipmentItemType = {
 export type SetEquipmentItemPostPayload = Omit<SetEquipmentItemType, "id">;
 export type SetEquipmentItemPutPayload = Partial<SetEquipmentItemPostPayload>;
 export type SetEquipmentListParams = Partial<SetEquipmentItemType>;
+
+export type SetEquipmentWithAvailabilityType = {
+  id: number;
+  title: string;
+  detail: string;
+  price: number;
+  discountPrice?: number;
+  totalPrice: number;
+  equipmentList: EquipmentWithAvailabilityType[];
+  memo?: string;
+  disabled?: boolean;
+};
+
+export type SetEquipmentWithAvailabilitySearchParams = EquipmentListParams & {
+  startDate: string;
+  endDate: string;
+  excludeReservationId?: number;
+};
