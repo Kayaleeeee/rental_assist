@@ -199,8 +199,6 @@ export const usePaymentList = () => {
       endDateParam: dateByPeriod.endDate,
     });
 
-    console.log("sumupParams", sumUpParams);
-
     fetchReservationList(searchParams);
     fetchPaymentSumUp(sumUpParams);
   };

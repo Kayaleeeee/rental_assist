@@ -48,7 +48,6 @@ const UserEditPage = () => {
   }, [userDetail]);
 
   const handleEditUserForm = useCallback(async () => {
-    console.log("hey");
     if (!userId) return;
 
     await editUserForm(userId);
