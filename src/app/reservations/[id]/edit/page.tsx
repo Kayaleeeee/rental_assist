@@ -52,6 +52,7 @@ import { RoundChangeModal } from "../../modules/form/RoundChangeModal";
 import { useReservationForms } from "../../hooks/useReservationForms";
 import { DiscountModal } from "../../modules/DiscountModal";
 import { EquipmentWithAvailabilitySearchModal } from "@/app/equipments/modules/EquipmentWithAvailablitySearchModal";
+import { GroupEquipmentWithAvailabilitySearchModal } from "@/app/equipments/sets/modules/GroupEquipmentAvailaiblityModal/GroupEquipmentWithAvailabilitySearchModal";
 
 const ReservationEditPage = () => {
   const router = useRouter();
@@ -94,6 +95,7 @@ const ReservationEditPage = () => {
     handleChangeGroupEquipment,
     handleSetEquipmentGroup,
     handleChangeItemPriceByRounds,
+    handleChangeGroupPriceByRounds,
   } = useReservationForms();
 
   const initializeForm = useCallback((detail: ReservationDetailStateType) => {
@@ -133,6 +135,15 @@ const ReservationEditPage = () => {
       rounds: form.rounds,
     });
   }, [form.rounds, equipmentItemList]);
+
+  useEffect(() => {
+    if (form.rounds < 1) return;
+
+    handleChangeGroupPriceByRounds({
+      groupEquipmentList: equipmentGroupList,
+      rounds: form.rounds,
+    });
+  }, [form.rounds, equipmentGroupList]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -494,12 +505,18 @@ const ReservationEditPage = () => {
         />
       )}
       {isOpenGroupSearchModal && dateRange.startDate && dateRange.endDate && (
-        <GroupEquipmentSearchModal
+        <GroupEquipmentWithAvailabilitySearchModal
+          dateRange={{
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          }}
           onCloseModal={() => setIsOpenGroupSearchModal(false)}
           onConfirm={(list) =>
             handleAddEquipmentGroup(list.map(convertGroupEquipmentToState))
           }
-          disabledIdList={equipmentGroupList.map((group) => group.setId)}
+          disabledGroupIdList={equipmentGroupList.map((group) => group.setId)}
+          disabledEquipmentIdList={existIdList}
+          excludeReservationId={reservationId}
         />
       )}
       {isOpenUserModal && (

@@ -14,7 +14,6 @@ import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
-import { GroupEquipmentSearchModal } from "../modules/form/GroupEquipmentSearchModal";
 import {
   EquipmentListItemType,
   SetEquipmentType,
@@ -43,6 +42,7 @@ import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { useReservationForms } from "../hooks/useReservationForms";
 import { DiscountModal } from "../modules/DiscountModal";
 import { EquipmentWithAvailabilitySearchModal } from "@/app/equipments/modules/EquipmentWithAvailablitySearchModal";
+import { GroupEquipmentWithAvailabilitySearchModal } from "@/app/equipments/sets/modules/GroupEquipmentAvailaiblityModal/GroupEquipmentWithAvailabilitySearchModal";
 
 const ReservationCreatePage = () => {
   const router = useRouter();
@@ -452,12 +452,17 @@ const ReservationCreatePage = () => {
         />
       )}
       {isOpenGroupSearchModal && dateRange.startDate && dateRange.endDate && (
-        <GroupEquipmentSearchModal
+        <GroupEquipmentWithAvailabilitySearchModal
+          dateRange={{
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          }}
           onCloseModal={() => setIsOpenGroupSearchModal(false)}
           onConfirm={(list) =>
             handleAddEquipmentGroup(list.map(convertGroupEquipmentToState))
           }
-          disabledIdList={equipmentGroupList.map((group) => group.setId)}
+          disabledGroupIdList={equipmentGroupList.map((group) => group.setId)}
+          disabledEquipmentIdList={existIdList}
         />
       )}
       {isOpenUserModal && (
