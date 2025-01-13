@@ -6,7 +6,7 @@ export const convertEquipmentItemToState = (
 ): EquipmentListItemState => ({
   equipmentId: equipment.id,
   title: equipment.title,
-  quantity: equipment.quantity,
+  quantity: 1,
   price: equipment.price,
   discountPrice: 0,
 });
@@ -17,7 +17,7 @@ export const convertEquipmentItemToStateWithOption = (
 ): EquipmentListItemState => ({
   equipmentId: equipment.id,
   title: equipment.title,
-  quantity: equipment.quantity,
+  quantity: 1,
   price: equipment.price,
   discountPrice: 0,
   ...options,

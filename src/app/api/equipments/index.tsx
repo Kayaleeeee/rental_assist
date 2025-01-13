@@ -169,6 +169,7 @@ export const getEquipmentListWithAvailability = async (
       offsetRows: params.offset || 0,
       categoryFilter: params.category || null,
       titleSearch: params.title || null,
+      excludeReservationId: params.excludeReservationId || null,
     };
   };
 

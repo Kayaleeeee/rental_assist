@@ -9,7 +9,6 @@ import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 
 import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EquipmentSearchModal } from "../../../equipments/modules/EquipmentSearchModal";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../../users/modules/UserSearchModal";
@@ -52,6 +51,7 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { RoundChangeModal } from "../../modules/form/RoundChangeModal";
 import { useReservationForms } from "../../hooks/useReservationForms";
 import { DiscountModal } from "../../modules/DiscountModal";
+import { EquipmentWithAvailabilitySearchModal } from "@/app/equipments/modules/EquipmentWithAvailablitySearchModal";
 
 const ReservationEditPage = () => {
   const router = useRouter();
@@ -93,6 +93,7 @@ const ReservationEditPage = () => {
     handleAddEquipmentGroup,
     handleChangeGroupEquipment,
     handleSetEquipmentGroup,
+    handleChangeItemPriceByRounds,
   } = useReservationForms();
 
   const initializeForm = useCallback((detail: ReservationDetailStateType) => {
@@ -123,6 +124,15 @@ const ReservationEditPage = () => {
 
     initializeForm(detail);
   }, [detail, reservationId]);
+
+  useEffect(() => {
+    if (form.rounds < 1) return;
+
+    handleChangeItemPriceByRounds({
+      equipmentItemList,
+      rounds: form.rounds,
+    });
+  }, [form.rounds, equipmentItemList]);
 
   useUnmount(() => {
     if (isFirstRender.current) {
@@ -472,10 +482,15 @@ const ReservationEditPage = () => {
         </div>
       </FormWrapper>
       {!isNil(changingStatus) && dateRange.startDate && dateRange.endDate && (
-        <EquipmentSearchModal
+        <EquipmentWithAvailabilitySearchModal
+          dateRange={{
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          }}
           onCloseModal={() => setChangingStatus(null)}
           onConfirm={handleConfirmEquipmentModal}
           disabledIdList={existIdList}
+          excludeReservationId={reservationId}
         />
       )}
       {isOpenGroupSearchModal && dateRange.startDate && dateRange.endDate && (

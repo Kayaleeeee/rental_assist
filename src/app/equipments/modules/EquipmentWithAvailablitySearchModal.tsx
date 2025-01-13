@@ -55,6 +55,7 @@ export const EquipmentWithAvailabilitySearchModal = ({
   } = useEquipmentListWithAvailability({
     startDate: props.dateRange.startDate,
     endDate: props.dateRange.endDate,
+    excludeReservationId: props.excludeReservationId,
   });
 
   useEffect(() => {

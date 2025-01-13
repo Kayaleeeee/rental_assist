@@ -9,7 +9,6 @@ import { DateTimeSelector } from "@/app/components/DateTimeSelector";
 
 import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { EquipmentSearchModal } from "../../equipments/modules/EquipmentSearchModal";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
 import { UserSearchModal } from "../../users/modules/UserSearchModal";
@@ -43,6 +42,7 @@ import { RoundChangeModal } from "../modules/form/RoundChangeModal";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { useReservationForms } from "../hooks/useReservationForms";
 import { DiscountModal } from "../modules/DiscountModal";
+import { EquipmentWithAvailabilitySearchModal } from "@/app/equipments/modules/EquipmentWithAvailablitySearchModal";
 
 const ReservationCreatePage = () => {
   const router = useRouter();
@@ -441,7 +441,11 @@ const ReservationCreatePage = () => {
         </div>
       </FormWrapper>
       {!isNil(changingStatus) && dateRange.startDate && dateRange.endDate && (
-        <EquipmentSearchModal
+        <EquipmentWithAvailabilitySearchModal
+          dateRange={{
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          }}
           onCloseModal={() => setChangingStatus(null)}
           onConfirm={handleConfirmEquipmentModal}
           disabledIdList={existIdList}
