@@ -1,15 +1,16 @@
 import {
   EquipmentDetailType,
-  EquipmentItemWithRentalDatesParams,
   EquipmentItemWithRentedDates,
   EquipmentListItemType,
   EquipmentListParams,
   EquipmentPostBody,
+  EquipmentWithAvailabilitySearchParams,
+  EquipmentWithAvailabilityType,
 } from "@/app/types/equipmentType";
 import { apiDelete, apiGet, apiPatch, apiPost } from "..";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
 import { createClient } from "@/app/utils/supabase/client";
-import { DEFAULT_LIMIT } from "@/app/types/listType";
+import { DEFAULT_LIMIT, ListReturnType } from "@/app/types/listType";
 
 const apiUrl = "/equipments";
 
@@ -22,7 +23,7 @@ const applyFilters = (query: any, params?: EquipmentListParams) => {
   if (params.title) {
     query = query.ilike("title", `%${params.title}%`);
   }
-  if (params.disabled !== undefined) {
+  if (!isNil(params.disabled)) {
     query = query.eq("disabled", params.disabled);
   }
   if (params.order) {
@@ -90,28 +91,6 @@ export const deleteEquipment = (id: EquipmentListItemType["id"]) => {
   return apiDelete(`${apiUrl}`, { params: { id } });
 };
 
-export const getEquipmentListWithRentedDates = (
-  params?: EquipmentItemWithRentalDatesParams
-) => {
-  const convertParams = () => {
-    if (!params) return {};
-
-    const { startDate, endDate, ...rest } = params;
-    if (!startDate || !endDate) return { ...rest };
-
-    return {
-      start_date: `lte.${params.endDate}`,
-      end_date: `gte.${params.startDate}`,
-      ...rest,
-    };
-  };
-
-  return apiGet<EquipmentItemWithRentedDates[]>(
-    `/equipment_rental_history`,
-    convertParams()
-  );
-};
-
 export const getEquipmentRentedDates = async (
   equipmentId: EquipmentListItemType["id"]
 ): Promise<EquipmentItemWithRentedDates | null> => {
@@ -175,4 +154,28 @@ export const getEquipmentListRentalHistoryByDate = async ({
   );
 
   return isEmpty(result) ? [] : result;
+};
+
+export const getEquipmentListWithAvailability = async (
+  params: EquipmentWithAvailabilitySearchParams
+): Promise<ListReturnType<EquipmentWithAvailabilityType>> => {
+  const convertParams = () => {
+    if (!params.startDate || !params.endDate) return {};
+
+    return {
+      paramsStartDate: params.startDate,
+      paramsEndDate: params.endDate,
+      limitRows: params.limit || DEFAULT_LIMIT,
+      offsetRows: params.offset || 0,
+      categoryFilter: params.category || null,
+      titleSearch: params.title || null,
+    };
+  };
+
+  const result = await apiPost<ListReturnType<EquipmentWithAvailabilityType>>(
+    `/rpc/equipments_with_availability`,
+    convertParams()
+  );
+
+  return result;
 };

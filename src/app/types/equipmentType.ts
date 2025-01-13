@@ -13,6 +13,11 @@ export type EquipmentListItemType = {
   quantity: number;
 };
 
+export type EquipmentWithAvailabilityType = EquipmentListItemType & {
+  isAvailable: boolean;
+  remainQuantity: number;
+};
+
 export type EquipmentDetailType = {
   id: number;
   title: string;
@@ -40,6 +45,12 @@ export type EquipmentListParams = ListParamsType<{
   disabled?: boolean;
   order?: string;
 }>;
+
+export type EquipmentWithAvailabilitySearchParams = EquipmentListParams & {
+  startDate: string;
+  endDate: string;
+  excludeReservationId?: number;
+};
 
 export enum EquipmentCategory {
   camera = "camera",
@@ -131,13 +142,6 @@ export type EquipmentItemWithRentedDates = {
   reservationId: ReservationType["id"];
   userName: UserType["name"];
   userId: UserType["id"];
-};
-
-export type EquipmentItemWithRentalDatesParams = {
-  equipmentId?: EquipmentListItemType["id"];
-  category?: EquipmentCategory;
-  startDate?: string;
-  endDate?: string;
 };
 
 export type SetEquipmentType = {

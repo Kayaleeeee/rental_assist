@@ -10,4 +10,9 @@ export type PageModelType = {
   limit: number;
 };
 
+export type ListReturnType<T> = {
+  data: T[];
+  totalElements: number;
+};
+
 export const DEFAULT_LIMIT = 25;
