@@ -32,7 +32,7 @@ import {
   EquipmentListItemType,
   SetEquipmentType,
 } from "@/app/types/equipmentType";
-import { GroupEquipmentSearchModal } from "../../modules/form/GroupEquipmentSearchModal";
+
 import {
   formatKoreanCurrency,
   formatLocaleString,

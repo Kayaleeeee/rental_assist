@@ -1,6 +1,5 @@
 import {
   EquipmentListParams,
-  EquipmentWithAvailabilitySearchParams,
   SetEquipmentItemPostPayload,
   SetEquipmentListItemType,
   SetEquipmentListParams,
