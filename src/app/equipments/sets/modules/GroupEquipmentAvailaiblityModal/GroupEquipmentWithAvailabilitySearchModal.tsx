@@ -1,13 +1,14 @@
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
-import { GroupEquipmentListWithAvailability } from "@/app/equipments/sets/modules/GroupEquipmentAvailaiblityModal/GroupEquipmentListWithAvailability";
+import { GroupEquipmentListWithAvailability } from "@/app/equipments/sets/modules/GroupEquipmentAvailaiblityModal/GroupEquipmentWithAvailabilityList";
 import { SetEquipmentWithAvailabilityType } from "@/app/types/equipmentType";
 import { useState } from "react";
 
 type Props = {
   onCloseModal: () => void;
   onConfirm: (list: SetEquipmentWithAvailabilityType[]) => void;
-  disabledIdList: SetEquipmentWithAvailabilityType["id"][];
+  disabledGroupIdList: SetEquipmentWithAvailabilityType["id"][];
+  disabledEquipmentIdList: SetEquipmentWithAvailabilityType["equipmentList"][0]["id"][];
   dateRange: { startDate: string; endDate: string };
   excludeReservationId?: number;
 };
@@ -15,9 +16,10 @@ type Props = {
 export const GroupEquipmentWithAvailabilitySearchModal = ({
   onCloseModal,
   onConfirm,
-  disabledIdList,
+  disabledGroupIdList,
   dateRange,
   excludeReservationId,
+  disabledEquipmentIdList,
 }: Props) => {
   const [selectedGroupList, setSelectedGroupList] = useState<
     SetEquipmentWithAvailabilityType[]
@@ -55,7 +57,8 @@ export const GroupEquipmentWithAvailabilitySearchModal = ({
         <GroupEquipmentListWithAvailability
           selectedEquipmentSetList={selectedGroupList}
           setSelectedEquipmentSetList={setSelectedGroupList}
-          disabledSetIdList={disabledIdList}
+          disabledGroupIdList={disabledGroupIdList}
+          disabledEquipmentIdList={disabledEquipmentIdList}
           dateRange={dateRange}
           excludeReservationId={excludeReservationId}
         />

@@ -1,6 +1,6 @@
 import { Margin } from "@/app/components/Margin";
 import { SearchBar } from "@/app/components/SearchBar";
-import styles from "./groupEquipmentList.module.scss";
+import styles from "./groupEquipmentWithAvailabilityList.module.scss";
 import {
   SetEquipmentType,
   EquipmentListItemType,
@@ -10,15 +10,16 @@ import {
 
 import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import { isEmpty, isEqual } from "lodash";
-import { GroupEquipmentAccordionWithAvailability } from "./GroupEquipmentAccordionWithAvailability";
+import { GroupEquipmentWithAvailabilityAccordion } from "./GroupEquipmentWithAvailabilityAccordion";
 import { useGroupEquipmentListWithAvailability } from "../../hooks/useGroupEquipmentListWithAvailability";
+import { getAvailableItemOnly } from "./utils/getAvailableItemOnly";
 
 type Props = {
   selectedEquipmentSetList: SetEquipmentWithAvailabilityType[];
   setSelectedEquipmentSetList: Dispatch<
     SetStateAction<SetEquipmentWithAvailabilityType[]>
   >;
-  disabledSetIdList?: SetEquipmentWithAvailabilityType["id"][];
+  disabledGroupIdList?: SetEquipmentWithAvailabilityType["id"][];
   disabledEquipmentIdList?: EquipmentListItemType["id"][];
   dateRange: { startDate: string; endDate: string };
   excludeReservationId?: number;
@@ -27,7 +28,7 @@ type Props = {
 export const GroupEquipmentListWithAvailability = ({
   selectedEquipmentSetList,
   setSelectedEquipmentSetList,
-  disabledSetIdList = [],
+  disabledGroupIdList = [],
   disabledEquipmentIdList = [],
   dateRange,
   excludeReservationId,
@@ -52,14 +53,25 @@ export const GroupEquipmentListWithAvailability = ({
         const selectedSetIndex = prev.findIndex(
           (set) => set.id === equipmentSet.id
         );
+
         if (selectedSetIndex === -1) {
-          return [...prev, equipmentSet];
+          const filteredEquipmentList = getAvailableItemOnly(
+            equipmentSet.equipmentList,
+            disabledEquipmentIdList
+          );
+
+          return isEmpty(filteredEquipmentList)
+            ? prev
+            : [
+                ...prev,
+                { ...equipmentSet, equipmentList: filteredEquipmentList },
+              ];
         } else {
           return prev.filter((set) => set.id !== equipmentSet.id);
         }
       });
     },
-    []
+    [disabledEquipmentIdList]
   );
 
   const addEquipmentToSet = useCallback(
@@ -163,17 +175,25 @@ export const GroupEquipmentListWithAvailability = ({
               ? selectedEquipmentSetList[selectedSetIndex].equipmentList
               : [];
 
+            const availableEquipmentList = getAvailableItemOnly(
+              item.equipmentList,
+              disabledEquipmentIdList
+            );
+
             const isAllSelected =
               isIncludedSet &&
-              isEqual(selectedEquipmentItemList, item.equipmentList);
+              isEqual(selectedEquipmentItemList, availableEquipmentList);
+
+            const isDisabledGroup =
+              disabledGroupIdList.includes(item.id) ||
+              item.disabled ||
+              isEmpty(availableEquipmentList);
 
             return (
-              <GroupEquipmentAccordionWithAvailability
+              <GroupEquipmentWithAvailabilityAccordion
                 key={item.id}
                 isDisabled={item.disabled}
-                disabledGroup={
-                  disabledSetIdList.includes(item.id) || item.disabled
-                }
+                disabledGroup={isDisabledGroup}
                 disabledEquipmentIdList={getDisabledGroupEquipmentItemList(
                   item
                 )}

@@ -4,7 +4,7 @@ import {
 } from "@/app/types/equipmentType";
 import { Accordion, AccordionDetails, AccordionSummary } from "@mui/material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import styles from "./groupEquipmentAccordion.module.scss";
+import styles from "./groupEquipmentWithAvailabilityAccordion.module.scss";
 import { Margin } from "@/app/components/Margin";
 import { Button } from "@/app/components/Button";
 import Link from "next/link";
@@ -27,7 +27,7 @@ type Props = {
   isDisabled?: boolean;
 };
 
-export const GroupEquipmentAccordionWithAvailability = ({
+export const GroupEquipmentWithAvailabilityAccordion = ({
   title,
   hideDetailButton = false,
   equipmentList = [],

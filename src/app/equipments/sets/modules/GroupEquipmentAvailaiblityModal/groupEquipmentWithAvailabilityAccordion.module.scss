@@ -1,0 +1,52 @@
+.equipmentListWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.titleWrapper {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--default-font);
+  font-weight: 700;
+}
+
+.accordionFooter {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+  gap: 12px;
+  height: 60px;
+}
+
+.price {
+  font-weight: 400;
+}
+
+.days {
+  font-size: 14px;
+  width: 50px;
+}
+
+.customAccordion {
+  border: 1px solid var(--grey-1);
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+.priceWrapper {
+  display: inline-flex;
+  font-size: 14px;
+  justify-content: flex-end;
+}
+
+.inlineWrapper {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -2,8 +2,13 @@ import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentWithAvailabilityType } from "@/app/types/equipmentType";
+import { showToast } from "@/app/utils/toastUtils";
 import { GridColDef } from "@mui/x-data-grid";
 import { isEmpty } from "lodash";
+import {
+  getAvailableItemOnly,
+  getIsAvailableItem,
+} from "./utils/getAvailableItemOnly";
 
 const getColumns = (): GridColDef<EquipmentWithAvailabilityType>[] => [
   {
@@ -68,15 +73,23 @@ export const GroupEquipmentWithAvailabilityTable = ({
       checkboxSelection={checkboxSelection}
       rows={equipmentList}
       hideFooter
+      isRowSelectable={({ row }) =>
+        getIsAvailableItem(row, disabledEquipmentIdList)
+      }
       rowSelectionModel={
         isAllSelected
-          ? equipmentList.map((item) => item.id)
+          ? getAvailableItemOnly(equipmentList, disabledEquipmentIdList).map(
+              (item) => item.id
+            )
           : selectedEquipmentList.map((item) => item.id)
       }
       onCellClick={({ row }) => {
         if (disabledEquipmentIdList.includes(row.id)) {
+          showToast({ message: "이미 추가된 장비입니다", type: "error" });
           return;
         }
+
+        if (!row.isAvailable) return;
         toggleEquipmentItem?.(row);
       }}
       columns={getColumns()}
