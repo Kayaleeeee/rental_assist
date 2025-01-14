@@ -17,12 +17,21 @@ import { showToast } from "../utils/toastUtils";
 const SignUpPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [inviteCode, setInviteCode] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const isPasswordMatch = useMemo(() => {
     return password === confirmPassword;
   }, [confirmPassword, password]);
+
+  const checkInviteCode = async (code: string) => {
+    const inviteCode = process.env.NEXT_PUBLIC_INVITE_CODE;
+    if (!inviteCode || code !== inviteCode)
+      throw new CustomError("초대코드가 올바르지 않습니다");
+
+    return true;
+  };
 
   const handleSignUp = async () => {
     if (!isPasswordMatch) {
@@ -31,6 +40,8 @@ const SignUpPage = () => {
     }
 
     try {
+      await checkInviteCode(inviteCode);
+
       await signup({ email, password });
       showToast({
         message:
@@ -60,6 +71,15 @@ const SignUpPage = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+        </section>
+        <section className={formStyles.sectionWrapper}>
+          <Label title="초대코드" />
+          <EditableField
+            placeholder="초대코드를 입력해주세요."
+            type="text"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
           />
         </section>
         <section className={formStyles.sectionWrapper}>
