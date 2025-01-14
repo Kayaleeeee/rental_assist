@@ -59,7 +59,7 @@ const notoSansKR = localFont({
 
 export const metadata: Metadata = {
   title: "Rental Assist",
-  description: "장비 렌탈 예약관리",
+  description: "장비 렌탈 운영을 더 쉽고 스마트하게! 🎥",
   icons: {
     icon: "./icon.ico",
   },
