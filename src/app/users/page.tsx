@@ -3,12 +3,13 @@
 import formStyles from "@components/Form/index.module.scss";
 import { Button } from "@components/Button";
 import { useRouter } from "next/navigation";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { UserType } from "../types/userType";
 import { HeaderName } from "../components/DataTable/HeaderName";
 import { useUserList } from "./hooks/useUserList";
 import { formatPhoneNumber } from "../utils/textUtils";
 import { UserStatusBadge } from "./modules/UserStatusBadge";
+import { useEffect } from "react";
 
 const columns: GridColDef<UserType>[] = [
   {
@@ -51,7 +52,18 @@ const columns: GridColDef<UserType>[] = [
 
 const UserListPage = () => {
   const router = useRouter();
-  const { list } = useUserList();
+  const {
+    list,
+    fetchUserList,
+    getSearchParams,
+    onChangePage,
+    totalElements,
+    pageModel,
+  } = useUserList();
+
+  useEffect(() => {
+    fetchUserList(getSearchParams());
+  }, [getSearchParams, fetchUserList]);
 
   return (
     <div>
@@ -69,6 +81,19 @@ const UserListPage = () => {
         rows={list}
         getRowId={(cell) => cell.id}
         onCellClick={(cell) => router.push(`/users/${cell.id}`)}
+        pageSizeOptions={[5, 10, 50]}
+        paginationModel={{
+          pageSize: pageModel.limit,
+          page: pageModel.offset / pageModel.limit,
+        }}
+        paginationMode="server"
+        rowCount={totalElements}
+        onPaginationModelChange={(model: GridPaginationModel) => {
+          onChangePage({
+            offset: model.page * model.pageSize,
+            limit: model.pageSize,
+          });
+        }}
         sx={{
           background: "white",
           width: "100%",

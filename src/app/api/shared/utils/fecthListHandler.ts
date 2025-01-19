@@ -1,6 +1,6 @@
 import { DEFAULT_LIMIT } from "@/app/types/listType";
 import { createClient } from "@/app/utils/supabase/client";
-import { toCamelCase, toSnakeCase } from "../../apiInstance";
+import { toCamelCase } from "../../apiInstance";
 
 export const fetchListHandler = async (
   tableName: string,

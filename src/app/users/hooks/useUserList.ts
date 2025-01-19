@@ -1,15 +1,36 @@
 import { getUserList } from "@/app/api/users";
-import { UserType } from "@/app/types/userType";
+import { PageModelType } from "@/app/types/listType";
+import { UserListParams, UserType } from "@/app/types/userType";
 import { showToast } from "@/app/utils/toastUtils";
 import { useCallback, useEffect, useState } from "react";
 
 export const useUserList = () => {
+  const [totalElements, setTotalElements] = useState<number>(0);
+  const [pageModel, setPageModel] = useState({
+    offset: 0,
+    limit: 50,
+  });
   const [list, setList] = useState<UserType[]>([]);
 
-  const fetchUserList = useCallback(async () => {
+  const getSearchParams = useCallback(
+    (params = {}): UserListParams => {
+      const defaultParams = {
+        ...pageModel,
+      };
+
+      return {
+        ...defaultParams,
+        ...params,
+      };
+    },
+    [pageModel]
+  );
+
+  const fetchUserList = useCallback(async (params?: UserListParams) => {
     try {
-      const result = await getUserList();
-      setList(result);
+      const result = await getUserList(params);
+      setList(result.data);
+      setTotalElements(result.totalElements);
     } catch {
       setList([]);
       showToast({
@@ -23,5 +44,20 @@ export const useUserList = () => {
     fetchUserList();
   }, []);
 
-  return { list };
+  const onChangePage = useCallback(
+    (pageModel: PageModelType) => {
+      setPageModel(pageModel);
+      fetchUserList(getSearchParams(pageModel));
+    },
+    [fetchUserList, getSearchParams]
+  );
+
+  return {
+    list,
+    totalElements,
+    onChangePage,
+    getSearchParams,
+    fetchUserList,
+    pageModel,
+  };
 };

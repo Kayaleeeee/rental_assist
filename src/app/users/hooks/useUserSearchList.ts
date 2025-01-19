@@ -19,7 +19,7 @@ export const useUserSearchList = () => {
   const fetchUserList = useCallback(async () => {
     try {
       const result = await getUserList(getSearchParams());
-      setList(result);
+      setList(result.data);
     } catch {
       showToast({
         message: "유저 목록을 불러오는데 실패했습니다.",
