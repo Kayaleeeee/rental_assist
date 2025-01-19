@@ -22,7 +22,7 @@ export const toCamelCase = (obj: any): any => {
 };
 
 // Convert keys of an object to snakeCase
-const toSnakeCase = (obj: any): any => {
+export const toSnakeCase = (obj: any): any => {
   if (isArray(obj)) {
     return obj.map(toSnakeCase);
   } else if (isObject(obj)) {
