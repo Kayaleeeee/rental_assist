@@ -1,5 +1,6 @@
 import { getPaymentsSumUp } from "@/app/api/payments/paymentsApi";
 import { getReservationList } from "@/app/api/reservation";
+import { PageModelType } from "@/app/types/listType";
 import { PaymentSumUpPostPayload } from "@/app/types/paymentType";
 import {
   PaymentStatus,
@@ -73,6 +74,7 @@ export const usePaymentList = () => {
     offset: 0,
     limit: 50,
   });
+  const [totalElements, setTotalElements] = useState<number>(0);
   const [sumUpState, setSumUpState] = useState<{
     [key: string]: number;
   }>(initialSumUpState);
@@ -92,8 +94,8 @@ export const usePaymentList = () => {
       const { startDate, endDate } = getDateRangeByPeriod(period);
 
       return {
-        startDate: `lte.${endDate}`,
-        endDate: `gte.${startDate}`,
+        startDate,
+        endDate,
       };
     },
     [getDateRangeByPeriod]
@@ -103,8 +105,8 @@ export const usePaymentList = () => {
     (params = {}): ReservationSearchParams => {
       const defaultParams = {
         ...pageModel,
-        order: "id.desc",
-        status: `in.(${ReservationStatus.confirmed})`,
+
+        status: ReservationStatus.confirmed,
       };
 
       const dateParams = getParamsByPeriod(selectedPeriod);
@@ -146,6 +148,7 @@ export const usePaymentList = () => {
       try {
         const result = await getReservationList(params);
         setList(result.data);
+        setTotalElements(result.totalElements);
       } catch {
         showToast({
           message: "예약 목록을 불러오는데 실패했습니다.",
@@ -203,6 +206,14 @@ export const usePaymentList = () => {
     fetchPaymentSumUp(sumUpParams);
   };
 
+  const onChangePage = useCallback(
+    (pageModel: PageModelType) => {
+      setPageModel(pageModel);
+      fetchReservationList(getSearchParams(pageModel));
+    },
+    [fetchReservationList, getSearchParams]
+  );
+
   return {
     sumUpState,
     list,
@@ -211,6 +222,8 @@ export const usePaymentList = () => {
     selectedPaymentCategory,
     periodCategoryList,
     selectedPeriod,
+    totalElements,
+    pageModel,
     onChangeStatusCategory,
     onChangePeriodCategory,
     fetchReservationList,
@@ -219,5 +232,6 @@ export const usePaymentList = () => {
     getDateRangeByPeriod,
     getSumUpParams,
     fetchPaymentSumUp,
+    onChangePage,
   };
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { PaymentStatus, ReservationType } from "../types/reservationType";
 import { HeaderName } from "../components/DataTable/HeaderName";
 
@@ -68,6 +68,8 @@ export default function PaymentsListPage() {
     selectedPaymentCategory,
     selectedPeriod,
     periodCategoryList,
+    totalElements,
+    pageModel,
     onChangeStatusCategory,
     onChangePeriodCategory,
     fetchReservationList,
@@ -75,6 +77,7 @@ export default function PaymentsListPage() {
     getSumUpParams,
     getDateRangeByPeriod,
     fetchPaymentSumUp,
+    onChangePage,
   } = usePaymentList();
 
   useEffect(() => {
@@ -137,6 +140,19 @@ export default function PaymentsListPage() {
       <GridTable<ReservationType>
         columns={columns}
         rows={list}
+        paginationModel={{
+          pageSize: pageModel.limit,
+          page: pageModel.offset / pageModel.limit,
+        }}
+        pageSizeOptions={[5, 10, 50]}
+        paginationMode="server"
+        rowCount={totalElements}
+        onPaginationModelChange={(model: GridPaginationModel) => {
+          onChangePage({
+            offset: model.page * model.pageSize,
+            limit: model.pageSize,
+          });
+        }}
         onCellClick={({ row }) =>
           router.push(`/reservations/${row.id}?quoteId=${row.quoteId}`)
         }

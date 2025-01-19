@@ -69,7 +69,6 @@ export const useReservationList = () => {
     (params = {}): ReservationSearchParams => {
       const defaultParams = {
         ...pageModel,
-        order: "id.desc",
       };
 
       const dateParams = {

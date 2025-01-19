@@ -17,7 +17,7 @@ import { formatDateTime } from "@/app/utils/timeUtils";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { PaymentStatusText } from "@/app/reservations/modules/PaymentStatusText";
 import { ReservationStatusText } from "@/app/reservations/modules/ReservationStatusText";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { ReservationType } from "@/app/types/reservationType";
 import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { formatPhoneNumber } from "@/app/utils/textUtils";
@@ -68,16 +68,24 @@ const UserDetailPage = () => {
   const router = useRouter();
 
   const { detail } = useUserDetail(userId);
-  const { list: reservationHistoryList, fetchReservationList } =
-    useReservationList();
+  const {
+    list: reservationHistoryList,
+    fetchReservationList,
+    pageModel,
+    onChangePage,
+    totalElements,
+    getSearchParams,
+  } = useReservationList();
 
   useEffect(() => {
     if (!userId) return;
 
-    fetchReservationList({ userId });
-  }, [userId]);
+    const params = getSearchParams({ userId });
+    fetchReservationList(params);
+  }, [userId, getSearchParams, fetchReservationList]);
 
   if (!detail) return null;
+
   return (
     <>
       <ListButton
@@ -135,9 +143,23 @@ const UserDetailPage = () => {
               <DataGrid<ReservationType>
                 columns={column}
                 rows={reservationHistoryList}
+                getRowId={(cell) => cell.id}
+                paginationModel={{
+                  pageSize: pageModel.limit,
+                  page: pageModel.offset / pageModel.limit,
+                }}
+                pageSizeOptions={[5, 10, 50]}
                 onCellClick={({ row }) => {
                   const url = `/reservations/${row.id}?quoteId=${row.quoteId}`;
                   window.open(url, "_blank");
+                }}
+                paginationMode="server"
+                rowCount={totalElements}
+                onPaginationModelChange={(model: GridPaginationModel) => {
+                  onChangePage({
+                    offset: model.page * model.pageSize,
+                    limit: model.pageSize,
+                  });
                 }}
                 sx={{
                   background: "white",
