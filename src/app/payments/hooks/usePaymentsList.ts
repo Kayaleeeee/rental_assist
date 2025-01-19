@@ -1,4 +1,4 @@
-import { getPaymentsSumUp } from "@/app/api/payments/paymentsApi";
+import { getPaymentsSumUp } from "@/app/api/payments";
 import { getReservationList } from "@/app/api/reservation";
 import { PageModelType } from "@/app/types/listType";
 import { PaymentSumUpPostPayload } from "@/app/types/paymentType";
