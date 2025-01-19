@@ -1,6 +1,6 @@
 "use client";
 
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { useReservationList } from "./hooks/useReservationList";
 import { ReservationType } from "../types/reservationType";
 import { HeaderName } from "../components/DataTable/HeaderName";
@@ -10,7 +10,7 @@ import { Margin } from "../components/Margin";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatLocaleString } from "../utils/priceUtils";
 import { CategoryList } from "../components/Category/CategoryList";
-import { formatDateTime } from "../utils/timeUtils";
+import { formatDateTime, isAfter } from "../utils/timeUtils";
 import { useRouter } from "next/navigation";
 import { SearchBar } from "../components/SearchBar";
 import { GridTable } from "../components/Table/GridTable";
@@ -20,7 +20,9 @@ import { Button } from "../components/Button";
 import { DateTimeSelector } from "../components/DateTimeSelector";
 import styles from "./reservationPage.module.scss";
 import dayjs from "dayjs";
-import { isEmpty } from "lodash";
+import { isEmpty, isNil } from "lodash";
+import { showToast } from "../utils/toastUtils";
+import RestartAltOutlinedIcon from "@mui/icons-material/RestartAltOutlined";
 
 const columns: GridColDef<ReservationType>[] = [
   {
@@ -82,10 +84,41 @@ export default function ReservationListPage() {
     searchMenu,
     dateRange,
     setDateRange,
+    pageModel,
+    onChangePage,
+    totalElements,
   } = useReservationList();
+
+  const handleResetDateRange = useCallback(() => {
+    setDateRange({
+      startDate: undefined,
+      endDate: undefined,
+    });
+  }, []);
 
   const onSearch = useCallback(() => {
     const params = getSearchParams();
+
+    if (params.startDate && !params.endDate) {
+      showToast({
+        message: "시작일과 종료일을 모두 입력해주세요.",
+        type: "error",
+      });
+      return;
+    }
+
+    if (
+      params.startDate &&
+      params.endDate &&
+      isAfter(params.startDate, params.endDate)
+    ) {
+      showToast({
+        message: "시작일은 종료일 이전이어야 합니다.",
+        type: "error",
+      });
+      return;
+    }
+
     fetchReservationList(params);
   }, [getSearchParams]);
 
@@ -165,6 +198,19 @@ export default function ReservationListPage() {
                 setDateRange((prev) => ({ ...prev, endDate: value }));
               }}
             />
+            <div
+              className={styles.resetIconWrapper}
+              onClick={handleResetDateRange}
+            >
+              <RestartAltOutlinedIcon
+                sx={{
+                  color:
+                    !isNil(dateRange.startDate) || !isNil(dateRange.endDate)
+                      ? "var(--blue-1)"
+                      : "var(--grey)",
+                }}
+              />
+            </div>
           </div>
           <Margin
             top={20}
@@ -201,6 +247,19 @@ export default function ReservationListPage() {
       <GridTable<ReservationType>
         columns={columns}
         rows={list}
+        getRowId={(cell) => cell.id}
+        paginationModel={{
+          pageSize: pageModel.limit,
+          page: pageModel.offset / pageModel.limit,
+        }}
+        rowCount={totalElements}
+        paginationMode="server"
+        onPaginationModelChange={(model: GridPaginationModel) => {
+          onChangePage({
+            offset: model.page * model.pageSize,
+            limit: model.pageSize,
+          });
+        }}
         onCellClick={({ row }) =>
           router.push(`/reservations/${row.id}?quoteId=${row.quoteId}`)
         }

@@ -12,7 +12,7 @@ import { fetchListHandler } from "../shared/utils/fecthListHandler";
 import { parseReservationListParams } from "./utils";
 
 const apiUrl = "/reservations";
-const listUrl = "/reservation_list";
+const listUrl = "reservation_list";
 const detailUrl = "/reservation_detail";
 
 export const postReservation = async (payload: ReservationPostPayload) => {

@@ -106,6 +106,15 @@
   max-width: 600px;
 }
 
+.resetIconWrapper {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
 .filterIconWrapper {
   display: flex;
   align-items: center;

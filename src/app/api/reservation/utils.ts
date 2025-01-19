@@ -12,18 +12,20 @@ export const parseReservationListParams = (
   }
 
   if (params.userName) {
-    query = query.ilike("userName", `%${params.userName}%`);
+    query = query.ilike("user_name", `%${params.userName}%`);
+  }
+
+  if (params.userId) {
+    query = query.eq("user_id", params.userId);
   }
 
   if (!isNil(params.startDate) && !isNil(params.endDate)) {
-    //   query = query.eq("disabled", params.disabled);
+    query = query.gte("start_date", params.startDate);
   }
 
-  // if (params.order) {
-  //   query = query.order(params.order, {
-  //     ascending: params.order === "asc",
-  //   });
-  // }
+  if (!isNil(params.endDate)) {
+    query = query.lte("end_date", params.endDate);
+  }
 
   return query.order("id", { ascending: false });
 };

@@ -2,6 +2,7 @@ import {
   getReservationList,
   getReservationStatusCount,
 } from "@/app/api/reservation";
+import { PageModelType } from "@/app/types/listType";
 import {
   ReservationSearchParams,
   ReservationStatus,
@@ -50,6 +51,7 @@ export const useReservationList = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categoryList[0].key
   );
+  const [totalElements, setTotalElements] = useState<number>(0);
   const [pageModel, setPageModel] = useState({
     offset: 0,
     limit: 50,
@@ -70,22 +72,18 @@ export const useReservationList = () => {
         order: "id.desc",
       };
 
-      const dateParams =
-        dateRange.startDate && dateRange.endDate
-          ? {
-              startDate: `lte.${dateRange.endDate}`,
-              endDate: `gte.${dateRange.startDate}`,
-            }
-          : {};
+      const dateParams = {
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+      };
+
       const categoryParams =
         selectedCategory === categoryList[0].key
           ? {}
           : { status: selectedCategory };
 
       const keywordParams =
-        keyword && selectedSearchKey
-          ? { [selectedSearchKey]: `ilike.%${keyword}%` }
-          : {};
+        keyword && selectedSearchKey ? { [selectedSearchKey]: keyword } : {};
 
       return {
         ...defaultParams,
@@ -102,7 +100,8 @@ export const useReservationList = () => {
     async (params?: ReservationSearchParams) => {
       try {
         const result = await getReservationList(params);
-        setList(result);
+        setList(result.data);
+        setTotalElements(result.totalElements);
       } catch {
         showToast({
           message: "예약 목록을 불러오는데 실패했습니다.",
@@ -147,6 +146,14 @@ export const useReservationList = () => {
     setSelectedSearchKey(key);
   };
 
+  const onChangePage = useCallback(
+    (pageModel: PageModelType) => {
+      setPageModel(pageModel);
+      fetchReservationList(getSearchParams(pageModel));
+    },
+    [fetchReservationList, getSearchParams]
+  );
+
   return {
     list,
     setList,
@@ -163,6 +170,8 @@ export const useReservationList = () => {
     searchMenu,
     setDateRange,
     dateRange,
-    setPageModel,
+    onChangePage,
+    pageModel,
+    totalElements,
   };
 };

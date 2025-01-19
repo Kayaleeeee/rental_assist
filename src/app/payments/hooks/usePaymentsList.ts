@@ -145,7 +145,7 @@ export const usePaymentList = () => {
     async (params?: ReservationSearchParams) => {
       try {
         const result = await getReservationList(params);
-        setList(result);
+        setList(result.data);
       } catch {
         showToast({
           message: "예약 목록을 불러오는데 실패했습니다.",
