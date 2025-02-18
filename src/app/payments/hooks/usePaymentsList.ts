@@ -1,13 +1,11 @@
-import { getPaymentsSumUp } from "@/app/api/payments";
-import { getReservationList } from "@/app/api/reservation";
+import { getPaymentList, getPaymentsSumUp } from "@/app/api/payments";
 import { PageModelType } from "@/app/types/listType";
-import { PaymentSumUpPostPayload } from "@/app/types/paymentType";
 import {
-  PaymentStatus,
-  ReservationSearchParams,
-  ReservationStatus,
-  ReservationType,
-} from "@/app/types/reservationType";
+  PaymentListItemType,
+  PaymentListSearchParams,
+  PaymentSumUpPostPayload,
+} from "@/app/types/paymentType";
+import { PaymentStatus, ReservationStatus } from "@/app/types/reservationType";
 
 import { showToast } from "@utils/toastUtils";
 import dayjs from "dayjs";
@@ -62,8 +60,13 @@ const initialSumUpState = {
   refunded: 0,
 };
 
+const searchMenu = [{ key: "userName", title: "회원이름" }];
+
 export const usePaymentList = () => {
-  const [list, setList] = useState<ReservationType[]>([]);
+  const [selectedSearchKey, setSelectedSearchKey] = useState<string>(
+    searchMenu[0].key
+  );
+  const [list, setList] = useState<PaymentListItemType[]>([]);
   const [selectedPaymentCategory, setSelectedPaymentCategory] =
     useState<string>(paymentStatusCategoryList[0].key);
 
@@ -78,6 +81,7 @@ export const usePaymentList = () => {
   const [sumUpState, setSumUpState] = useState<{
     [key: string]: number;
   }>(initialSumUpState);
+  const [keyword, setKeyword] = useState<string>("");
 
   const getDateRangeByPeriod = useCallback((period: number) => {
     const today = dayjs();
@@ -102,29 +106,47 @@ export const usePaymentList = () => {
   );
 
   const getSearchParams = useCallback(
-    (params = {}): ReservationSearchParams => {
+    (params = {}): PaymentListSearchParams => {
       const defaultParams = {
         ...pageModel,
-
         status: ReservationStatus.confirmed,
       };
 
       const dateParams = getParamsByPeriod(selectedPeriod);
 
-      const categoryParams =
+      const paymentStatus =
         selectedPaymentCategory === paymentStatusCategoryList[0].key
           ? {}
           : { paymentStatus: selectedPaymentCategory };
 
+      const keywordParams =
+        keyword && selectedSearchKey ? { [selectedSearchKey]: keyword } : {};
+
       return {
         ...defaultParams,
-        ...categoryParams,
+        ...paymentStatus,
         ...dateParams,
         ...params,
+        ...keywordParams,
       };
     },
-    [selectedPeriod, selectedPaymentCategory, pageModel, getParamsByPeriod]
+    [
+      selectedPeriod,
+      selectedPaymentCategory,
+      pageModel,
+      getParamsByPeriod,
+      keyword,
+      selectedSearchKey,
+    ]
   );
+
+  const onChangeSearchKey = (key: string) => {
+    setSelectedSearchKey(key);
+  };
+
+  const onChangeKeyword = (keyword: string) => {
+    setKeyword(keyword);
+  };
 
   const getSumUpParams = useCallback(
     (params?: Partial<PaymentSumUpPostPayload>): PaymentSumUpPostPayload => {
@@ -143,10 +165,10 @@ export const usePaymentList = () => {
     [selectedPeriod, selectedPaymentCategory, getDateRangeByPeriod]
   );
 
-  const fetchReservationList = useCallback(
-    async (params?: ReservationSearchParams) => {
+  const fetchPaymentList = useCallback(
+    async (params?: PaymentListSearchParams) => {
       try {
-        const result = await getReservationList(params);
+        const result = await getPaymentList(params);
         setList(result.data);
         setTotalElements(result.totalElements);
       } catch {
@@ -188,7 +210,7 @@ export const usePaymentList = () => {
       paymentStatusParam: paymentStatus || null,
     });
 
-    fetchReservationList(searchParams);
+    fetchPaymentList(searchParams);
     fetchPaymentSumUp(sumUpParams);
   };
 
@@ -202,16 +224,16 @@ export const usePaymentList = () => {
       endDateParam: dateByPeriod.endDate,
     });
 
-    fetchReservationList(searchParams);
+    fetchPaymentList(searchParams);
     fetchPaymentSumUp(sumUpParams);
   };
 
   const onChangePage = useCallback(
     (pageModel: PageModelType) => {
       setPageModel(pageModel);
-      fetchReservationList(getSearchParams(pageModel));
+      fetchPaymentList(getSearchParams(pageModel));
     },
-    [fetchReservationList, getSearchParams]
+    [fetchPaymentList, getSearchParams]
   );
 
   return {
@@ -224,14 +246,19 @@ export const usePaymentList = () => {
     selectedPeriod,
     totalElements,
     pageModel,
+    searchMenu,
+    keyword,
+    selectedSearchKey,
     onChangeStatusCategory,
     onChangePeriodCategory,
-    fetchReservationList,
+    fetchPaymentList,
     getSearchParams,
     setPageModel,
     getDateRangeByPeriod,
     getSumUpParams,
     fetchPaymentSumUp,
     onChangePage,
+    onChangeSearchKey,
+    onChangeKeyword,
   };
 };

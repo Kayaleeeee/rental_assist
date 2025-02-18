@@ -5,7 +5,7 @@ import { PaymentStatus, ReservationType } from "../types/reservationType";
 import { HeaderName } from "../components/DataTable/HeaderName";
 
 import { Margin } from "../components/Margin";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { formatLocaleString } from "../utils/priceUtils";
 import { CategoryList } from "../components/Category/CategoryList";
 import { formatDateTime } from "../utils/timeUtils";
@@ -15,6 +15,8 @@ import { PaymentStatusText } from "../reservations/modules/PaymentStatusText";
 import { ReservationStatusText } from "../reservations/modules/ReservationStatusText";
 import { usePaymentList } from "./hooks/usePaymentsList";
 import styles from "./paymentPage.module.scss";
+import { SearchBar } from "../components/SearchBar";
+import { isNil } from "lodash";
 
 const getColumns = (): GridColDef<ReservationType>[] => [
   {
@@ -57,6 +59,13 @@ const getColumns = (): GridColDef<ReservationType>[] => [
     renderCell: ({ row }) => <PaymentStatusText status={row.paymentStatus} />,
     renderHeader: () => HeaderName("결제 상태"),
   },
+  {
+    field: "paymentMethod",
+    flex: 1,
+    renderCell: ({ row }) =>
+      isNil(row.paymentMethod) ? "-" : row.paymentMethod,
+    renderHeader: () => HeaderName("결제 수단"),
+  },
 ];
 
 export default function PaymentsListPage() {
@@ -70,18 +79,23 @@ export default function PaymentsListPage() {
     periodCategoryList,
     totalElements,
     pageModel,
+    searchMenu,
+    keyword,
+    selectedSearchKey,
+    onChangeSearchKey,
     onChangeStatusCategory,
     onChangePeriodCategory,
-    fetchReservationList,
+    fetchPaymentList,
     getSearchParams,
     getSumUpParams,
     getDateRangeByPeriod,
     fetchPaymentSumUp,
     onChangePage,
+    onChangeKeyword,
   } = usePaymentList();
 
   useEffect(() => {
-    fetchReservationList(getSearchParams());
+    fetchPaymentList(getSearchParams());
     fetchPaymentSumUp(getSumUpParams());
   }, []);
 
@@ -100,6 +114,10 @@ export default function PaymentsListPage() {
       );
     }
   }, [sumUpState, selectedPaymentCategory]);
+
+  const onSearch = useCallback(() => {
+    fetchPaymentList(getSearchParams());
+  }, [keyword, getSearchParams, fetch]);
 
   return (
     <div>
@@ -136,6 +154,24 @@ export default function PaymentsListPage() {
       </div>
 
       <Margin top={30} />
+
+      <Margin
+        bottom={16}
+        style={{
+          width: "100%",
+          maxWidth: "600px",
+          display: "inline-flex",
+        }}
+      >
+        <SearchBar
+          menuList={searchMenu}
+          keyword={keyword}
+          selectedKey={selectedSearchKey}
+          onChangeKeyword={onChangeKeyword}
+          onChangeSearchKey={onChangeSearchKey}
+          onSearch={onSearch}
+        />
+      </Margin>
 
       <GridTable<ReservationType>
         columns={columns}
