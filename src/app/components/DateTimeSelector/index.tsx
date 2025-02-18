@@ -1,5 +1,5 @@
 "use client";
-
+import "dayjs/locale/ko";
 import {
   DateOrTimeView,
   DateTimePicker,
@@ -30,7 +30,7 @@ export const DateTimeSelector = ({
   views,
 }: Props) => {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ko">
       <DateTimePicker
         label={label}
         value={value ? dayjs(value) : undefined}
