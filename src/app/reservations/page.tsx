@@ -69,7 +69,7 @@ const columns: GridColDef<ReservationType>[] = [
 
 export default function ReservationListPage() {
   const router = useRouter();
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [showFilters, setShowFilters] = useState<boolean>(true);
   const {
     list,
     categoryList,
