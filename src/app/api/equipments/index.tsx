@@ -16,7 +16,11 @@ import { fetchListHandler } from "../shared/utils/fecthListHandler";
 const apiUrl = "/equipments";
 
 export const getEquipmentList = async (params?: EquipmentListParams) => {
-  return await fetchListHandler("equipments", params, parseEquipmentListParams);
+  return await fetchListHandler<EquipmentListItemType>(
+    "equipments",
+    params,
+    parseEquipmentListParams
+  );
 };
 
 export const postEquipmentForm = async (payload: EquipmentPostBody) => {

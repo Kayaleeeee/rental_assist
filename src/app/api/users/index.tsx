@@ -15,7 +15,11 @@ export const registerUser = (payload: UserPostPayload) => {
 };
 
 export const getUserList = (params?: UserListParams) => {
-  return fetchListHandler("users", params, parseReservationListParams);
+  return fetchListHandler<UserType>(
+    "users",
+    params,
+    parseReservationListParams
+  );
 };
 
 export const getUserDetail = async (id: UserType["id"]) => {

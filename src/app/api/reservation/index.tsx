@@ -26,7 +26,11 @@ export const postReservation = async (payload: ReservationPostPayload) => {
 };
 
 export const getReservationList = (params?: ReservationSearchParams) => {
-  return fetchListHandler(listUrl, params, parseReservationListParams);
+  return fetchListHandler<ReservationType>(
+    listUrl,
+    params,
+    parseReservationListParams
+  );
 };
 
 export const getReservationDetail = async (id: number) => {
