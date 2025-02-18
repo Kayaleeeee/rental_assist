@@ -5,6 +5,7 @@ import { MenuItem, Select } from "@mui/material";
 import { useCallback, useState } from "react";
 import { getPaymentStatusText } from "../PaymentStatusText";
 import { Label } from "@/app/components/Form/Label";
+import { mapPaymentMethodName } from "@/app/payments/utils/paymentMethodNameUtils";
 
 const statusMenu = [
   {
@@ -19,15 +20,9 @@ const statusMenu = [
 ];
 
 const paymentOptionMenu = [
-  {
-    key: PaymentMethod.card,
-    title: "카드",
-  },
-  { key: PaymentMethod.cash, title: "현금" },
-  {
-    key: PaymentMethod.bank_transfer,
-    title: "계좌이체",
-  },
+  PaymentMethod.card,
+  PaymentMethod.cash,
+  PaymentMethod.bank_transfer,
 ];
 
 type Props = {
@@ -99,8 +94,8 @@ export const PaymentStatusChangeModal = ({
             >
               {paymentOptionMenu.map((item) => {
                 return (
-                  <MenuItem key={item.key} value={item.key}>
-                    {item.title}
+                  <MenuItem key={item} value={item}>
+                    {mapPaymentMethodName(item)}
                   </MenuItem>
                 );
               })}

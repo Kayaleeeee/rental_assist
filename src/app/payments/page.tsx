@@ -12,11 +12,13 @@ import { formatDateTime } from "../utils/timeUtils";
 import { useRouter } from "next/navigation";
 import { GridTable } from "../components/Table/GridTable";
 import { PaymentStatusText } from "../reservations/modules/PaymentStatusText";
-import { ReservationStatusText } from "../reservations/modules/ReservationStatusText";
+
 import { usePaymentList } from "./hooks/usePaymentsList";
 import styles from "./paymentPage.module.scss";
 import { SearchBar } from "../components/SearchBar";
 import { isNil } from "lodash";
+
+import { PaymentMethodText } from "./components/PaymentMethodText";
 
 const getColumns = (): GridColDef<ReservationType>[] => [
   {
@@ -47,12 +49,7 @@ const getColumns = (): GridColDef<ReservationType>[] => [
     renderHeader: () => HeaderName("총 금액"),
     renderCell: ({ row }) => <>{formatLocaleString(row.totalPrice)}</>,
   },
-  {
-    field: "status",
-    flex: 1,
-    renderHeader: () => HeaderName("상태"),
-    renderCell: ({ row }) => <ReservationStatusText status={row.status} />,
-  },
+
   {
     field: "paymentStatus",
     flex: 1,
@@ -63,7 +60,11 @@ const getColumns = (): GridColDef<ReservationType>[] => [
     field: "paymentMethod",
     flex: 1,
     renderCell: ({ row }) =>
-      isNil(row.paymentMethod) ? "-" : row.paymentMethod,
+      isNil(row.paymentMethod) ? (
+        "-"
+      ) : (
+        <PaymentMethodText paymentMethod={row.paymentMethod} />
+      ),
     renderHeader: () => HeaderName("결제 수단"),
   },
 ];

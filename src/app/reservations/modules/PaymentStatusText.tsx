@@ -14,8 +14,10 @@ export const PaymentStatusText = ({
         return "#f3260c";
       case PaymentStatus.refunded:
         return "#ff8522";
-      default:
+      case PaymentStatus.paid:
         return "#009cd8";
+      default:
+        return "#f3260c";
     }
   }, [status]);
 
@@ -41,6 +43,6 @@ export const getPaymentStatusText = (status: PaymentStatus) => {
     case PaymentStatus.refunded:
       return "환불";
     default:
-      return "결제완료";
+      return "미결제";
   }
 };
