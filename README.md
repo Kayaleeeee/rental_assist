@@ -57,4 +57,4 @@ https://github.com/user-attachments/assets/5c9e4601-9cc4-48f0-8a9b-91d1c1377f44
 
 프로젝트와 관련하여 문의 사항이 있으시면 아래로 연락해 주세요.
 
-- Email: gayeon71057@gmail.cpm
+- Email: gayeon71057@gmail.com
