@@ -12,7 +12,7 @@ export const useUserSearchList = () => {
     if (!keyword || !searchKey) return {};
 
     return {
-      [searchKey]: `ilike.%${keyword}%`,
+      [searchKey]: keyword,
     };
   }, [keyword, searchKey]);
 
