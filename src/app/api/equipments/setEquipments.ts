@@ -9,7 +9,7 @@ import {
   SetEquipmentWithAvailabilityType,
 } from "@/app/types/equipmentType";
 import { DEFAULT_LIMIT, ListReturnType } from "@/app/types/listType";
-import { createClient } from "@/app/utils/supabase/client";
+import { clientSupabase } from "@/app/utils/supabase/client";
 import { apiDelete, apiGet, apiPatch, apiPost } from "..";
 import { isEmpty } from "lodash";
 import { toCamelCase } from "../apiInstance";
@@ -38,9 +38,7 @@ const applyFilters = (query: any, params?: EquipmentListParams) => {
 };
 
 export const getSetEquipmentList = async (params?: EquipmentListParams) => {
-  const supabase = await createClient();
-
-  let query = supabase
+  let query = clientSupabase
     .from("equipment_set_list")
     .select("*", { count: "exact" });
 

@@ -1,7 +1,8 @@
 import { DEFAULT_LIMIT } from "@/app/types/listType";
-import { createClient } from "@/app/utils/supabase/client";
+
 import { toCamelCase } from "../../apiInstance";
 import { PostgrestError } from "@supabase/supabase-js";
+import { clientSupabase } from "@/app/utils/supabase/client";
 
 export const fetchListHandler = async <T>(
   tableName: string,
@@ -12,9 +13,7 @@ export const fetchListHandler = async <T>(
   totalElements: number;
   error: PostgrestError | null;
 }> => {
-  const supabase = await createClient();
-
-  let query = supabase.from(tableName).select("*", { count: "exact" });
+  let query = clientSupabase.from(tableName).select("*", { count: "exact" });
 
   if (customizeQuery) {
     query = customizeQuery(query, params);

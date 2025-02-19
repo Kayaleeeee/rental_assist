@@ -1,5 +1,5 @@
 import { AdminUserType } from "@/app/types/userType";
-import { createClient } from "@/app/utils/supabase/client";
+import { clientSupabase } from "@/app/utils/supabase/client";
 import { create } from "zustand";
 
 interface AuthState {
@@ -23,13 +23,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return get().user;
   },
   fetchUser: async () => {
-    const supabase = createClient();
-
     set({ loading: true });
 
     try {
       const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
+        await clientSupabase.auth.getSession();
 
       if (sessionError || !sessionData.session) {
         set({
@@ -41,7 +39,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       const { data: userData, error: userError } =
-        await supabase.auth.getUser();
+        await clientSupabase.auth.getUser();
 
       if (userError) {
         set({ error: userError, user: undefined, loading: false });
@@ -56,9 +54,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
   logout: async () => {
-    const supabase = createClient();
-
-    await supabase.auth.signOut();
+    await clientSupabase.auth.signOut();
     set({ user: undefined });
   },
 }));

@@ -1,13 +1,12 @@
 "use server";
 
 import { CustomError } from "@/app/class/CustomError";
-import { createClient } from "@/app/utils/supabase/server";
+import { serverSupabase } from "@/app/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function login(formData: { email: string; password: string }) {
-  const supabase = await createClient();
-
+  const supabase = await serverSupabase;
   const { error } = await supabase.auth.signInWithPassword(formData);
 
   if (error) {
@@ -22,8 +21,7 @@ export async function signup(formData: {
   email: string;
   password: string;
 }): Promise<void> {
-  const supabase = await createClient();
-
+  const supabase = await serverSupabase;
   const { error } = await supabase.auth.signUp(formData);
 
   if (error) {
