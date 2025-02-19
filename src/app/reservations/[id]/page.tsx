@@ -35,6 +35,8 @@ import { isEmpty, isNil } from "lodash";
 import { ReservationItemTable } from "../modules/form/ReservationItemTable";
 import { ReservationGroupTable } from "@/app/reservations/modules/form/ReservationGroupTable";
 import { formatPhoneNumber } from "@/app/utils/textUtils";
+import { updatePayment } from "../actions/updatePayment";
+import { PaymentMethodText } from "@/app/payments/components/PaymentMethodText";
 
 const defaultString = "-";
 
@@ -89,18 +91,30 @@ const ReservationDetailPage = () => {
   );
 
   const onChangePaymentStatus = useCallback(
-    async (status: PaymentStatus, paymentMethod?: PaymentMethod) => {
+    async ({
+      paymentStatus,
+      paymentMethod,
+    }: {
+      paymentStatus: PaymentStatus;
+      paymentMethod?: PaymentMethod;
+    }) => {
       if (!reservationDetail) return;
-
-      const payload = {
-        paymentStatus: status,
-        ...(paymentMethod && status === PaymentStatus.paid
-          ? { paymentMethod }
-          : {}),
-      };
+      if (paymentStatus === PaymentStatus.paid && !paymentMethod) {
+        showToast({
+          type: "error",
+          message: "결제 수단을 선택해주세요.",
+        });
+        return;
+      }
 
       try {
-        await updateReservation(reservationDetail.id, payload);
+        const result = await updatePayment({
+          reservationId: reservationDetail.id,
+          body: {
+            paymentMethod,
+            paymentStatus,
+          },
+        });
 
         showToast({
           message: "결제 상태를 변경했습니다.",
@@ -109,7 +123,11 @@ const ReservationDetailPage = () => {
 
         setReservationDetail((prev) => {
           if (!prev) return;
-          return { ...prev, paymentStatus: status };
+          return {
+            ...prev,
+            paymentStatus: result.paymentStatus,
+            paymentMethod: result.paymentMethod,
+          };
         });
 
         setIsOpenPaymentModal(false);
@@ -208,9 +226,21 @@ const ReservationDetailPage = () => {
               <ArrowDropDownOutlinedIcon />
             </div>
             <div>
-              <PaymentStatusText status={reservationDetail.paymentStatus} />
+              <PaymentStatusText status={reservationDetail.paymentStatus} />{" "}
             </div>
           </div>
+          {reservationDetail.paymentMethod && (
+            <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
+              <div className={styles.clickableLabelWrapper}>
+                <Label title="결제 수단" />
+              </div>
+              <div>
+                <PaymentMethodText
+                  paymentMethod={reservationDetail.paymentMethod}
+                />
+              </div>
+            </div>
+          )}
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <Label title={`회차 정보`} />
 

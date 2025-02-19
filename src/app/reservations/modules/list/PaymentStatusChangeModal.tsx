@@ -28,7 +28,13 @@ const paymentOptionMenu = [
 type Props = {
   currentStatus: PaymentStatus;
   onCloseModal: () => void;
-  onChangeStatus: (status: PaymentStatus) => void;
+  onChangeStatus: ({
+    paymentStatus,
+    paymentMethod,
+  }: {
+    paymentStatus: PaymentStatus;
+    paymentMethod: PaymentMethod;
+  }) => void;
 };
 
 export const PaymentStatusChangeModal = ({
@@ -46,8 +52,11 @@ export const PaymentStatusChangeModal = ({
   const onConfirmChange = useCallback(async () => {
     if (!confirm("결제 상태를 변경하시겠어요?")) return;
 
-    onChangeStatus(selectedStatus);
-  }, [selectedStatus]);
+    onChangeStatus({
+      paymentStatus: selectedStatus,
+      paymentMethod: selectedMethod,
+    });
+  }, [selectedStatus, selectedMethod]);
 
   return (
     <Modal
