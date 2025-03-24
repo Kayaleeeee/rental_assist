@@ -10,6 +10,8 @@ import { AvailableEquipmentSearchModal } from "@/app/equipments/modules/Availabl
 import { AvailableGroupEquipmentModal } from "@/app/equipments/sets/modules/AvailableGroupEquipmentModal/AvailableGroupEquipmentModal";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { EquipmentPriceChangeModal } from "@/app/equipments/modules/EquipmentPriceChangeModal/EquipmentPriceChangeModal";
+import { EquipmentQuantityChangeModal } from "@/app/equipments/modules/EquipmentQuantityChangeModal/EquipmentQuantityChangeModal";
 
 type Props = {
   modal: ModalType;
@@ -80,6 +82,22 @@ export const ModalRenderer = ({ modal, onCloseModal }: Props) => {
         );
       case "reservationDiscount":
         return <DiscountModal {...modal.props} onCloseModal={onCloseModal} />;
+
+      case "equipmentPriceChange":
+        return (
+          <EquipmentPriceChangeModal
+            {...modal.props}
+            onCloseModal={onCloseModal}
+          />
+        );
+
+      case "equipmentQuantityChange":
+        return (
+          <EquipmentQuantityChangeModal
+            {...modal.props}
+            onCloseModal={onCloseModal}
+          />
+        );
       default:
         return null;
     }

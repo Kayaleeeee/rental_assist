@@ -11,6 +11,8 @@ import { PaymentStatusChangeModalProps } from "@/app/reservations/modules/list/P
 import { DiscountModalProps } from "@/app/reservations/modules/DiscountModal";
 import { AvailableEquipmentSearchModalProps } from "@/app/equipments/modules/AvailableEquipmentSearchModal";
 import { AvailableGroupEquipmentModalProps } from "@/app/equipments/sets/modules/AvailableGroupEquipmentModal/AvailableGroupEquipmentModal";
+import { EquipmentPriceChangeModalProps } from "@/app/equipments/modules/EquipmentPriceChangeModal/EquipmentPriceChangeModal";
+import { EquipmentQuantityChangeModalProps } from "@/app/equipments/modules/EquipmentQuantityChangeModal/EquipmentQuantityChangeModal";
 
 export interface ModalBasicProps {
   onCloseModal: () => void;
@@ -43,6 +45,14 @@ export type ModalType =
     }
   | { name: "priceSetting"; props: ModalProps<PriceSettingModalProps> }
   | { name: "rentalDateChange"; props: ModalProps<RentalDateChangeModalProps> }
+  | {
+      name: "equipmentPriceChange";
+      props: ModalProps<EquipmentPriceChangeModalProps>;
+    }
+  | {
+      name: "equipmentQuantityChange";
+      props: ModalProps<EquipmentQuantityChangeModalProps>;
+    }
   | null;
 
 const ModalContext = createContext<{
