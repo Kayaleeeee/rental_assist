@@ -5,6 +5,7 @@ import { Menu } from "@components/Menu";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Cart } from "./components/Cart";
+import { ModalProvider } from "./components/Modal/useModal";
 
 const notoSansKR = localFont({
   src: [
@@ -73,19 +74,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${notoSansKR.className}`}>
-        <ToastContainer
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-        <div className="mainWrapper">
-          <aside>
-            <Menu />
-          </aside>
-          <div className="childrenWrapper">{children}</div>
-        </div>
-        <Cart />
+        <ModalProvider>
+          <ToastContainer
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
+          <div className="mainWrapper">
+            <aside>
+              <Menu />
+            </aside>
+            <div className="childrenWrapper">{children}</div>
+          </div>
+          <Cart />
+          <div id="modal-root" />
+        </ModalProvider>
       </body>
     </html>
   );
