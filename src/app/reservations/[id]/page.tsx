@@ -22,33 +22,25 @@ import {
   PaymentStatus,
   ReservationStatus,
 } from "@/app/types/reservationType";
-import { HTMLAttributes, useCallback, useMemo, useState } from "react";
+import { HTMLAttributes, useCallback, useMemo } from "react";
 import { showToast } from "@/app/utils/toastUtils";
 import { updateReservation } from "@/app/api/reservation";
 import { Button } from "@/app/components/Button";
-import { ReservationStatusChangeModal } from "../modules/list/StatusChangeModal";
 import { ReservationStatusText } from "../modules/ReservationStatusText";
-import { PaymentStatusChangeModal } from "../modules/list/PaymentStatusChangeModal";
 import ArrowDropDownOutlinedIcon from "@mui/icons-material/ArrowDropDownOutlined";
-import { RentalDateChangeModal } from "../modules/list/RentalDateChangeModal";
 import { isEmpty, isNil } from "lodash";
 import { ReservationItemTable } from "../modules/form/ReservationItemTable";
 import { ReservationGroupTable } from "@/app/reservations/modules/form/ReservationGroupTable";
 import { formatPhoneNumber } from "@/app/utils/textUtils";
 import { updatePayment } from "../actions/updatePayment";
 import { PaymentMethodText } from "@/app/payments/components/PaymentMethodText";
+import { useModal } from "@/app/components/Modal/useModal";
 
 const defaultString = "-";
 
 const ReservationDetailPage = () => {
-  const [isOpenStatusModal, setIsOpenStatusModal] = useState<boolean>(false);
-  const [isOpenPaymentModal, setIsOpenPaymentModal] = useState<boolean>(false);
-  const [isOpenRentalDateModal, setIsOpenRentalDateModal] =
-    useState<boolean>(false);
-
   const router = useRouter();
   const params = useParams();
-
   const reservationId = Number(params.id);
 
   const { detail: reservationDetail, setDetail: setReservationDetail } =
@@ -62,6 +54,55 @@ const ReservationDetailPage = () => {
   const formWrapperStyle = {
     width: "200px",
   } as HTMLAttributes<HTMLDivElement["style"]>;
+  const { openModal } = useModal();
+
+  const itemDiscount = useMemo(() => {
+    if (!reservationDetail) return 0;
+    return (
+      reservationDetail.supplyPrice -
+      (reservationDetail.totalPrice + (reservationDetail.discountPrice || 0))
+    );
+  }, [reservationDetail]);
+
+  const formDiscountPrice = useMemo(() => {
+    if (!reservationDetail) return 0;
+
+    return reservationDetail.discountPrice || 0;
+  }, [reservationDetail]);
+
+  const openRentalDateModal = () => {
+    if (!reservationDetail) return;
+
+    openModal({
+      name: "rentalDateChange",
+      props: {
+        dateRange: {
+          startDate: reservationDetail.startDate,
+          endDate: reservationDetail.endDate,
+        },
+        quoteId: reservationDetail.quoteId,
+        onChangeDate: (dateRange) => {
+          setReservationDetail({
+            ...reservationDetail,
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+          });
+        },
+      },
+    });
+  };
+
+  const openReservationStatusModal = () => {
+    if (!reservationDetail) return;
+
+    openModal({
+      name: "reservationStatusChange",
+      props: {
+        currentStatus: reservationDetail.status,
+        onChangeStatus: onChangeReservationStatus,
+      },
+    });
+  };
 
   const onChangeReservationStatus = useCallback(
     async (status: ReservationStatus) => {
@@ -78,8 +119,6 @@ const ReservationDetailPage = () => {
           if (!prev) return;
           return { ...prev, status };
         });
-
-        setIsOpenStatusModal(false);
       } catch {
         showToast({
           message: "상태 변경에 실패했습니다.",
@@ -89,6 +128,18 @@ const ReservationDetailPage = () => {
     },
     [reservationDetail]
   );
+
+  const openPaymentStatusModal = () => {
+    if (!reservationDetail) return;
+
+    openModal({
+      name: "paymentStatusChange",
+      props: {
+        currentStatus: reservationDetail.paymentStatus || PaymentStatus.unpaid,
+        onChangeStatus: onChangePaymentStatus,
+      },
+    });
+  };
 
   const onChangePaymentStatus = useCallback(
     async ({
@@ -129,8 +180,6 @@ const ReservationDetailPage = () => {
             paymentMethod: result.paymentMethod,
           };
         });
-
-        setIsOpenPaymentModal(false);
       } catch {
         showToast({
           message: "상태 변경에 실패했습니다.",
@@ -140,20 +189,6 @@ const ReservationDetailPage = () => {
     },
     [reservationDetail]
   );
-
-  const itemDiscount = useMemo(() => {
-    if (!reservationDetail) return 0;
-    return (
-      reservationDetail.supplyPrice -
-      (reservationDetail.totalPrice + (reservationDetail.discountPrice || 0))
-    );
-  }, [reservationDetail]);
-
-  const formDiscountPrice = useMemo(() => {
-    if (!reservationDetail) return 0;
-
-    return reservationDetail.discountPrice || 0;
-  }, [reservationDetail]);
 
   if (!reservationDetail) return null;
 
@@ -208,7 +243,7 @@ const ReservationDetailPage = () => {
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <div
               className={styles.clickableLabelWrapper}
-              onClick={() => setIsOpenStatusModal(true)}
+              onClick={openReservationStatusModal}
             >
               <Label title="예약 상태" />
               <ArrowDropDownOutlinedIcon />
@@ -220,7 +255,7 @@ const ReservationDetailPage = () => {
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <div
               className={styles.clickableLabelWrapper}
-              onClick={() => setIsOpenPaymentModal(true)}
+              onClick={openPaymentStatusModal}
             >
               <Label title="결제 상태" />
               <ArrowDropDownOutlinedIcon />
@@ -251,7 +286,7 @@ const ReservationDetailPage = () => {
           <div className={formStyles.sectionWrapper} style={formWrapperStyle}>
             <div
               className={styles.clickableLabelWrapper}
-              onClick={() => setIsOpenRentalDateModal(true)}
+              onClick={openRentalDateModal}
             >
               <Label title={`대여 기간 (총 ${rentalDays}일)`} />
               <ArrowDropDownOutlinedIcon />
@@ -368,37 +403,6 @@ const ReservationDetailPage = () => {
           </div>
         </div>
       </FormWrapper>
-      {isOpenStatusModal && reservationDetail && (
-        <ReservationStatusChangeModal
-          currentStatus={reservationDetail.status}
-          onCloseModal={() => setIsOpenStatusModal(false)}
-          onChangeStatus={onChangeReservationStatus}
-        />
-      )}
-      {isOpenPaymentModal && reservationDetail && (
-        <PaymentStatusChangeModal
-          currentStatus={reservationDetail.paymentStatus}
-          onCloseModal={() => setIsOpenPaymentModal(false)}
-          onChangeStatus={onChangePaymentStatus}
-        />
-      )}
-      {isOpenRentalDateModal && (
-        <RentalDateChangeModal
-          onCloseModal={() => setIsOpenRentalDateModal(false)}
-          dateRange={{
-            startDate: reservationDetail.startDate,
-            endDate: reservationDetail.endDate,
-          }}
-          onChangeDate={(dateRange) =>
-            setReservationDetail({
-              ...reservationDetail,
-              startDate: dateRange.startDate,
-              endDate: dateRange.endDate,
-            })
-          }
-          quoteId={reservationDetail.quoteId}
-        />
-      )}
     </div>
   );
 };

@@ -11,17 +11,13 @@ import { Margin } from "@/app/components/Margin";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { EditableField } from "@/app/components/EditableField";
 import { showToast } from "@/app/utils/toastUtils";
-import { UserSearchModal } from "../../users/modules/UserSearchModal";
 import { UserType } from "@/app/types/userType";
 import dayjs from "dayjs";
-import {
-  EquipmentListItemType,
-  SetEquipmentType,
-} from "@/app/types/equipmentType";
-import { isEmpty, isNil } from "lodash";
+import { SetEquipmentType } from "@/app/types/equipmentType";
+import { isEmpty } from "lodash";
 import { onCreateReservation } from "../actions/createReservation";
 import { useRouter } from "next/navigation";
-import { convertEquipmentItemToStateWithOption } from "@/app/types/mapper/convertEquipmentItemToState";
+import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 import {
   getAllEquipmentGroupSupplyPrice,
   getAllEquipmentGroupTotalPrice,
@@ -33,30 +29,21 @@ import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
-import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 import { ReservationItemTableEditor } from "../modules/form/ReservationItemTableEditor";
 import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { RoundChangeModal } from "../modules/form/RoundChangeModal";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { useReservationForms } from "../hooks/useReservationForms";
-import { DiscountModal } from "../modules/DiscountModal";
-import { EquipmentWithAvailabilitySearchModal } from "@/app/equipments/modules/EquipmentWithAvailablitySearchModal";
-import { GroupEquipmentWithAvailabilitySearchModal } from "@/app/equipments/sets/modules/GroupEquipmentAvailaiblityModal/GroupEquipmentWithAvailabilitySearchModal";
+
+import { useModal } from "@/app/components/Modal/useModal";
+import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 
 const ReservationCreatePage = () => {
   const router = useRouter();
-  const [isOpenGroupSearchModal, setIsOpenGroupSearchModal] = useState(false);
-  const [isOpenUserModal, setIsOpenUserModal] = useState(false);
-  const [isOpenRoundChangeModal, setIsOpenRoundChangeModal] = useState(false);
-  const [isOpenDiscountModal, setIsOpenDiscountModal] = useState(false);
-  const [changingStatus, setChangingStatus] = useState<
-    { mode: "item" } | { mode: "group"; groupId: SetEquipmentType["id"] } | null
-  >(null);
-
   const [availabilityState, setAvailabilityState] = useState<{
     checkedList: EquipmentAvailableItem[];
   }>(initialAvailability);
+  const { openModal } = useModal();
 
   const {
     form,
@@ -105,82 +92,6 @@ const ReservationCreatePage = () => {
     });
   }, [form.rounds, equipmentGroupList]);
 
-  const handleOpenEquipmentModal = (
-    status:
-      | { mode: "item" }
-      | { mode: "group"; groupId: SetEquipmentType["id"] }
-  ) => {
-    if (form.rounds === 0) {
-      showToast({ message: "기간을 설정해주세요.", type: "error" });
-      return;
-    }
-
-    if (form.rounds < 1) {
-      showToast({
-        message: "회차는 1회보다 작을 수 없습니다.",
-        type: "error",
-      });
-      return;
-    }
-
-    setChangingStatus(status);
-  };
-
-  const onClickGroupEquipmentModal = () => {
-    if (form.rounds === 0) {
-      showToast({ message: "기간을 설정해주세요.", type: "error" });
-      return;
-    }
-
-    if (form.rounds < 1) {
-      showToast({
-        message: "회차는 1회보다 작을 수 없습니다.",
-        type: "error",
-      });
-      return;
-    }
-
-    setIsOpenGroupSearchModal(true);
-  };
-
-  const handleSelectUser = (user: UserType) => {
-    setForm((prev) => ({
-      ...prev,
-      userId: user.id,
-      guestName: user.name,
-      guestPhoneNumber: user.phoneNumber ?? "",
-    }));
-  };
-
-  const handleConfirmEquipmentModal = useCallback(
-    async (list: EquipmentListItemType[]) => {
-      if (!changingStatus) return;
-
-      const convertedList = list.map((item) =>
-        convertEquipmentItemToStateWithOption(item, { quantity: 1 })
-      );
-
-      if (changingStatus.mode === "item") {
-        handleAddEquipmentList(convertedList);
-        return;
-      }
-
-      if (changingStatus.mode === "group") {
-        const targetSet = equipmentGroupList.find(
-          (set) => set.setId === changingStatus.groupId
-        );
-
-        if (targetSet) {
-          handleChangeGroupEquipment({
-            ...targetSet,
-            equipmentList: targetSet.equipmentList.concat(convertedList),
-          });
-        }
-      }
-    },
-    [changingStatus, equipmentGroupList, equipmentItemList]
-  );
-
   const {
     total: reservationTotalPrice,
     supply: reservationSupplyPrice,
@@ -210,10 +121,6 @@ const ReservationCreatePage = () => {
 
     return [...equipmentIdList, ...groupEquipmentItemIdList];
   }, [equipmentItemList, equipmentGroupList]);
-
-  const handleChangeRounds = useCallback((rounds: number) => {
-    onChangeForm("rounds", rounds);
-  }, []);
 
   const handleCreateReservation = useCallback(async () => {
     setAvailabilityState(initialAvailability);
@@ -259,6 +166,126 @@ const ReservationCreatePage = () => {
     rentalDays,
   ]);
 
+  const openEquipmentModal = (
+    status:
+      | { mode: "item" }
+      | { mode: "group"; groupId: SetEquipmentType["id"] }
+  ) => {
+    if (!dateRange.endDate || !dateRange.startDate) return;
+
+    if (form.rounds === 0) {
+      showToast({ message: "기간을 설정해주세요.", type: "error" });
+      return;
+    }
+
+    if (form.rounds < 1) {
+      showToast({
+        message: "회차는 1회보다 작을 수 없습니다.",
+        type: "error",
+      });
+      return;
+    }
+
+    openModal({
+      name: "equipmentSearch",
+      props: {
+        dateRange: {
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
+        },
+
+        disabledIdList: existIdList,
+        onConfirm: (list) => {
+          const convertedList = list.map(convertEquipmentItemToState);
+
+          if (status.mode === "group") {
+            const targetSet = equipmentGroupList.find(
+              (set) => set.setId === status.groupId
+            );
+
+            if (targetSet) {
+              handleChangeGroupEquipment({
+                ...targetSet,
+                equipmentList: targetSet.equipmentList.concat(convertedList),
+              });
+            }
+          } else {
+            handleAddEquipmentList(convertedList);
+          }
+        },
+      },
+    });
+  };
+
+  const openGroupEquipmentModal = () => {
+    if (form.rounds === 0) {
+      showToast({ message: "기간을 설정해주세요.", type: "error" });
+      return;
+    }
+
+    if (form.rounds < 1) {
+      showToast({
+        message: "회차는 1회보다 작을 수 없습니다.",
+        type: "error",
+      });
+      return;
+    }
+
+    if (!dateRange.startDate || !dateRange.endDate) return;
+
+    openModal({
+      name: "groupEquipmentSearch",
+      props: {
+        dateRange: {
+          startDate: dateRange.startDate,
+          endDate: dateRange.endDate,
+        },
+        onConfirm: (list) =>
+          handleAddEquipmentGroup(list.map(convertGroupEquipmentToState)),
+        disabledGroupIdList: equipmentGroupList.map((group) => group.setId),
+        disabledEquipmentIdList: existIdList,
+      },
+    });
+  };
+
+  const openDiscountModal = () => {
+    openModal({
+      name: "reservationDiscount",
+      props: {
+        supplyPrice: reservationSupplyPrice + itemDiscount,
+        discountPrice: form.discountPrice,
+        onConfirm: (discountPrice: number) =>
+          onChangeForm("discountPrice", discountPrice),
+      },
+    });
+  };
+
+  const openUserSearchModal = () => {
+    openModal({
+      name: "userSearch",
+      props: {
+        onConfirm: (user: UserType) => {
+          setForm((prev) => ({
+            ...prev,
+            userId: user.id,
+            guestName: user.name,
+            guestPhoneNumber: user.phoneNumber ?? "",
+          }));
+        },
+      },
+    });
+  };
+
+  const openRoundChangeModal = () => {
+    openModal({
+      name: "round",
+      props: {
+        currentValue: form.rounds,
+        onConfirm: (rounds: number) => onChangeForm("rounds", rounds),
+      },
+    });
+  };
+
   return (
     <div>
       <FormWrapper title="예약 생성">
@@ -268,7 +295,7 @@ const ReservationCreatePage = () => {
           <Button
             variant="outlined"
             size="Small"
-            onClick={() => setIsOpenUserModal(true)}
+            onClick={openUserSearchModal}
             style={{
               width: "200px",
             }}
@@ -316,10 +343,7 @@ const ReservationCreatePage = () => {
           <div className={formStyles.sectionWrapper}>
             <Label title={`회차 정보`} />
 
-            <div
-              className={styles.roundRow}
-              onClick={() => setIsOpenRoundChangeModal(true)}
-            >
+            <div className={styles.roundRow} onClick={openRoundChangeModal}>
               {form.rounds} 회차
               <EditOutlinedIcon sx={{ color: "var(--grey)" }} />
             </div>
@@ -342,7 +366,7 @@ const ReservationCreatePage = () => {
                 <Button
                   size="Small"
                   variant="outlined"
-                  onClick={() => handleOpenEquipmentModal({ mode: "item" })}
+                  onClick={() => openEquipmentModal({ mode: "item" })}
                 >
                   단품 장비 추가
                 </Button>
@@ -368,7 +392,7 @@ const ReservationCreatePage = () => {
                       availabilityCheckedList={availabilityState.checkedList}
                       changeSetEquipment={handleChangeGroupEquipment}
                       onClickAddEquipment={() =>
-                        handleOpenEquipmentModal({
+                        openEquipmentModal({
                           mode: "group",
                           groupId: item.setId,
                         })
@@ -382,7 +406,7 @@ const ReservationCreatePage = () => {
                 <Button
                   size="Small"
                   variant="outlined"
-                  onClick={onClickGroupEquipmentModal}
+                  onClick={openGroupEquipmentModal}
                 >
                   풀세트 추가
                 </Button>
@@ -414,7 +438,7 @@ const ReservationCreatePage = () => {
               <b
                 className={styles.label}
                 style={{ cursor: "pointer", textDecoration: "underline" }}
-                onClick={() => setIsOpenDiscountModal(true)}
+                onClick={openDiscountModal}
               >
                 견적서 할인
               </b>
@@ -444,54 +468,6 @@ const ReservationCreatePage = () => {
           </Button>
         </div>
       </FormWrapper>
-      {!isNil(changingStatus) && dateRange.startDate && dateRange.endDate && (
-        <EquipmentWithAvailabilitySearchModal
-          dateRange={{
-            startDate: dateRange.startDate,
-            endDate: dateRange.endDate,
-          }}
-          onCloseModal={() => setChangingStatus(null)}
-          onConfirm={handleConfirmEquipmentModal}
-          disabledIdList={existIdList}
-        />
-      )}
-      {isOpenGroupSearchModal && dateRange.startDate && dateRange.endDate && (
-        <GroupEquipmentWithAvailabilitySearchModal
-          dateRange={{
-            startDate: dateRange.startDate,
-            endDate: dateRange.endDate,
-          }}
-          onCloseModal={() => setIsOpenGroupSearchModal(false)}
-          onConfirm={(list) =>
-            handleAddEquipmentGroup(list.map(convertGroupEquipmentToState))
-          }
-          disabledGroupIdList={equipmentGroupList.map((group) => group.setId)}
-          disabledEquipmentIdList={existIdList}
-        />
-      )}
-      {isOpenUserModal && (
-        <UserSearchModal
-          onCloseModal={() => setIsOpenUserModal(false)}
-          onConfirm={handleSelectUser}
-        />
-      )}
-      {isOpenRoundChangeModal && (
-        <RoundChangeModal
-          currentValue={form.rounds}
-          onConfirm={handleChangeRounds}
-          onClose={() => setIsOpenRoundChangeModal(false)}
-        />
-      )}
-      {isOpenDiscountModal && (
-        <DiscountModal
-          supplyPrice={reservationSupplyPrice + itemDiscount}
-          discountPrice={form.discountPrice}
-          onClose={() => setIsOpenDiscountModal(false)}
-          onConfirm={(discountPrice) =>
-            onChangeForm("discountPrice", discountPrice)
-          }
-        />
-      )}
     </div>
   );
 };

@@ -141,15 +141,6 @@ const ReservationEditPage = () => {
     }
   });
 
-  const handleSelectUser = (user: UserType) => {
-    setForm((prev) => ({
-      ...prev,
-      userId: user.id,
-      guestName: user.name,
-      guestPhoneNumber: user.phoneNumber ?? "",
-    }));
-  };
-
   const handleSaveForm = useCallback(async () => {
     if (!detail?.quoteId) return;
 
@@ -280,11 +271,17 @@ const ReservationEditPage = () => {
   };
 
   const openUserSearchModal = () => {
-    console.log("h");
     openModal({
       name: "userSearch",
       props: {
-        onConfirm: handleSelectUser,
+        onConfirm: (user: UserType) => {
+          setForm((prev) => ({
+            ...prev,
+            userId: user.id,
+            guestName: user.name,
+            guestPhoneNumber: user.phoneNumber ?? "",
+          }));
+        },
       },
     });
   };
