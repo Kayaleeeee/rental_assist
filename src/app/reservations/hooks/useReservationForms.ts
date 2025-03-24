@@ -14,6 +14,8 @@ import { getDiffDays } from "@/app/utils/timeUtils";
 import { showToast } from "@/app/utils/toastUtils";
 import { isEmpty, isEqual } from "lodash";
 import { useCallback, useMemo, useState } from "react";
+import { useGroupEquipmentState } from "./useGroupEquipmentState";
+import { useEquipmentItemState } from "./useEquipmentItemState";
 
 export type ReservationFormState = {
   userId?: number;
@@ -24,6 +26,23 @@ export type ReservationFormState = {
 };
 
 export const useReservationForms = () => {
+  const {
+    equipmentGroupList,
+    handleDeleteGroupEquipment,
+    handleDeleteGroupEquipmentItem,
+    handleChangeGroupEquipment,
+    handleAddEquipmentGroup,
+    handleSetEquipmentGroup,
+  } = useGroupEquipmentState();
+
+  const {
+    equipmentItemList,
+    handleAddEquipmentList,
+    handleDeleteEquipmentItem,
+    handleChangeEquipmentItem,
+    handleSetEquipmentList,
+  } = useEquipmentItemState();
+
   const [form, setForm] = useState<ReservationFormState>({
     userId: undefined,
     guestName: "",
@@ -39,12 +58,9 @@ export const useReservationForms = () => {
     startDate: undefined,
     endDate: undefined,
   });
-  const [equipmentItemList, setEquipmentItemList] = useState<
-    EquipmentListItemState[]
-  >([]);
-  const [equipmentGroupList, setEquipmentGroupList] = useState<
-    SetEquipmentStateType[]
-  >([]);
+  // const [equipmentItemList, setEquipmentItemList] = useState<
+  //   EquipmentListItemState[]
+  // >([]);
 
   const rentalDays = useMemo(() => {
     if (!dateRange.startDate || !dateRange.endDate) return 0;
@@ -130,86 +146,6 @@ export const useReservationForms = () => {
     []
   );
 
-  const handleAddEquipmentGroup = useCallback(
-    (groupList: SetEquipmentStateType[]) => {
-      setEquipmentGroupList((prev) => [...prev, ...groupList]);
-    },
-    []
-  );
-
-  const handleAddEquipmentList = useCallback(
-    (equipmentList: EquipmentListItemState[]) => {
-      setEquipmentItemList((prev) => [...prev, ...equipmentList]);
-    },
-    []
-  );
-
-  const handleSetEquipmentGroup = useCallback(
-    (setList: SetEquipmentStateType[]) => {
-      setEquipmentGroupList(setList);
-    },
-    []
-  );
-
-  const handleSetEquipmentList = useCallback(
-    (equipmentList: EquipmentListItemState[]) => {
-      setEquipmentItemList(equipmentList);
-    },
-    []
-  );
-
-  const handleDeleteEquipmentItem = useCallback(
-    (itemId: EquipmentListItemState["equipmentId"]) => {
-      setEquipmentItemList((prev) =>
-        prev.filter((item) => item.equipmentId !== itemId)
-      );
-    },
-    []
-  );
-
-  const handleDeleteGroupEquipment = useCallback(
-    (setId: SetEquipmentStateType["setId"]) => {
-      setEquipmentGroupList((prev) =>
-        prev.filter((set) => set.setId !== setId)
-      );
-    },
-    []
-  );
-
-  const handleChangeGroupEquipment = (setEquipment: SetEquipmentStateType) => {
-    setEquipmentGroupList((prev) =>
-      prev.map((set) => (set.setId === setEquipment.setId ? setEquipment : set))
-    );
-  };
-
-  const handleChangeEquipmentItem = (equipmentItem: EquipmentListItemState) => {
-    setEquipmentItemList((prev) =>
-      prev.map((prevItem) =>
-        prevItem.equipmentId === equipmentItem.equipmentId
-          ? equipmentItem
-          : prevItem
-      )
-    );
-  };
-
-  const handleDeleteGroupEquipmentItem = (
-    setEquipment: SetEquipmentStateType,
-    equipmentItemId: EquipmentListItemState["equipmentId"]
-  ) => {
-    setEquipmentGroupList((prev) =>
-      prev.map((prevSet) =>
-        prevSet.setId === setEquipment.setId
-          ? {
-              ...prevSet,
-              equipmentList: prevSet.equipmentList.filter(
-                (item) => item.equipmentId !== equipmentItemId
-              ),
-            }
-          : prevSet
-      )
-    );
-  };
-
   const handleChangeItemPriceByRounds = useCallback(
     async ({
       equipmentItemList,
@@ -257,25 +193,30 @@ export const useReservationForms = () => {
     form,
     setForm,
     onChangeForm,
+
     dateRange,
     handleChangeDate,
     rentalDays,
 
     //세트 아이템
-    equipmentGroupList,
-    handleDeleteGroupEquipment,
-    handleDeleteGroupEquipmentItem,
-    handleChangeGroupEquipment,
-    handleAddEquipmentGroup,
-    handleSetEquipmentGroup,
-    handleChangeGroupPriceByRounds,
+    groupEquipmentControl: {
+      equipmentGroupList,
+      handleDeleteGroupEquipment,
+      handleDeleteGroupEquipmentItem,
+      handleChangeGroupEquipment,
+      handleAddEquipmentGroup,
+      handleSetEquipmentGroup,
+      handleChangeGroupPriceByRounds,
+    },
 
     //단품 아이템
-    equipmentItemList,
-    handleAddEquipmentList,
-    handleDeleteEquipmentItem,
-    handleChangeEquipmentItem,
-    handleSetEquipmentList,
-    handleChangeItemPriceByRounds,
+    equipmentItemControl: {
+      equipmentItemList,
+      handleAddEquipmentList,
+      handleDeleteEquipmentItem,
+      handleChangeEquipmentItem,
+      handleSetEquipmentList,
+      handleChangeItemPriceByRounds,
+    },
   };
 };

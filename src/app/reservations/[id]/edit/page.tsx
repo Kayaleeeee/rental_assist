@@ -81,21 +81,24 @@ const ReservationEditPage = () => {
     onChangeForm,
     handleChangeDate,
     dateRange,
-
     rentalDays,
-    equipmentItemList,
-    handleAddEquipmentList,
-    handleDeleteEquipmentItem,
-    handleChangeEquipmentItem,
-    handleSetEquipmentList,
 
-    equipmentGroupList,
-    handleDeleteGroupEquipment,
-    handleAddEquipmentGroup,
-    handleChangeGroupEquipment,
-    handleSetEquipmentGroup,
-    handleChangeItemPriceByRounds,
-    handleChangeGroupPriceByRounds,
+    equipmentItemControl: {
+      equipmentItemList,
+      handleAddEquipmentList,
+      handleDeleteEquipmentItem,
+      handleChangeEquipmentItem,
+      handleSetEquipmentList,
+      handleChangeItemPriceByRounds,
+    },
+    groupEquipmentControl: {
+      equipmentGroupList,
+      handleDeleteGroupEquipment,
+      handleAddEquipmentGroup,
+      handleChangeGroupEquipment,
+      handleSetEquipmentGroup,
+      handleChangeGroupPriceByRounds,
+    },
   } = useReservationForms();
 
   const initializeForm = useCallback((detail: ReservationDetailStateType) => {

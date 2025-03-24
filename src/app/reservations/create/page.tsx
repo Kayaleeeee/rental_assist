@@ -66,17 +66,21 @@ const ReservationCreatePage = () => {
     dateRange,
 
     rentalDays,
-    equipmentItemList,
-    handleDeleteEquipmentItem,
-    handleChangeEquipmentItem,
-    handleAddEquipmentList,
-    handleChangeItemPriceByRounds,
+    equipmentItemControl: {
+      equipmentItemList,
+      handleDeleteEquipmentItem,
+      handleChangeEquipmentItem,
+      handleAddEquipmentList,
+      handleChangeItemPriceByRounds,
+    },
 
-    equipmentGroupList,
-    handleDeleteGroupEquipment,
-    handleChangeGroupEquipment,
-    handleAddEquipmentGroup,
-    handleChangeGroupPriceByRounds,
+    groupEquipmentControl: {
+      equipmentGroupList,
+      handleDeleteGroupEquipment,
+      handleChangeGroupEquipment,
+      handleAddEquipmentGroup,
+      handleChangeGroupPriceByRounds,
+    },
   } = useReservationForms();
 
   useEffect(() => {
