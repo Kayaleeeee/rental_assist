@@ -12,18 +12,17 @@ import { Margin } from "@/app/components/Margin";
 import {
   PriceItemStateType,
   PriceListTable,
-  PriceSettingModal,
 } from "../modules/PriceSettingModal/PriceSettingModal";
 import { useCallback, useState } from "react";
 import { showToast } from "@/app/utils/toastUtils";
 import { EquipmentPostBody } from "@/app/types/equipmentType";
 import { createEquipment } from "../actions/createEquipment";
 import { useRouter } from "next/navigation";
+import { useModal } from "@/app/components/Modal/useModal";
 
 const EquipmentCreatePage = () => {
   const router = useRouter();
   const [priceList, setPriceList] = useState<PriceItemStateType[]>([]);
-  const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
 
   const {
     categoryMenu,
@@ -38,16 +37,21 @@ const EquipmentCreatePage = () => {
     quantity,
     setQuantity,
   } = useEquipmentForm();
+  const { openModal } = useModal();
 
-  const handleUpdatePriceList = useCallback(
-    async (list: PriceItemStateType[]) => {
-      setPriceList(list);
-      setIsOpenPriceSettingModal(false);
-    },
-    []
-  );
+  const openPriceSettingModal = () => {
+    openModal({
+      name: "priceSetting",
+      props: {
+        mode: "item",
+        priceList,
+        onConfirm: setPriceList,
+      },
+    });
+  };
 
   const handleCreateEquipment = useCallback(async () => {
+    console.log("handleCreateEquipment called");
     try {
       const payload: EquipmentPostBody = {
         title,
@@ -68,121 +72,111 @@ const EquipmentCreatePage = () => {
   }, [category, title, quantity, memo, detail, router]);
 
   return (
-    <>
-      <FormWrapper title="장비 등록">
-        <div className={formStyles.sectionWrapper}>
-          <Label title="카테고리" />
-          <Select<string>
-            title="카테고리"
-            value={category.key}
-            fullWidth
-            onChange={(e) => {
-              onChangeCategory(e.target.value);
-            }}
-          >
-            {categoryMenu.map((item) => (
-              <MenuItem
-                key={item.key}
-                selected={item.key === category.key}
-                value={item.key}
-              >
-                {item.title}
-              </MenuItem>
-            ))}
-          </Select>
-        </div>
-        <Margin top={20} />
-
-        <div className={styles.sectionWrapper}>
-          <Label title="장비명" />
-          <EditableField
-            fullWidth
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <Margin top={20} />
-
-        <div className={styles.sectionWrapper}>
-          <Label title="수량" />
-          <EditableField
-            fullWidth
-            value={quantity}
-            onChange={(e) => {
-              const value = Number(e.target.value);
-
-              if (isNaN(value)) return;
-              setQuantity(value);
-            }}
-          />
-        </div>
-
-        <Margin top={40} />
-        <div className={styles.sectionWrapper}>
-          <div
-            style={{
-              width: "100%",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Label title="렌탈 가격" />
-            <Button
-              variant="outlined"
-              size="Small"
-              onClick={() => setIsOpenPriceSettingModal(true)}
+    <FormWrapper title="장비 등록">
+      <div className={formStyles.sectionWrapper}>
+        <Label title="카테고리" />
+        <Select<string>
+          title="카테고리"
+          value={category.key}
+          fullWidth
+          onChange={(e) => {
+            onChangeCategory(e.target.value);
+          }}
+        >
+          {categoryMenu.map((item) => (
+            <MenuItem
+              key={item.key}
+              selected={item.key === category.key}
+              value={item.key}
             >
-              가격 등록하기
-            </Button>
-          </div>
+              {item.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </div>
+      <Margin top={20} />
 
-          <Margin top={20} />
-          <PriceListTable priceList={priceList} />
-        </div>
+      <div className={styles.sectionWrapper}>
+        <Label title="장비명" />
+        <EditableField
+          fullWidth
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </div>
+      <Margin top={20} />
 
-        <Margin top={40} />
-        <div className={styles.sectionWrapper}>
-          <Label title="상세 정보" />
-          <TextField
-            fullWidth
-            multiline
-            value={detail}
-            placeholder="상세 정보를 입력해주세요."
-            onChange={(e) => setDetail(e.target.value)}
-          />
-        </div>
+      <div className={styles.sectionWrapper}>
+        <Label title="수량" />
+        <EditableField
+          fullWidth
+          value={quantity}
+          onChange={(e) => {
+            const value = Number(e.target.value);
 
-        <Margin top={40} />
-        <div className={styles.sectionWrapper}>
-          <Label title="메모" />
-          <EditableField
-            fullWidth
-            multiline
-            value={memo}
-            onChange={(e) => setMemo(e.target.value)}
-          />
-        </div>
+            if (isNaN(value)) return;
+            setQuantity(value);
+          }}
+        />
+      </div>
 
-        <div className={styles.buttonWrapper}>
+      <Margin top={40} />
+      <div className={styles.sectionWrapper}>
+        <div
+          style={{
+            width: "100%",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Label title="렌탈 가격" />
           <Button
-            size="Medium"
-            style={{ width: "150px" }}
-            onClick={handleCreateEquipment}
+            variant="outlined"
+            size="Small"
+            onClick={openPriceSettingModal}
           >
-            등록
+            가격 등록하기
           </Button>
         </div>
-      </FormWrapper>
-      {isOpenPriceSettingModal && (
-        <PriceSettingModal
-          priceList={priceList}
-          onClose={() => setIsOpenPriceSettingModal(false)}
-          onConfirm={handleUpdatePriceList}
-          mode={"item"}
+
+        <Margin top={20} />
+        <PriceListTable priceList={priceList} />
+      </div>
+
+      <Margin top={40} />
+      <div className={styles.sectionWrapper}>
+        <Label title="상세 정보" />
+        <TextField
+          fullWidth
+          multiline
+          value={detail}
+          placeholder="상세 정보를 입력해주세요."
+          onChange={(e) => setDetail(e.target.value)}
         />
-      )}
-    </>
+      </div>
+
+      <Margin top={40} />
+      <div className={styles.sectionWrapper}>
+        <Label title="메모" />
+        <EditableField
+          fullWidth
+          multiline
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
+        />
+      </div>
+
+      <div className={styles.buttonWrapper}>
+        <Button
+          size="Medium"
+          style={{ width: "150px" }}
+          onClick={handleCreateEquipment}
+        >
+          등록
+        </Button>
+      </div>
+    </FormWrapper>
   );
 };
 
