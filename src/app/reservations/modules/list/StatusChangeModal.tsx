@@ -44,7 +44,10 @@ export const ReservationStatusChangeModal = ({
         },
         {
           title: "변경하기",
-          onClick: onConfirmChange,
+          onClick: async () => {
+            await onConfirmChange();
+            onCloseModal();
+          },
         },
       ]}
     >

@@ -72,7 +72,10 @@ export const PaymentStatusChangeModal = ({
         },
         {
           title: "변경하기",
-          onClick: onConfirmChange,
+          onClick: async () => {
+            await onConfirmChange();
+            onCloseModal();
+          },
         },
       ]}
     >
