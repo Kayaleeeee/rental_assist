@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { getPaymentStatusText } from "../PaymentStatusText";
 import { Label } from "@/app/components/Form/Label";
 import { mapPaymentMethodName } from "@/app/payments/utils/paymentMethodNameUtils";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 
 const statusMenu = [
   {
@@ -25,9 +26,8 @@ const paymentOptionMenu = [
   PaymentMethod.bank_transfer,
 ];
 
-type Props = {
+export interface PaymentStatusChangeModalProps extends ModalBasicProps {
   currentStatus: PaymentStatus;
-  onCloseModal: () => void;
   onChangeStatus: ({
     paymentStatus,
     paymentMethod,
@@ -35,13 +35,13 @@ type Props = {
     paymentStatus: PaymentStatus;
     paymentMethod: PaymentMethod;
   }) => void;
-};
+}
 
 export const PaymentStatusChangeModal = ({
   onCloseModal,
   currentStatus,
   onChangeStatus,
-}: Props) => {
+}: PaymentStatusChangeModalProps) => {
   const [selectedStatus, setSelectedStatus] =
     useState<PaymentStatus>(currentStatus);
 

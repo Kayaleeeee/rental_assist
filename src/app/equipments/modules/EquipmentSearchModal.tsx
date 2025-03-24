@@ -1,6 +1,7 @@
 import { Label } from "@/app/components/Form/Label";
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 import { useEquipmentList } from "@/app/equipments/hooks/useEquipmentList";
 import { EquipmentListTable } from "@/app/equipments/modules/EquipmentListTable";
 
@@ -10,23 +11,21 @@ import {
   EquipmentListItemType,
 } from "@/app/types/equipmentType";
 import { showToast } from "@/app/utils/toastUtils";
-
 import { MenuItem, Select } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 
 const allString = "all";
 
-type Props = {
-  onCloseModal: () => void;
+export interface EquipmentSearchModalProps extends ModalBasicProps {
   onConfirm: (list: EquipmentListItemType[]) => void;
   disabledIdList: number[];
-};
+}
 
 export const EquipmentSearchModal = ({
   onCloseModal,
   onConfirm,
   disabledIdList,
-}: Props) => {
+}: EquipmentSearchModalProps) => {
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     EquipmentListItemType[]
   >([]);

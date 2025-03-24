@@ -9,20 +9,20 @@ import { updateQuote } from "@/app/api/quote";
 import { ReservationDetailResponse } from "@/app/types/reservationType";
 import { showToast } from "@/app/utils/toastUtils";
 import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 
-type Props = {
+export interface RentalDateChangeModalProps extends ModalBasicProps {
   dateRange: { startDate: string; endDate: string };
-  onCloseModal: () => void;
   onChangeDate: (date: { startDate: string; endDate: string }) => void;
   quoteId: ReservationDetailResponse["quoteId"];
-};
+}
 
 export const RentalDateChangeModal = ({
-  onCloseModal,
   dateRange,
   onChangeDate,
   quoteId,
-}: Props) => {
+  onCloseModal,
+}: RentalDateChangeModalProps) => {
   const [endAtCurrentTime, setEndAtCurrentTime] = useState<boolean>(false);
 
   const [changedDateRange, setChangedDateRange] = useState<{

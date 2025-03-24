@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import styles from "./discountModal.module.scss";
 import { EditableField } from "@/app/components/EditableField";
 import { Margin } from "@/app/components/Margin";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 
 const discountMenuList = [
   { key: 10, title: "10%" },
@@ -10,19 +11,18 @@ const discountMenuList = [
   { key: 50, title: "50%" },
 ];
 
-type Props = {
+export interface DiscountModalProps extends ModalBasicProps {
   supplyPrice: number;
   discountPrice: number;
-  onClose: () => void;
   onConfirm: (price: number) => void;
-};
+}
 
 export const DiscountModal = ({
-  onClose,
+  onCloseModal,
   onConfirm,
   supplyPrice,
   discountPrice,
-}: Props) => {
+}: DiscountModalProps) => {
   const [discountPriceState, setDiscountPriceState] =
     useState<number>(discountPrice);
 
@@ -35,7 +35,7 @@ export const DiscountModal = ({
 
   return (
     <Modal
-      onCloseModal={onClose}
+      onCloseModal={onCloseModal}
       ButtonListWrapperStyle={{
         width: "200px",
         placeSelf: "flex-end",
@@ -43,7 +43,7 @@ export const DiscountModal = ({
       ButtonProps={[
         {
           title: "닫기",
-          onClick: onClose,
+          onClick: onCloseModal,
           size: "Small",
         },
         {
@@ -52,7 +52,7 @@ export const DiscountModal = ({
 
           onClick: () => {
             onConfirm(discountPriceState);
-            onClose();
+            onCloseModal();
           },
         },
       ]}

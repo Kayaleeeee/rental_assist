@@ -16,6 +16,7 @@ import {
 } from "@/app/types/equipmentPriceType";
 import { calculatePrices, formatLocaleString } from "@/app/utils/priceUtils";
 import { showToast } from "@/app/utils/toastUtils";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 
 export type PriceItemStateType = {
   id?: number;
@@ -23,13 +24,12 @@ export type PriceItemStateType = {
   price: number;
 };
 
-type Props = {
+export interface PriceSettingModalProps extends ModalBasicProps {
   mode: "group" | "item";
   id?: EquipmentListItemType["id"] | SetEquipmentType["id"];
   priceList: PriceItemStateType[];
-  onClose: () => void;
   onConfirm: (list: PriceItemStateType[]) => void;
-};
+}
 
 const defaultPriceItem = {
   day: 1,
@@ -40,7 +40,11 @@ const convertPriceStateToPriceList = (list: PriceItemStateType[]) => {
   return list.map((item, index) => ({ ...item, day: index + 1 }));
 };
 
-export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
+export const PriceSettingModal = ({
+  priceList,
+  onCloseModal,
+  onConfirm,
+}: PriceSettingModalProps) => {
   const [priceListState, setPriceListState] =
     useState<PriceItemStateType[]>(priceList);
 
@@ -121,7 +125,7 @@ export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
 
   return (
     <Modal
-      onCloseModal={onClose}
+      onCloseModal={onCloseModal}
       ButtonListWrapperStyle={{
         width: "400px",
         placeSelf: "flex-end",
@@ -130,7 +134,7 @@ export const PriceSettingModal = ({ priceList, onClose, onConfirm }: Props) => {
       ButtonProps={[
         {
           title: "닫기",
-          onClick: onClose,
+          onClick: onCloseModal,
         },
         {
           title: "저장하기",
