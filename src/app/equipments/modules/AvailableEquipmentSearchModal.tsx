@@ -13,27 +13,26 @@ import { useCallback, useEffect, useState } from "react";
 import { ReservationType } from "@/app/types/reservationType";
 import { useEquipmentListWithAvailability } from "../hooks/useEquipmentListWithAvailability";
 import { EquipmentWithAvailabilityListTable } from "./EquipmentWithAvailabilityListTable";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 
 const allString = "all";
 
-type Props = {
-  onCloseModal: () => void;
+export interface AvailableEquipmentSearchModalProps extends ModalBasicProps {
   onConfirm: (list: EquipmentListItemType[]) => void;
   disabledIdList: number[];
-  checkAvailability?: boolean;
   dateRange: {
     startDate: string;
     endDate: string;
   };
   excludeReservationId?: ReservationType["id"];
-};
+}
 
-export const EquipmentWithAvailabilitySearchModal = ({
+export const AvailableEquipmentSearchModal = ({
   onCloseModal,
   onConfirm,
   disabledIdList,
   ...props
-}: Props) => {
+}: AvailableEquipmentSearchModalProps) => {
   const [selectedEquipmentList, setSelectedEquipmentList] = useState<
     EquipmentWithAvailabilityType[]
   >([]);
