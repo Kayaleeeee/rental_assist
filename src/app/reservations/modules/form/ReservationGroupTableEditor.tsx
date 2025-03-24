@@ -12,13 +12,13 @@ import { isEmpty, isNil } from "lodash";
 import {
   GROUP_QUOTE_ITEM_MENU,
   GROUP_QUOTE_MENU,
-  PriceChangingModal,
   QuoteEquipmentMoreMenu,
 } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Margin } from "@/app/components/Margin";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { UnavailableEquipmentList } from "./UnavailableEquipmentList";
+import { useModal } from "@/app/components/Modal/useModal";
 
 type Props = {
   rounds: number;
@@ -37,8 +37,7 @@ export const ReservationGroupTableEditor = ({
   changeSetEquipment,
   availabilityCheckedList,
 }: Props) => {
-  const [isOpenPriceChangingModal, setIsOpenPriceChangingModal] =
-    useState(false);
+  const { openModal } = useModal();
 
   const columns = useMemo((): GridColDef<EquipmentListItemState>[] => {
     return [
@@ -120,6 +119,19 @@ export const ReservationGroupTableEditor = ({
 
     return list;
   }, [groupEquipment, availabilityCheckedList]);
+
+  const openPriceChangeModal = () => {
+    openModal({
+      name: "equipmentPriceChange",
+      props: {
+        currentTotalPrice: groupEquipment.price,
+        currentDiscountPrice: groupEquipment.discountPrice || 0,
+        onConfirm: (price) =>
+          changeSetEquipment({ ...groupEquipment, discountPrice: price }),
+      },
+    });
+  };
+
   return (
     <>
       <div className={styles.wrapper}>
@@ -139,7 +151,7 @@ export const ReservationGroupTableEditor = ({
               }
 
               if (menu.key === "price") {
-                setIsOpenPriceChangingModal(true);
+                openPriceChangeModal();
               }
             }}
           />
@@ -194,16 +206,6 @@ export const ReservationGroupTableEditor = ({
       </div>
       {!isEmpty(unavailableList) && (
         <UnavailableEquipmentList unavailableList={unavailableList} />
-      )}
-      {isOpenPriceChangingModal && (
-        <PriceChangingModal
-          currentTotalPrice={groupEquipment.price}
-          currentDiscountPrice={groupEquipment.discountPrice || 0}
-          onConfirm={(price) =>
-            changeSetEquipment({ ...groupEquipment, discountPrice: price })
-          }
-          onClose={() => setIsOpenPriceChangingModal(false)}
-        />
       )}
     </>
   );

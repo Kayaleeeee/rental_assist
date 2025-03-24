@@ -9,18 +9,16 @@ import { Button } from "@/app/components/Button";
 import { EditableField } from "@/app/components/EditableField";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { isEmpty, isNil } from "lodash";
+import { isEmpty } from "lodash";
 import { useSetEquipmentForm } from "../../create/hooks/useSetEquipmentForm";
 import { useSetEquipmentDetail } from "../hooks/useSetEquipmentDetail";
 import { useParams } from "next/navigation";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { GridTable } from "@/app/components/Table/GridTable";
-import { QuantityChangingModal } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
 import { Margin } from "@/app/components/Margin";
 import {
   PriceItemStateType,
   PriceListTable,
-  PriceSettingModal,
 } from "@/app/equipments/modules/PriceSettingModal/PriceSettingModal";
 import { EquipmentGroupPriceItem } from "@/app/types/equipmentPriceType";
 import { useGroupEquipmentPriceList } from "@/app/equipments/[id]/hooks/useGroupEquipmentPriceList";
@@ -29,20 +27,16 @@ import { showToast } from "@/app/utils/toastUtils";
 import { getGroupEquipmentListColumns } from "../../modules/getGroupEquipmentListColumns";
 import { EQUIPMENT_AVAILABILITY_MENU_LIST } from "@/app/equipments/utils/equipmentUtils";
 import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
+import { useModal } from "@/app/components/Modal/useModal";
 
 const EquipmentEditPage = () => {
   const { id } = useParams();
   const setId = Number(id);
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
   const originalEquipmentList = useRef<EquipmentListItemType[]>([]);
-  const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
-  const [isOpenQuantityChangeModal, setIsOpenQuantityChangeModal] =
-    useState(false);
-  const [selectedRow, setSelectedRow] = useState<
-    EquipmentListItemType | undefined
-  >(undefined);
   const [priceList, setPriceList] = useState<EquipmentGroupPriceItem[]>([]);
   const originalPriceList = useRef<EquipmentGroupPriceItem[]>([]);
+  const { openModal } = useModal();
 
   const {
     title,
@@ -73,23 +67,6 @@ const EquipmentEditPage = () => {
       .catch(() => setPriceList([]));
   }, []);
 
-  const handleUpdatePriceList = useCallback(
-    async (list: PriceItemStateType[]) => {
-      try {
-        await updateGroupPriceList(setId, list, originalPriceList.current);
-        setIsOpenPriceSettingModal(false);
-        showToast({
-          message: "가격이 수정되었습니다.",
-          type: "success",
-        });
-        handleFetchPriceList(setId);
-      } catch {
-        showToast({ message: "가격을 수정할 수 없습니다.", type: "error" });
-      }
-    },
-    [setId, handleFetchPriceList]
-  );
-
   useEffect(() => {
     if (!setEquipmentDetail) return;
 
@@ -107,17 +84,58 @@ const EquipmentEditPage = () => {
     handleFetchPriceList(setId);
   }, [setId, handleFetchPriceList]);
 
+  const openEquipmentQuantityChangeModal = (row: EquipmentListItemType) => {
+    openModal({
+      name: "equipmentQuantityChange",
+      props: {
+        currentQuantity: row.quantity,
+        onConfirm: (quantity) => {
+          setEquipmentList((prev) =>
+            prev.map((item) =>
+              item.id === row.id ? { ...item, quantity } : item
+            )
+          );
+        },
+      },
+    });
+  };
+
   const columns = useMemo(
     () =>
       getGroupEquipmentListColumns({
         onDeleteItem: (id) =>
           setEquipmentList(equipmentList.filter((item) => item.id !== id)),
-        onSelectQuantityChange: (row: EquipmentListItemType) => {
-          setSelectedRow(row);
-          setIsOpenQuantityChangeModal(true);
-        },
+        onSelectQuantityChange: openEquipmentQuantityChangeModal,
       }),
     [equipmentList]
+  );
+
+  const openPriceSettingModal = () => {
+    openModal({
+      name: "priceSetting",
+      props: {
+        priceList,
+        onConfirm: handleUpdatePriceList,
+        mode: "group",
+        id: Number(id),
+      },
+    });
+  };
+
+  const handleUpdatePriceList = useCallback(
+    async (list: PriceItemStateType[]) => {
+      try {
+        await updateGroupPriceList(setId, list, originalPriceList.current);
+        showToast({
+          message: "가격이 수정되었습니다.",
+          type: "success",
+        });
+        handleFetchPriceList(setId);
+      } catch {
+        showToast({ message: "가격을 수정할 수 없습니다.", type: "error" });
+      }
+    },
+    [setId, handleFetchPriceList]
   );
 
   return (
@@ -168,7 +186,7 @@ const EquipmentEditPage = () => {
             <Button
               variant="outlined"
               size="Small"
-              onClick={() => setIsOpenPriceSettingModal(true)}
+              onClick={openPriceSettingModal}
             >
               가격 수정하기
             </Button>
@@ -243,32 +261,6 @@ const EquipmentEditPage = () => {
           onCloseModal={() => setIsOpenSearchModal(false)}
           onConfirm={(list) => setEquipmentList((prev) => [...prev, ...list])}
           disabledIdList={equipmentList.map((item) => item.id)}
-        />
-      )}
-      {isOpenPriceSettingModal && (
-        <PriceSettingModal
-          priceList={priceList}
-          onClose={() => setIsOpenPriceSettingModal(false)}
-          onConfirm={handleUpdatePriceList}
-          mode={"group"}
-          id={Number(id)}
-        />
-      )}
-
-      {isOpenQuantityChangeModal && !isNil(selectedRow) && (
-        <QuantityChangingModal
-          currentQuantity={selectedRow.quantity}
-          onConfirm={(quantity) => {
-            setEquipmentList((prev) =>
-              prev.map((item) =>
-                item.id === selectedRow.id ? { ...item, quantity } : item
-              )
-            );
-          }}
-          onClose={() => {
-            setSelectedRow(undefined);
-            setIsOpenQuantityChangeModal(false);
-          }}
         />
       )}
     </div>
