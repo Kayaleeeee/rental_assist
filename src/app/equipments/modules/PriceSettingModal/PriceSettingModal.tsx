@@ -81,7 +81,7 @@ export const PriceSettingModal = ({
     );
   };
 
-  const handleConfirmList = (list: PriceItemStateType[]) => {
+  const handleConfirmList = async (list: PriceItemStateType[]) => {
     if (isEmpty(list)) {
       showToast({
         message: "가격을 입력해주세요.",
@@ -91,7 +91,8 @@ export const PriceSettingModal = ({
     }
 
     const convertedList = convertPriceStateToPriceList(list);
-    onConfirm(convertedList);
+    await onConfirm(convertedList);
+    onCloseModal();
   };
 
   const handleFillOut30Days = useCallback(() => {
