@@ -3,13 +3,19 @@ import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { GridColDef } from "@mui/x-data-grid";
-import { getEquipmentTotalPrice } from "../../utils/reservationUtils";
+
 import { isEmpty, isNil } from "lodash";
-import { QUOTE_ITEM_MENU, QuoteEquipmentMoreMenu } from "./QuoteEquipmentMenu";
+
 import { useMemo } from "react";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
-import { UnavailableEquipmentList } from "./UnavailableEquipmentList";
+
 import { useModal } from "@/app/components/Modal/useModal";
+import { getEquipmentTotalPrice } from "@/app/reservations/utils/reservationUtils";
+import {
+  QUOTE_ITEM_MENU,
+  QuoteEquipmentMoreMenu,
+} from "../QuoteEquipmentMenu/QuoteEquipmentMenu";
+import { UnavailableEquipmentList } from "../UnavailableEquipmentList";
 
 type Props = {
   rows: EquipmentListItemState[];

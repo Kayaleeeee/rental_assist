@@ -2,7 +2,7 @@ import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import {
   GROUP_EQUIPMENT_ITEM_MENU,
   QuoteEquipmentMoreMenu,
-} from "@/app/reservations/modules/form/QuoteEquipmentMenu";
+} from "@/app/reservations/modules/form/QuoteEquipmentMenu/QuoteEquipmentMenu";
 import { EquipmentListItemType } from "@/app/types/equipmentType";
 import { GridColDef } from "@mui/x-data-grid";
 

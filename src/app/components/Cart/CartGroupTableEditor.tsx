@@ -11,7 +11,7 @@ import {
   GROUP_QUOTE_ITEM_MENU,
   CART_GROUP_MENU,
   QuoteEquipmentMoreMenu,
-} from "@/app/reservations/modules/form/QuoteEquipmentMenu";
+} from "@/app/reservations/modules/form/QuoteEquipmentMenu/QuoteEquipmentMenu";
 import { useMemo } from "react";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { UnavailableEquipmentList } from "@/app/reservations/modules/form/UnavailableEquipmentList";

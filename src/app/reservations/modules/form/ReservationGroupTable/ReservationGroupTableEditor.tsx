@@ -13,11 +13,11 @@ import {
   GROUP_QUOTE_ITEM_MENU,
   GROUP_QUOTE_MENU,
   QuoteEquipmentMoreMenu,
-} from "@/app/reservations/modules/form/QuoteEquipmentMenu";
+} from "@/app/reservations/modules/form/QuoteEquipmentMenu/QuoteEquipmentMenu";
 import { useMemo } from "react";
 import { Margin } from "@/app/components/Margin";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
-import { UnavailableEquipmentList } from "./UnavailableEquipmentList";
+import { UnavailableEquipmentList } from "../UnavailableEquipmentList";
 import { useModal } from "@/app/components/Modal/useModal";
 
 type Props = {

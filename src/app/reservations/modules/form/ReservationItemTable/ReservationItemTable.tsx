@@ -3,7 +3,7 @@ import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { GridColDef } from "@mui/x-data-grid";
-import { getEquipmentTotalPrice } from "../../utils/reservationUtils";
+import { getEquipmentTotalPrice } from "../../../utils/reservationUtils";
 import { isEmpty, isNil } from "lodash";
 
 const getColumns = (rounds: number): GridColDef<EquipmentListItemState>[] => [

@@ -8,7 +8,7 @@ import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import {
   CART_ITEM_MENU,
   QuoteEquipmentMoreMenu,
-} from "@/app/reservations/modules/form/QuoteEquipmentMenu";
+} from "@/app/reservations/modules/form/QuoteEquipmentMenu/QuoteEquipmentMenu";
 import { UnavailableEquipmentList } from "@/app/reservations/modules/form/UnavailableEquipmentList";
 import { useModal } from "../Modal/useModal";
 
