@@ -29,8 +29,8 @@ import {
   formatKoreanCurrency,
   formatLocaleString,
 } from "@/app/utils/priceUtils";
-import { ReservationItemTableEditor } from "../modules/form/ReservationItemTableEditor";
-import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
+import { ReservationItemTableEditor } from "../modules/form/ReservationItemTable/ReservationItemTableEditor";
+import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTable/ReservationGroupTableEditor";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { useReservationForms } from "../hooks/useReservationForms";

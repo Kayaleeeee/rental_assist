@@ -40,11 +40,12 @@ import {
   initialAvailability,
 } from "../../utils/reservationUtils";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
-import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTableEditor";
-import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTableEditor";
+import { ReservationGroupTableEditor } from "@/app/reservations/modules/form/ReservationGroupTable/ReservationGroupTableEditor";
+
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { useReservationForms } from "../../hooks/useReservationForms";
 import { useModal } from "@/app/components/Modal/useModal";
+import { ReservationItemTableEditor } from "../../modules/form/ReservationItemTable/ReservationItemTableEditor";
 
 const ReservationEditPage = () => {
   const router = useRouter();
