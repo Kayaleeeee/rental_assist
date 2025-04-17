@@ -5,6 +5,8 @@ import { MenuItem, Select } from "@mui/material";
 import { useCallback, useState } from "react";
 import { getPaymentStatusText } from "../PaymentStatusText";
 import { Label } from "@/app/components/Form/Label";
+import { mapPaymentMethodName } from "@/app/payments/utils/paymentMethodNameUtils";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 
 const statusMenu = [
   {
@@ -19,28 +21,27 @@ const statusMenu = [
 ];
 
 const paymentOptionMenu = [
-  {
-    key: PaymentMethod.card,
-    title: "카드",
-  },
-  { key: PaymentMethod.cash, title: "현금" },
-  {
-    key: PaymentMethod.bank_transfer,
-    title: "계좌이체",
-  },
+  PaymentMethod.card,
+  PaymentMethod.cash,
+  PaymentMethod.bank_transfer,
 ];
 
-type Props = {
+export interface PaymentStatusChangeModalProps extends ModalBasicProps {
   currentStatus: PaymentStatus;
-  onCloseModal: () => void;
-  onChangeStatus: (status: PaymentStatus) => void;
-};
+  onChangeStatus: ({
+    paymentStatus,
+    paymentMethod,
+  }: {
+    paymentStatus: PaymentStatus;
+    paymentMethod: PaymentMethod;
+  }) => void;
+}
 
 export const PaymentStatusChangeModal = ({
   onCloseModal,
   currentStatus,
   onChangeStatus,
-}: Props) => {
+}: PaymentStatusChangeModalProps) => {
   const [selectedStatus, setSelectedStatus] =
     useState<PaymentStatus>(currentStatus);
 
@@ -51,8 +52,11 @@ export const PaymentStatusChangeModal = ({
   const onConfirmChange = useCallback(async () => {
     if (!confirm("결제 상태를 변경하시겠어요?")) return;
 
-    onChangeStatus(selectedStatus);
-  }, [selectedStatus]);
+    onChangeStatus({
+      paymentStatus: selectedStatus,
+      paymentMethod: selectedMethod,
+    });
+  }, [selectedStatus, selectedMethod]);
 
   return (
     <Modal
@@ -68,7 +72,10 @@ export const PaymentStatusChangeModal = ({
         },
         {
           title: "변경하기",
-          onClick: onConfirmChange,
+          onClick: async () => {
+            await onConfirmChange();
+            onCloseModal();
+          },
         },
       ]}
     >
@@ -99,8 +106,8 @@ export const PaymentStatusChangeModal = ({
             >
               {paymentOptionMenu.map((item) => {
                 return (
-                  <MenuItem key={item.key} value={item.key}>
-                    {item.title}
+                  <MenuItem key={item} value={item}>
+                    {mapPaymentMethodName(item)}
                   </MenuItem>
                 );
               })}

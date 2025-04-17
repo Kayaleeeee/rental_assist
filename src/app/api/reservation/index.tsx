@@ -8,9 +8,11 @@ import {
 } from "@/app/types/reservationType";
 import { apiGet, apiPatch, apiPost } from "..";
 import { isEmpty, isNil } from "lodash";
+import { fetchListHandler } from "../shared/utils/fecthListHandler";
+import { parseReservationListParams } from "./utils";
 
 const apiUrl = "/reservations";
-const listUrl = "/reservation_list";
+const listUrl = "reservation_list";
 const detailUrl = "/reservation_detail";
 
 export const postReservation = async (payload: ReservationPostPayload) => {
@@ -24,7 +26,11 @@ export const postReservation = async (payload: ReservationPostPayload) => {
 };
 
 export const getReservationList = (params?: ReservationSearchParams) => {
-  return apiGet<ReservationType[]>(listUrl, params);
+  return fetchListHandler<ReservationType>(
+    listUrl,
+    params,
+    parseReservationListParams
+  );
 };
 
 export const getReservationDetail = async (id: number) => {

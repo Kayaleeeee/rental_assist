@@ -3,17 +3,19 @@ import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
 import { formatLocaleString } from "@/app/utils/priceUtils";
 import { GridColDef } from "@mui/x-data-grid";
-import { getEquipmentTotalPrice } from "../../utils/reservationUtils";
+
 import { isEmpty, isNil } from "lodash";
+
+import { useMemo } from "react";
+import { EquipmentAvailableItem } from "@/app/types/reservationType";
+
+import { useModal } from "@/app/components/Modal/useModal";
+import { getEquipmentTotalPrice } from "@/app/reservations/utils/reservationUtils";
 import {
-  PriceChangingModal,
-  QuantityChangingModal,
   QUOTE_ITEM_MENU,
   QuoteEquipmentMoreMenu,
-} from "./QuoteEquipmentMenu";
-import { useMemo, useState } from "react";
-import { EquipmentAvailableItem } from "@/app/types/reservationType";
-import { UnavailableEquipmentList } from "./UnavailableEquipmentList";
+} from "../QuoteEquipmentMenu/QuoteEquipmentMenu";
+import { UnavailableEquipmentList } from "../UnavailableEquipmentList";
 
 type Props = {
   rows: EquipmentListItemState[];
@@ -32,13 +34,28 @@ export const ReservationItemTableEditor = ({
   onChangeField,
   availabilityCheckedList,
 }: Props) => {
-  const [modalProps, setModalProps] = useState<
-    | {
-        mode: "price" | "quantity";
-        selectedRow: EquipmentListItemState;
-      }
-    | undefined
-  >(undefined);
+  const { openModal } = useModal();
+
+  const openQuantityChangeModal = (row: EquipmentListItemState) => {
+    openModal({
+      name: "equipmentQuantityChange",
+      props: {
+        currentQuantity: row.quantity,
+        onConfirm: (quantity) => onChangeField({ ...row, quantity }),
+      },
+    });
+  };
+
+  const openPriceChangeModal = (row: EquipmentListItemState) => {
+    openModal({
+      name: "equipmentPriceChange",
+      props: {
+        currentDiscountPrice: row.discountPrice || 0,
+        currentTotalPrice: row.price * row.quantity,
+        onConfirm: (price) => onChangeField({ ...row, discountPrice: price }),
+      },
+    });
+  };
 
   const columns = useMemo((): GridColDef<EquipmentListItemState>[] => {
     return [
@@ -112,10 +129,13 @@ export const ReservationItemTableEditor = ({
                   return;
                 }
 
-                setModalProps({
-                  mode: menu.key as "price" | "quantity",
-                  selectedRow: row,
-                });
+                if (menu.key === "price") {
+                  openPriceChangeModal(row);
+                }
+
+                if (menu.key === "quantity") {
+                  openQuantityChangeModal(row);
+                }
               }}
             />
           </div>
@@ -164,31 +184,6 @@ export const ReservationItemTableEditor = ({
       />
       {!isEmpty(unavailableList) && (
         <UnavailableEquipmentList unavailableList={unavailableList} />
-      )}
-      {!isNil(modalProps) && modalProps.mode === "price" && (
-        <PriceChangingModal
-          currentTotalPrice={
-            modalProps.selectedRow.price * modalProps.selectedRow.quantity
-          }
-          currentDiscountPrice={modalProps.selectedRow.discountPrice || 0}
-          onConfirm={(price) =>
-            onChangeField({ ...modalProps.selectedRow, discountPrice: price })
-          }
-          onClose={() => setModalProps(undefined)}
-        />
-      )}
-
-      {!isNil(modalProps) && modalProps.mode === "quantity" && (
-        <QuantityChangingModal
-          currentQuantity={modalProps.selectedRow.quantity}
-          onConfirm={(quantity) =>
-            onChangeField({
-              ...modalProps.selectedRow,
-              quantity,
-            })
-          }
-          onClose={() => setModalProps(undefined)}
-        />
       )}
     </>
   );

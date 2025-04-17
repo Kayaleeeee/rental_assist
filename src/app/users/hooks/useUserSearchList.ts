@@ -12,14 +12,14 @@ export const useUserSearchList = () => {
     if (!keyword || !searchKey) return {};
 
     return {
-      [searchKey]: `ilike.%${keyword}%`,
+      [searchKey]: keyword,
     };
   }, [keyword, searchKey]);
 
   const fetchUserList = useCallback(async () => {
     try {
       const result = await getUserList(getSearchParams());
-      setList(result);
+      setList(result.data);
     } catch {
       showToast({
         message: "유저 목록을 불러오는데 실패했습니다.",

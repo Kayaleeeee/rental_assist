@@ -1,20 +1,20 @@
 import { Margin } from "@/app/components/Margin";
 import { Modal } from "@/app/components/Modal";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 import { GroupEquipmentList } from "@/app/equipments/sets/modules/GroupEquipmentList";
 import { SetEquipmentType } from "@/app/types/equipmentType";
 import { useState } from "react";
 
-type Props = {
-  onCloseModal: () => void;
+export interface GroupEquipmentSearchModalProps extends ModalBasicProps {
   onConfirm: (list: SetEquipmentType[]) => void;
   disabledIdList: SetEquipmentType["id"][];
-};
+}
 
 export const GroupEquipmentSearchModal = ({
   onCloseModal,
   onConfirm,
   disabledIdList,
-}: Props) => {
+}: GroupEquipmentSearchModalProps) => {
   const [selectedGroupList, setSelectedGroupList] = useState<
     SetEquipmentType[]
   >([]);

@@ -9,6 +9,7 @@ import { showToast } from "@/app/utils/toastUtils";
 import { useState } from "react";
 import { formatPhoneNumber } from "@/app/utils/textUtils";
 import { UserStatusBadge } from "./UserStatusBadge";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 
 const HeaderName = (name: string) => {
   return (
@@ -62,12 +63,15 @@ const columns: GridColDef<UserType>[] = [
   },
 ];
 
-type Props = {
+export interface UserSearchModalProps extends ModalBasicProps {
   onCloseModal: () => void;
   onConfirm: (user: UserType) => void;
-};
+}
 
-export const UserSearchModal = ({ onCloseModal, onConfirm }: Props) => {
+export const UserSearchModal = ({
+  onCloseModal,
+  onConfirm,
+}: UserSearchModalProps) => {
   const [selectedUserState, setSelectedUserState] = useState<UserType | null>(
     null
   );

@@ -1,0 +1,28 @@
+.item {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  padding: 8px 16px;
+
+  &:hover {
+    font-weight: 800;
+  }
+}
+
+.iconButton {
+  color: var(--grey);
+}
+
+.moreIconWrapper {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.menuListWrapper {
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+}

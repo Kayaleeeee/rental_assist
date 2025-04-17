@@ -69,7 +69,6 @@ export default function SetEquipmentPage() {
   return (
     <div className={styles.relativeWrapper}>
       <div className={styles.headerTitleButtonWrapper}>
-        <h3></h3>
         <div className={formStyles.rightAlignButtonWrapper}>
           <Button
             style={{ width: "150px" }}

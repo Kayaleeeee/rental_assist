@@ -2,15 +2,15 @@ import { HeaderName } from "@/app/components/DataTable/HeaderName";
 import { GridTable } from "@/app/components/Table/GridTable";
 import { EquipmentListItemState } from "@/app/store/useCartStore";
 import { GridColDef } from "@mui/x-data-grid";
-import { isEmpty, isNil } from "lodash";
-import { useMemo, useState } from "react";
+import { isEmpty } from "lodash";
+import { useMemo } from "react";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import {
   CART_ITEM_MENU,
-  QuantityChangingModal,
   QuoteEquipmentMoreMenu,
-} from "@/app/reservations/modules/form/QuoteEquipmentMenu";
+} from "@/app/reservations/modules/form/QuoteEquipmentMenu/QuoteEquipmentMenu";
 import { UnavailableEquipmentList } from "@/app/reservations/modules/form/UnavailableEquipmentList";
+import { useModal } from "../Modal/useModal";
 
 type Props = {
   rows: EquipmentListItemState[];
@@ -27,13 +27,21 @@ export const CartItemTableEditor = ({
   onChangeField,
   availabilityCheckedList,
 }: Props) => {
-  const [modalProps, setModalProps] = useState<
-    | {
-        mode: "price" | "quantity";
-        selectedRow: EquipmentListItemState;
-      }
-    | undefined
-  >(undefined);
+  const { openModal } = useModal();
+
+  const openQuantityChangeModal = (row: EquipmentListItemState) => {
+    openModal({
+      name: "equipmentQuantityChange",
+      props: {
+        currentQuantity: row.quantity,
+        onConfirm: (quantity) =>
+          onChangeField({
+            ...row,
+            quantity,
+          }),
+      },
+    });
+  };
 
   const columns = useMemo((): GridColDef<EquipmentListItemState>[] => {
     return [
@@ -79,10 +87,9 @@ export const CartItemTableEditor = ({
                   return;
                 }
 
-                setModalProps({
-                  mode: menu.key as "quantity",
-                  selectedRow: row,
-                });
+                if (menu.key === "quantity") {
+                  openQuantityChangeModal(row);
+                }
               }}
             />
           </div>
@@ -131,19 +138,6 @@ export const CartItemTableEditor = ({
       />
       {!isEmpty(unavailableList) && (
         <UnavailableEquipmentList unavailableList={unavailableList} />
-      )}
-
-      {!isNil(modalProps) && modalProps.mode === "quantity" && (
-        <QuantityChangingModal
-          currentQuantity={modalProps.selectedRow.quantity}
-          onConfirm={(quantity) =>
-            onChangeField({
-              ...modalProps.selectedRow,
-              quantity,
-            })
-          }
-          onClose={() => setModalProps(undefined)}
-        />
       )}
     </>
   );

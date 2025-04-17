@@ -1,4 +1,5 @@
 import { Margin } from "@/app/components/Margin";
+import { ModalBasicProps } from "@/app/components/Modal/useModal";
 import { ReservationStatus } from "@/app/types/reservationType";
 import { Modal } from "@components/Modal";
 import { MenuItem, Select } from "@mui/material";
@@ -10,17 +11,16 @@ const statusMenu = [
   { key: ReservationStatus.canceled, title: "예약 취소" },
 ];
 
-type Props = {
+export interface ReservationStatusChangeModalProps extends ModalBasicProps {
   currentStatus: ReservationStatus;
-  onCloseModal: () => void;
   onChangeStatus: (status: ReservationStatus) => void;
-};
+}
 
 export const ReservationStatusChangeModal = ({
   onCloseModal,
   currentStatus,
   onChangeStatus,
-}: Props) => {
+}: ReservationStatusChangeModalProps) => {
   const [selectedStatus, setSelectedStatus] =
     useState<ReservationStatus>(currentStatus);
 
@@ -44,7 +44,10 @@ export const ReservationStatusChangeModal = ({
         },
         {
           title: "변경하기",
-          onClick: onConfirmChange,
+          onClick: async () => {
+            await onConfirmChange();
+            onCloseModal();
+          },
         },
       ]}
     >

@@ -1,11 +1,12 @@
 import { AdminUserType } from "@/app/types/userType";
-import { createClient } from "@/app/utils/supabase/client";
+import { clientSupabase } from "@/app/utils/supabase/client";
 import { create } from "zustand";
 
 interface AuthState {
   user: AdminUserType | undefined;
   error: any;
   loading: boolean;
+  isAuthenticated: boolean;
   fetchUser: () => Promise<void>;
   getUser: () => Promise<AdminUserType | undefined>;
   logout: () => void;
@@ -15,6 +16,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: undefined,
   error: null,
   loading: true,
+  isAuthenticated: false,
   getUser: async () => {
     const currentUser = get().user;
     if (currentUser) return currentUser;
@@ -23,13 +25,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return get().user;
   },
   fetchUser: async () => {
-    const supabase = createClient();
-
     set({ loading: true });
 
     try {
       const { data: sessionData, error: sessionError } =
-        await supabase.auth.getSession();
+        await clientSupabase.auth.getSession();
 
       if (sessionError || !sessionData.session) {
         set({
@@ -41,24 +41,32 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       const { data: userData, error: userError } =
-        await supabase.auth.getUser();
+        await clientSupabase.auth.getUser();
 
       if (userError) {
-        set({ error: userError, user: undefined, loading: false });
+        set({
+          error: userError,
+          user: undefined,
+          loading: false,
+          isAuthenticated: false,
+        });
       } else {
-        set({ user: userData.user || undefined, error: null, loading: false });
+        set({
+          user: userData.user || undefined,
+          error: null,
+          loading: false,
+          isAuthenticated: true,
+        });
       }
     } catch (err) {
       console.error("Error fetching user:", err);
       set({ error: err, user: undefined, loading: false });
     } finally {
-      set({ loading: false });
+      set((prev) => ({ ...prev, loading: false }));
     }
   },
   logout: async () => {
-    const supabase = createClient();
-
-    await supabase.auth.signOut();
-    set({ user: undefined });
+    await clientSupabase.auth.signOut();
+    set((prev) => ({ ...prev, user: undefined, isAuthenticated: false }));
   },
 }));

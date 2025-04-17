@@ -15,7 +15,6 @@ import { Margin } from "@/app/components/Margin";
 import {
   PriceItemStateType,
   PriceListTable,
-  PriceSettingModal,
 } from "../../modules/PriceSettingModal/PriceSettingModal";
 import { useEquipmentPriceList } from "../hooks/useEquipmentPriceList";
 import { EquipmentPriceItem } from "@/app/types/equipmentPriceType";
@@ -24,14 +23,13 @@ import { showToast } from "@/app/utils/toastUtils";
 import { ListButton } from "@/app/components/Button/ListButton";
 import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
 import { EQUIPMENT_AVAILABILITY_MENU_LIST } from "../../utils/equipmentUtils";
+import { useModal } from "@/app/components/Modal/useModal";
 
 const EditEquipmentPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const [priceList, setPriceList] = useState<EquipmentPriceItem[]>([]);
-
   const originalPriceList = useRef<EquipmentPriceItem[]>([]);
-  const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
   const equipmentId = Number(id);
 
   const {
@@ -51,6 +49,7 @@ const EditEquipmentPage = () => {
     setDisabled,
   } = useEquipmentForm();
   const { fetchPriceList } = useEquipmentPriceList();
+  const { openModal } = useModal();
 
   const { detail: equipmentDetail, isLoading } =
     useEquipmentDetail(equipmentId);
@@ -80,11 +79,22 @@ const EditEquipmentPage = () => {
     handleFetchPriceList(equipmentId);
   }, [equipmentId, handleFetchPriceList]);
 
+  const openPriceSettingModal = () => {
+    openModal({
+      name: "priceSetting",
+      props: {
+        mode: "item",
+        id: equipmentId,
+        priceList,
+        onConfirm: handleUpdatePriceList,
+      },
+    });
+  };
+
   const handleUpdatePriceList = useCallback(
     async (list: PriceItemStateType[]) => {
       try {
         await updatePriceList(equipmentId, list, originalPriceList.current);
-        setIsOpenPriceSettingModal(false);
         showToast({
           message: "가격이 수정되었습니다.",
           type: "success",
@@ -188,7 +198,7 @@ const EditEquipmentPage = () => {
             <Button
               variant="outlined"
               size="Small"
-              onClick={() => setIsOpenPriceSettingModal(true)}
+              onClick={openPriceSettingModal}
             >
               가격 수정하기
             </Button>
@@ -237,15 +247,6 @@ const EditEquipmentPage = () => {
           </Button>
         </div>
       </FormWrapper>
-      {isOpenPriceSettingModal && (
-        <PriceSettingModal
-          priceList={priceList}
-          onClose={() => setIsOpenPriceSettingModal(false)}
-          onConfirm={handleUpdatePriceList}
-          mode={"item"}
-          id={equipmentId}
-        />
-      )}
     </>
   );
 };

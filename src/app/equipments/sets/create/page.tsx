@@ -10,12 +10,11 @@ import { EditableField } from "@/app/components/EditableField";
 import { useSetEquipmentForm } from "./hooks/useSetEquipmentForm";
 import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchModal";
 import { useCallback, useMemo, useState } from "react";
-import { isEmpty, isNil } from "lodash";
+import { isEmpty } from "lodash";
 import { Margin } from "@/app/components/Margin";
 import {
   PriceItemStateType,
   PriceListTable,
-  PriceSettingModal,
 } from "../../modules/PriceSettingModal/PriceSettingModal";
 import {
   EquipmentListItemType,
@@ -26,19 +25,13 @@ import { showToast } from "@/app/utils/toastUtils";
 import { useRouter } from "next/navigation";
 
 import { GridTable } from "@/app/components/Table/GridTable";
-import { QuantityChangingModal } from "@/app/reservations/modules/form/QuoteEquipmentMenu";
 import { getGroupEquipmentListColumns } from "../modules/getGroupEquipmentListColumns";
+import { useModal } from "@/app/components/Modal/useModal";
 
 const EquipmentCreatePage = () => {
   const router = useRouter();
   const [isOpenSearchModal, setIsOpenSearchModal] = useState(false);
-  const [isOpenPriceSettingModal, setIsOpenPriceSettingModal] = useState(false);
   const [priceList, setPriceList] = useState<PriceItemStateType[]>([]);
-  const [isOpenQuantityChangeModal, setIsOpenQuantityChangeModal] =
-    useState(false);
-  const [selectedRow, setSelectedRow] = useState<
-    EquipmentListItemType | undefined
-  >(undefined);
 
   const {
     title,
@@ -51,13 +44,7 @@ const EquipmentCreatePage = () => {
     setEquipmentList,
   } = useSetEquipmentForm();
 
-  const handleUpdatePriceList = useCallback(
-    async (list: PriceItemStateType[]) => {
-      setPriceList(list);
-      setIsOpenPriceSettingModal(false);
-    },
-    []
-  );
+  const { openModal } = useModal();
 
   const handleCreateEquipment = useCallback(async () => {
     try {
@@ -76,18 +63,43 @@ const EquipmentCreatePage = () => {
     }
   }, [title, memo, detail, router, equipmentList]);
 
+  const openQuantityChangeModal = (row: EquipmentListItemType) => {
+    openModal({
+      name: "equipmentQuantityChange",
+      props: {
+        currentQuantity: row.quantity,
+        onConfirm: (quantity) =>
+          setEquipmentList((prev) =>
+            prev.map((item) =>
+              item.id === row.id ? { ...item, quantity } : item
+            )
+          ),
+      },
+    });
+  };
+
+  const openPriceSettingModal = () => {
+    openModal({
+      name: "priceSetting",
+      props: {
+        priceList,
+        mode: "group",
+        onConfirm: setPriceList,
+      },
+    });
+  };
+
   const columns = useMemo(
     () =>
       getGroupEquipmentListColumns({
         onDeleteItem: (id) =>
           setEquipmentList(equipmentList.filter((item) => item.id !== id)),
-        onSelectQuantityChange: (row: EquipmentListItemType) => {
-          setSelectedRow(row);
-          setIsOpenQuantityChangeModal(true);
-        },
+        onSelectQuantityChange: (row: EquipmentListItemType) =>
+          openQuantityChangeModal(row),
       }),
     [equipmentList]
   );
+
   return (
     <div>
       <FormWrapper title="풀세트 등록">
@@ -115,7 +127,7 @@ const EquipmentCreatePage = () => {
             <Button
               variant="outlined"
               size="Small"
-              onClick={() => setIsOpenPriceSettingModal(true)}
+              onClick={openPriceSettingModal}
             >
               {isEmpty(priceList) ? "가격 등록하기" : "가격 수정하기"}
             </Button>
@@ -192,30 +204,6 @@ const EquipmentCreatePage = () => {
             setEquipmentList((prev) => [...prev, ...equipmentList])
           }
           disabledIdList={equipmentList.map((item) => item.id)}
-        />
-      )}
-      {isOpenPriceSettingModal && (
-        <PriceSettingModal
-          priceList={priceList}
-          onClose={() => setIsOpenPriceSettingModal(false)}
-          onConfirm={handleUpdatePriceList}
-          mode={"group"}
-        />
-      )}
-      {isOpenQuantityChangeModal && !isNil(selectedRow) && (
-        <QuantityChangingModal
-          currentQuantity={selectedRow.quantity}
-          onConfirm={(quantity) => {
-            setEquipmentList((prev) =>
-              prev.map((item) =>
-                item.id === selectedRow.id ? { ...item, quantity } : item
-              )
-            );
-          }}
-          onClose={() => {
-            setSelectedRow(undefined);
-            setIsOpenQuantityChangeModal(false);
-          }}
         />
       )}
     </div>

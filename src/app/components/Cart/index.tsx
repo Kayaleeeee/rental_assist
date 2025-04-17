@@ -14,14 +14,12 @@ import { EquipmentSearchModal } from "@/app/equipments/modules/EquipmentSearchMo
 import { SetEquipmentType } from "@/app/types/equipmentType";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
-import {
-  checkEquipmentAvailability,
-  initialAvailability,
-} from "@/app/reservations/utils/reservationUtils";
+import { initialAvailability } from "@/app/reservations/utils/reservationUtils";
 import { CartGroupTableEditor } from "./CartGroupTableEditor";
 import { CartItemTableEditor } from "./CartItemTableEditor";
 import { showToast } from "@/app/utils/toastUtils";
 import CloseIcon from "@mui/icons-material/Close";
+import { checkEquipmentAvailability } from "@/app/equipments/actions/checkEquipmentAvailability";
 
 export const getAvailableStatus = (
   isChecked: boolean,

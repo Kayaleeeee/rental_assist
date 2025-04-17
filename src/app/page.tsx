@@ -61,8 +61,8 @@ export default function Home() {
 
     const params = getSearchParams({
       status: ReservationStatus.confirmed,
-      startDate: `lte.${endDate}`,
-      endDate: `gte.${startDate}`,
+      startDate,
+      endDate,
     });
 
     fetchReservationList(params);

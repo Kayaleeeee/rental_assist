@@ -3,8 +3,12 @@ import styles from "./index.module.scss";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { Margin } from "../Margin";
 import { useMemo } from "react";
+import { useAuthStore } from "@/app/store/useAuthStore";
+import { useRouter } from "next/navigation";
 
 export const CartMenu = () => {
+  const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
   const { equipmentItemList, setIsCartOpen, equipmentGroupList } =
     useCartStore();
 
@@ -12,8 +16,17 @@ export const CartMenu = () => {
     return equipmentItemList.length + equipmentGroupList.length;
   }, [equipmentItemList, equipmentGroupList]);
 
+  const onClickCartIcon = () => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+
+    setIsCartOpen(true);
+  };
+
   return (
-    <div className={styles.item} onClick={() => setIsCartOpen(true)}>
+    <div className={styles.item} onClick={onClickCartIcon}>
       <div className={styles.icon}>
         <AddShoppingCartIcon />
       </div>

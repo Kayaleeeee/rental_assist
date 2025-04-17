@@ -4,9 +4,11 @@ import {
 } from "@/app/constants";
 import { createBrowserClient } from "@supabase/ssr";
 
-export function createClient() {
+function createClient() {
   return createBrowserClient(
     NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
 }
+
+export const clientSupabase = createClient();

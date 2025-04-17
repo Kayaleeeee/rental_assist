@@ -5,7 +5,6 @@ import {
 } from "@/app/store/useCartStore";
 
 import {
-  checkUpdateEquipmentAvailability,
   getEquipmentGroupTotalPrice,
   getEquipmentTotalPrice,
   getValidReservationForm,
@@ -22,6 +21,7 @@ import { isEmpty, isEqual } from "lodash";
 import { QuoteItemPostPayload, QuoteType } from "@/app/types/quoteType";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { ReservationFormState } from "../hooks/useReservationForms";
+import { checkUpdateEquipmentAvailability } from "@/app/equipments/actions/checkEquipmentAvailability";
 
 const convertSetEquipmentListToQuoteItemPayload = (
   quoteId: QuoteType["id"],

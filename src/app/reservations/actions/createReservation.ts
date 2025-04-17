@@ -1,7 +1,6 @@
 import { createQuote, updateQuote } from "@/app/api/quote";
 import { QuoteItemPostPayload } from "@/app/types/quoteType";
 import {
-  checkEquipmentAvailability,
   getEquipmentGroupTotalPrice,
   getEquipmentTotalPrice,
   getValidReservationForm,
@@ -16,6 +15,7 @@ import { postReservation } from "@/app/api/reservation";
 import { isEmpty } from "lodash";
 import { EquipmentAvailableItem } from "@/app/types/reservationType";
 import { ReservationFormState } from "../hooks/useReservationForms";
+import { checkEquipmentAvailability } from "@/app/equipments/actions/checkEquipmentAvailability";
 
 export const onCreateReservation = async ({
   form,

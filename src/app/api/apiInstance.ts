@@ -1,10 +1,11 @@
 import axios from "axios";
-import { createClient } from "../utils/supabase/client";
+
 import { camelCase, isArray, isObject, snakeCase } from "lodash";
 import {
   NEXT_PUBLIC_SUPABASE_ANON_KEY,
   NEXT_PUBLIC_SUPABASE_URL,
 } from "../constants";
+import { clientSupabase } from "../utils/supabase/client";
 
 const apiUrl = NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -22,7 +23,7 @@ export const toCamelCase = (obj: any): any => {
 };
 
 // Convert keys of an object to snakeCase
-const toSnakeCase = (obj: any): any => {
+export const toSnakeCase = (obj: any): any => {
   if (isArray(obj)) {
     return obj.map(toSnakeCase);
   } else if (isObject(obj)) {
@@ -73,8 +74,7 @@ export const apiInstance = axios.create({
 });
 
 apiInstance.interceptors.request.use(async (config) => {
-  const supabase = await createClient();
-  const { data: session } = await supabase.auth.getSession();
+  const { data: session } = await clientSupabase.auth.getSession();
   const token = session?.session?.access_token;
 
   if (token) {
@@ -103,8 +103,7 @@ apiInstance.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       // 토큰 갱신 로직
-      const supabase = await createClient();
-      const { data: session } = await supabase.auth.refreshSession();
+      const { data: session } = await clientSupabase.auth.refreshSession();
       const token = session?.session?.access_token;
 
       if (token) {

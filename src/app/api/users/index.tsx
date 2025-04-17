@@ -5,6 +5,8 @@ import {
 } from "@/app/types/userType";
 import { apiGet, apiPatch, apiPost } from "..";
 import { isEmpty } from "lodash";
+import { fetchListHandler } from "../shared/utils/fecthListHandler";
+import { parseReservationListParams } from "./utils";
 
 const apiUrl = "/users";
 
@@ -13,7 +15,11 @@ export const registerUser = (payload: UserPostPayload) => {
 };
 
 export const getUserList = (params?: UserListParams) => {
-  return apiGet<UserType[]>(apiUrl, params);
+  return fetchListHandler<UserType>(
+    "users",
+    params,
+    parseReservationListParams
+  );
 };
 
 export const getUserDetail = async (id: UserType["id"]) => {

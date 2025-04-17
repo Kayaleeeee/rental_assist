@@ -71,3 +71,10 @@ export const getIsBetween = (
 
   return isSameAndBefore && isSameAndAfter;
 };
+
+export const isAfter = (baseDate: string, targetDate: string) => {
+  const base = dayjs(baseDate);
+  const target = dayjs(targetDate);
+
+  return target.isBefore(base);
+};
