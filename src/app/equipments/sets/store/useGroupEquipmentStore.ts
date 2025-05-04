@@ -7,6 +7,9 @@ import { create } from "zustand";
 
 type GroupEquipmentStoreState = {
   selectedGroupEquipmentMap: Map<SetEquipmentType["id"], SetEquipmentType>;
+  setSelectedGroupEquipmentMap: (
+    selectedGroupEquipmentMap: Map<SetEquipmentType["id"], SetEquipmentType>
+  ) => void;
   toggleGroupEquipment: (groupEquipment: SetEquipmentType) => void;
   toggleEquipmentItemOfGroup: (
     groupEquipment: SetEquipmentType,
@@ -17,6 +20,9 @@ type GroupEquipmentStoreState = {
 export const useGroupEquipmentStore = create<GroupEquipmentStoreState>(
   (set) => ({
     selectedGroupEquipmentMap: new Map([]),
+    setSelectedGroupEquipmentMap: (selectedGroupEquipmentMap) => {
+      set({ selectedGroupEquipmentMap });
+    },
     toggleGroupEquipment: (groupEquipment) => {
       set((state) => {
         const newMap = new Map(state.selectedGroupEquipmentMap);

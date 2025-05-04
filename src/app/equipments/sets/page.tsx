@@ -2,33 +2,34 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@components/Button";
-
 import { Margin } from "@components/Margin";
-import { useCallback, useState } from "react";
-import { isEmpty } from "lodash";
+import { useCallback } from "react";
 import styles from "./page.module.scss";
 import formStyles from "@components/Form/index.module.scss";
-import { SetEquipmentType } from "@/app/types/equipmentType";
 import { useEquipmentCart } from "../hooks/useEquipmentCart";
 import { convertGroupEquipmentToState } from "@/app/types/mapper/convertGroupEquipmentToState";
 import { showToast } from "@/app/utils/toastUtils";
 import { GroupEquipmentList } from "./modules/GroupEquipmentList";
 import { convertEquipmentItemToState } from "@/app/types/mapper/convertEquipmentItemToState";
+import { useGroupEquipmentStore } from "./store/useGroupEquipmentStore";
 
 export default function SetEquipmentPage() {
   const router = useRouter();
-  const [selectedEquipmentSetList, setSelectedEquipmentSetList] = useState<
-    SetEquipmentType[]
-  >([]);
+  const setSelectedGroupEquipmentMap = useGroupEquipmentStore(
+    (state) => state.setSelectedGroupEquipmentMap
+  );
+  const selectedGroupEquipmentMap = useGroupEquipmentStore(
+    (state) => state.selectedGroupEquipmentMap
+  );
 
   const { equipmentGroupList, handleSetEquipmentGroup } = useEquipmentCart();
 
   const handleAddToCart = useCallback(async () => {
-    if (isEmpty(selectedEquipmentSetList)) return;
+    if (selectedGroupEquipmentMap.size === 0) return;
 
     const combinedGroupList = [...equipmentGroupList];
 
-    selectedEquipmentSetList.forEach((selectedGroup) => {
+    selectedGroupEquipmentMap.forEach((selectedGroup) => {
       const existedIndex = combinedGroupList.findIndex(
         (group) => group.setId === selectedGroup.id
       );
@@ -58,10 +59,10 @@ export default function SetEquipmentPage() {
       type: "info",
     });
 
-    setSelectedEquipmentSetList([]);
+    setSelectedGroupEquipmentMap(new Map([]));
   }, [
     handleSetEquipmentGroup,
-    selectedEquipmentSetList,
+    selectedGroupEquipmentMap,
     equipmentGroupList,
     equipmentGroupList,
   ]);
@@ -82,14 +83,11 @@ export default function SetEquipmentPage() {
 
       <Margin top={40} />
 
-      <GroupEquipmentList
-        selectedEquipmentSetList={selectedEquipmentSetList}
-        setSelectedEquipmentSetList={setSelectedEquipmentSetList}
-      />
+      <GroupEquipmentList />
 
       <Margin top={120} />
 
-      {!isEmpty(selectedEquipmentSetList) && (
+      {selectedGroupEquipmentMap.size !== 0 && (
         <div className={styles.fixedFooter}>
           <Button
             size="Medium"
