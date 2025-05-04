@@ -11,35 +11,47 @@ import Link from "next/link";
 import { CustomCheckbox } from "@/app/components/Checkbox/Checkbox";
 import { GroupEquipmentListTable } from "./GroupEquipmentListTable";
 import { EquipmentStatusBadge } from "../../modules/EquipmentStatusBadge";
+import { useCallback, useMemo } from "react";
+import { useGroupEquipmentStore } from "../store/useGroupEquipmentStore";
+import { isEqual } from "lodash";
 
 type Props = {
-  title: string;
-  price: number;
+  groupEquipment: SetEquipmentType;
   disabledGroup?: boolean;
   disabledEquipmentIdList?: number[];
-  setId: SetEquipmentType["id"];
-  equipmentList: EquipmentListItemType[];
-  selectedEquipmentList: EquipmentListItemType[];
-  isAllSelected: boolean;
-  toggleSelectAll: () => void;
-  toggleEquipmentItem: (item: EquipmentListItemType) => void;
   hideDetailButton?: boolean;
-  isDisabled?: boolean;
 };
 
 export const GroupEquipmentAccordion = ({
-  title,
+  groupEquipment,
   hideDetailButton = false,
-  equipmentList = [],
-  isAllSelected = false,
-  selectedEquipmentList,
-  toggleSelectAll,
-  toggleEquipmentItem,
-  setId,
   disabledGroup = false,
   disabledEquipmentIdList = [],
-  isDisabled = false,
 }: Props) => {
+  const toggleGroupEquipment = useGroupEquipmentStore(
+    (state) => state.toggleGroupEquipment
+  );
+  const toggleEquipmentItemOfGroup = useGroupEquipmentStore(
+    (state) => state.toggleEquipmentItemOfGroup
+  );
+
+  const storedGroupEquipment = useGroupEquipmentStore((state) =>
+    state.selectedGroupEquipmentMap.get(groupEquipment.id)
+  );
+
+  const isAllSelected = useMemo(() => {
+    return (
+      !!storedGroupEquipment &&
+      isEqual(storedGroupEquipment?.equipmentList, groupEquipment.equipmentList)
+    );
+  }, [storedGroupEquipment, groupEquipment.id]);
+
+  const toggleEquipmentItem = useCallback(
+    (equipment: EquipmentListItemType) =>
+      toggleEquipmentItemOfGroup(groupEquipment, equipment),
+    [toggleEquipmentItemOfGroup, groupEquipment]
+  );
+
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ArrowDropDownIcon />}>
@@ -50,7 +62,7 @@ export const GroupEquipmentAccordion = ({
           }}
         >
           <CustomCheckbox
-            onChange={toggleSelectAll}
+            onChange={() => toggleGroupEquipment(groupEquipment)}
             disabled={disabledGroup}
             checked={isAllSelected}
           />
@@ -59,25 +71,27 @@ export const GroupEquipmentAccordion = ({
               flex: 1,
             }}
           >
-            {title}
+            {groupEquipment.title}
           </div>
           <Margin left={8} right={10}>
-            <EquipmentStatusBadge isDisabled={isDisabled} />
+            <EquipmentStatusBadge
+              isDisabled={groupEquipment.disabled || false}
+            />
           </Margin>
         </div>
       </AccordionSummary>
       <AccordionDetails>
         <GroupEquipmentListTable
           isAllSelected={isAllSelected}
-          equipmentList={equipmentList}
+          equipmentList={groupEquipment.equipmentList}
           disabledEquipmentIdList={disabledEquipmentIdList}
-          selectedEquipmentList={selectedEquipmentList}
+          selectedEquipmentList={storedGroupEquipment?.equipmentList || []}
           toggleEquipmentItem={toggleEquipmentItem}
         />
         <Margin top={16} />
         <div className={styles.accordionFooter}>
           {!hideDetailButton && (
-            <Link href={`/equipments/sets/${setId}`}>
+            <Link href={`/equipments/sets/${groupEquipment.id}`}>
               <Button variant="outlined" size="Small">
                 상세보기
               </Button>
