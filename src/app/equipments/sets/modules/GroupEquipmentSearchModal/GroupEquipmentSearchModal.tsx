@@ -15,9 +15,7 @@ export const GroupEquipmentSearchModal = ({
   onConfirm,
   disabledIdList,
 }: GroupEquipmentSearchModalProps) => {
-  const [selectedGroupList, setSelectedGroupList] = useState<
-    SetEquipmentType[]
-  >([]);
+  const [selectedGroupList] = useState<SetEquipmentType[]>([]);
 
   return (
     <Modal
@@ -48,11 +46,7 @@ export const GroupEquipmentSearchModal = ({
           overflow: "scroll",
         }}
       >
-        <GroupEquipmentList
-          selectedEquipmentSetList={selectedGroupList}
-          setSelectedEquipmentSetList={setSelectedGroupList}
-          disabledSetIdList={disabledIdList}
-        />
+        <GroupEquipmentList disabledSetIdList={disabledIdList} />
         <Margin bottom={50} />
       </div>
     </Modal>
