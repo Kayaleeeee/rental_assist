@@ -10,6 +10,7 @@ import { useCallback, useEffect } from "react";
 import { useGroupEquipmentList } from "../hooks/useGroupEquipmentList";
 import { GroupEquipmentAccordion } from "./GroupEquipmentAccordion";
 import { isEmpty } from "lodash";
+import { Loader } from "@/app/components/Loader";
 
 type Props = {
   disabledSetIdList?: SetEquipmentType["id"][];
@@ -22,6 +23,7 @@ export const GroupEquipmentList = ({
 }: Props) => {
   const {
     list = [],
+    isLoading,
     searchMenu,
     onChangeKeyword,
     onChangeSearchKey,
@@ -51,6 +53,8 @@ export const GroupEquipmentList = ({
     fetchList();
   }, []);
 
+  console.log(isLoading);
+
   return (
     <>
       <Margin
@@ -70,9 +74,17 @@ export const GroupEquipmentList = ({
         />
       </Margin>
 
-      {isEmpty(list) ? (
+      {isLoading && (
+        <div className={styles.emptyListWrapper}>
+          <Loader mode="dark" />
+        </div>
+      )}
+
+      {!isLoading && isEmpty(list) && (
         <div className={styles.emptyListWrapper}>등록된 세트가 없습니다.</div>
-      ) : (
+      )}
+
+      {!isLoading && !isEmpty(list) && (
         <div className={styles.equipmentListWrapper}>
           {list.map((item) => {
             return (

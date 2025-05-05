@@ -12,6 +12,7 @@ export const useGroupEquipmentList = () => {
   const [selectedSearchKey, setSelectedSearchKey] = useState<string>(
     searchMenu[0].key
   );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [keyword, setKeyword] = useState<string>("");
   const [list, setList] = useState<SetEquipmentType[]>([]);
   const [totalElements, setTotalElements] = useState<number>(0);
@@ -22,6 +23,7 @@ export const useGroupEquipmentList = () => {
 
   const fetchList = useCallback(async (params?: EquipmentListParams) => {
     try {
+      setIsLoading(true);
       const result = await getSetEquipmentList(params);
 
       setList(result.data || []);
@@ -32,6 +34,8 @@ export const useGroupEquipmentList = () => {
         offset: 0,
         limit: DEFAULT_LIMIT,
       });
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -69,6 +73,7 @@ export const useGroupEquipmentList = () => {
 
   return {
     list,
+    isLoading,
     selectedSearchKey,
     keyword,
     searchMenu,
