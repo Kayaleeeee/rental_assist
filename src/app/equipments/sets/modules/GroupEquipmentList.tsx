@@ -53,8 +53,6 @@ export const GroupEquipmentList = ({
     fetchList();
   }, []);
 
-  console.log(isLoading);
-
   return (
     <>
       <Margin
