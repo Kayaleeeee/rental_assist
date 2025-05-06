@@ -78,3 +78,9 @@ export const isAfter = (baseDate: string, targetDate: string) => {
 
   return target.isBefore(base);
 };
+
+export const addDays = (date: string, days: number, format?: string) => {
+  return dayjs(date)
+    .add(days, "day")
+    .format(format || "YYYY-MM-DD");
+};
